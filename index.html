@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+
+    <body>
+        <div id="id01" style="color:grey"></div>
+
+        <script>
+            var xmlhttp = new XMLHttpRequest();
+            var url = "http://master.radio-t.com:8888/api/v1/news";
+
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var myArr = JSON.parse(xmlhttp.responseText);
+                    myFunction(myArr);
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+
+            function myFunction(arr) {
+                var out = "";
+                var i;
+                for(i = 0; i < arr.length; i++) {
+                    out += '<a href="' + arr[i].link + '">' + arr[i].title + '</a>' + ' - ' + arr[i].ts +
+                        ' pos:' + arr[i].position + ' id:' + arr[i].id + '<br>' +
+                        '<i>' + arr[i].snippet +'</i><br><br>'
+                }
+                document.getElementById("id01").innerHTML = out;
+            }
+        </script>
+
+    </body>
+
+</html>
