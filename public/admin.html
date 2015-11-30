@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Админ-панель — Новости для Радио-Т</title>
+	<link rel="stylesheet" href="css/main.css">
+
+	<script>
+		var login = localStorage.getItem('login'),
+			pass = localStorage.getItem('password');
+
+		if (! (login && pass)) {
+			location.href = 'login.html?back=' + location.href;
+		}
+	</script>
+
+	<script src="//yastatic.net/jquery/2.1.4/jquery.min.js"></script>
+	
+	<script src="js/main.js"></script>
+</head>
+<body class="page">
+	<div class="header wrapper page__header">
+		<div class="header__title">Новости для Радио-Т</div>
+		<ul class="header__menu menu">
+			<li class="menu__item" id="all-wrap">Все темы</li>
+			<li class="menu__item" id="geek-wrap"><a href="#geek" class="link" id="geek">Гиковские</a></li>
+			<li class="menu__item" id="dels-wrap"><a href="deleted.html" class="link">Удалённые</a></li>
+			<li class="menu__item"><a href="add.html" class="link">Добавить новость</a></li>
+			<li class="menu__item"><a href="feeds.html" class="link">Управление фидами</a></li>
+			<li class="menu__item"><a href="#update" id="update-feeds" class="link">Обновить базу</a></li>
+			<li class="menu__item menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
+		</ul>
+	</div>
+
+	<div class="wrapper">
+		<div class="news news_admin">
+			<div class="news__status" id="news__top-status"></div>
+			<ul class="news__list sortable" id="news__list">
+				
+			</ul>
+			<li class="news__item" id="news__skeleton">
+				<div class="news__manage">
+					<div class="news__mobile-buttons">
+						<a href="#" class="news__button news__button_up"></a>
+						<a href="#" class="news__button news__button_down"></a>
+					</div>
+					<a href="#" class="news__button news__button_current"></a>
+					<a href="#" class="news__button news__button_togeek"></a>
+					<a href="#" class="news__button news__button_first"></a>
+					<a href="#" class="news__button news__button_del"></a>
+					<a href="#" class="news__button news__button_restore"></a>
+				</div>
+				<div class="news__body">
+					<img class="news__image-hidden">
+					<div class="news__image"></div>
+					<a href="#" class="link news__title" target="_blank"></a>
+					<div class="news__info"></div>
+					<div class="news__desc"></div>
+				</div>
+				<div class="news__footer">
+					<a href="#" class="link news__light">Подробнее</a>
+					<div class="news__full"></div>
+				</div>
+			</li>
+		</div>
+	</div>
+
+	<div class="footer wrapper page__footer">
+	<a href="http://radio-t.com" class="link footer__copyright">Radio-T</a>, <script>document.write((new Date()).getFullYear());</script>
+</div>
+	<script>
+		var admin = true;
+	</script>
+</body>
+</html>

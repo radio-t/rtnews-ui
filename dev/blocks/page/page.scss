@@ -1,0 +1,21 @@
+.page {
+	padding: 0 10px;
+	
+	font-family: "PT Sans", Arial, sans-serif;
+	
+	&__header {
+		margin-bottom: 50px;
+		
+		@media (max-width: 500px) {
+			margin-bottom: 90px;
+		}
+	}
+
+	&__footer {
+		margin-top: 40px;
+		
+		@media (max-width: 500px) {
+			margin-top: 90px;
+		}
+	}
+}

@@ -1,0 +1,30 @@
+@@include('./includes/head_admin.html',{
+	"title": "Добавление — Новости для Радио-Т"
+})
+<body class="page">
+	<div class="header wrapper page__header">
+		<div class="header__title">Новости для Радио-Т</div>
+		<ul class="header__menu menu">
+			<li class="menu__item" id="all-wrap"><a href="admin.html" class="link">Все темы</a></li>
+			<li class="menu__item" id="geek-wrap"><a href="admin.html#geek" class="link" id="geek">Гиковские</a></li>
+			<li class="menu__item" id="dels-wrap"><a href="deleted.html" class="link">Удалённые</a></li>
+			<li class="menu__item">Добавить новость</li>
+			<li class="menu__item"><a href="feeds.html" class="link">Управление фидами</a></li>
+			<li class="menu__item"><a href="#update" id="update-feeds" class="link">Обновить базу</a></li>
+			<li class="menu__item menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
+		</ul>
+	</div>
+
+	<div class="wrapper">
+		<form class="add form" id="add-news">
+			<input type="text" class="form__input" placeholder="Ссылка на новость" autofocus required id="add__url">
+			<input type="submit" class="form__button" value="Добавить">
+		</form>
+	</div>
+
+	@@include('./blocks/footer/footer.html')
+	<script>
+		var admin = true;
+	</script>
+</body>
+</html>

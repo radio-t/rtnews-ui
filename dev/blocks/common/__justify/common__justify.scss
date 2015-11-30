@@ -1,0 +1,10 @@
+.common__justify {
+	text-align: justify;
+	-ms-text-justify: distribute; /* fucking ie fix */
+    
+    &::after {
+    	content: '';
+		display: inline-block;
+		width: 100%;
+    }
+}

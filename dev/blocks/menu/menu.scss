@@ -1,0 +1,29 @@
+@import '../common/__list-nostyle/common__list-nostyle';
+
+$b: '.menu';
+
+#{$b} {
+	@extend .common__list-nostyle;	
+	
+	&__item {
+		display: inline-block;
+		margin-right: 15px;
+		margin-top: 5px;
+		
+		&_to-current {
+			display: none;
+		}
+
+		&_right {
+			float: right; 
+			margin-right: 0;
+			margin-left: 15px;
+			
+			@media (max-width: 600px) {
+				float: none;
+				margin-right: 15px;
+				margin-left: 0;
+			}
+		}
+	}
+}

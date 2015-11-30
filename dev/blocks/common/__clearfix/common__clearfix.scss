@@ -1,0 +1,9 @@
+$b: '.common__clearfix';
+
+#{$b} {
+	&:after {
+		content: '';
+		display: table;
+		clear: both;
+	}
+}	

@@ -1,0 +1,55 @@
+/* common blocks */
+// @import 'row/row';
+@import 'wrapper/wrapper';
+@import 'link/link';
+@import 'sortable/sortable';
+@import 'notify/notify';
+
+/* main blocks */
+@import 'page/page';
+@import 'header/header';
+@import 'footer/footer';
+@import 'menu/menu';
+@import 'news/news';
+@import 'feeds/feeds';
+@import 'form/form';
+@import 'login/login';
+@import 'add/add';
+
+/* support blocks */
+// @import 'pattern/pattern';
+// @import 'sprite/sprite';
+@import 'mixins/mixins';
+
+/* fonts */
+@import '../fonts/pt-sans/pt-sans';
+@import '../fonts/pt-serif/pt-serif';
+
+/* fixes */
+
+html, body {
+	height: 100%;
+	margin: 0;
+    padding: 0;  
+}
+
+input, textarea {
+	&:focus {
+		&::placeholder {
+	    	color: transparent;
+		}
+	}
+}
+
+input, textarea {
+	font-family: inherit;
+}
+
+/* ie 9 fixes */
+img {
+	border: 0;
+} 
+
+textarea {
+	overflow: auto;
+}
