@@ -7,17 +7,16 @@ function notify(message, cb, timeout) {
 	});
 
 	$message.appendTo('body')
-			.slideDown('500');
+			.slideDown('500')
+			.click(function(event) {
+				$(this).slideUp(500, function() {
+					$message.remove();
+				});
 
-	$message.click(function(event) {
-		$(this).slideUp(500, function() {
-			$message.remove();
-		});
-
-		if (cb) {
-			cb();
-		}
-	});
+				if (cb) {
+					cb();
+				}
+			});
 
 	if (timeout) {
 		setTimeout(function() {

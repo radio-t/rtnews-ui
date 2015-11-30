@@ -1,14 +1,14 @@
-@@include('./includes/head_admin.html',{
+@@include('../../includes/head_admin.html',{
 	"title": "Управление фидами — Новости для Радио-Т"
 })
 <body class="page">
 	<div class="header wrapper page__header">
 		<div class="header__title">Новости для Радио-Т</div>
 		<ul class="header__menu menu">
-			<li class="menu__item" id="all-wrap"><a href="admin.html" class="link">Все темы</a></li>
-			<li class="menu__item" id="geek-wrap"><a href="admin.html#geek" class="link" id="geek">Гиковские</a></li>
-			<li class="menu__item" id="dels-wrap"><a href="deleted.html" class="link">Удалённые</a></li>
-			<li class="menu__item"><a href="add.html" class="link">Добавить новость</a></li>
+			<li class="menu__item" id="all-wrap"><a href="/admin/" class="link">Все темы</a></li>
+			<li class="menu__item" id="geek-wrap"><a href="/admin/#geek" class="link" id="geek">Гиковские</a></li>
+			<li class="menu__item" id="dels-wrap"><a href="/deleted/" class="link">Удалённые</a></li>
+			<li class="menu__item"><a href="/add/" class="link">Добавить новость</a></li>
 			<li class="menu__item">Управление фидами</li>
 			<li class="menu__item"><a href="#update" id="update-feeds" class="link">Обновить базу</a></li>
 			<li class="menu__item menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
@@ -41,9 +41,6 @@
 		</div>
 	</div>
 
-	@@include('./blocks/footer/footer.html')
-	<script>
-		var admin = true;
-	</script>
+	@@include('../../blocks/footer/footer.html')
 </body>
 </html>

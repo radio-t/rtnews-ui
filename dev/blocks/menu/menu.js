@@ -3,11 +3,9 @@ $(function() {
 		event.preventDefault();
 
 		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/reload',
+			url: APIPath + '/news/reload',
 			type: 'PUT',
-			headers: {
-			    "Authorization": "Basic " + btoa(login + ":" + pass)
-			}
+			headers: authHeaders
 		})
 		.done(function() {
 			location.reload();
@@ -22,14 +20,14 @@ $(function() {
 		event.preventDefault();
 
 		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/reload',
+			url: APIPath + '/news/reload',
 			type: 'PUT',
 			headers: {
 			    "Authorization": "Basic " + btoa('colloportus')
 			}
 		})
 		.fail(function(response) {
-			location.href = 'login.html';
+			location.href = '/login/';
 			localStorage.removeItem('login');
 			localStorage.removeItem('password');
 		});

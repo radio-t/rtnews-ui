@@ -15,8 +15,8 @@ var	gulp		= require('gulp'),
 	imagemin 	= require('gulp-imagemin'),
 	pngquant 	= require('imagemin-pngquant'),
 	del 		= require('del'),
+	addsrc 		= require('gulp-add-src'),
 
-	// compass  	= require('gulp-compass'),
 	sass 	 	= require('gulp-sass'),
 	autoprefixr	= require('autoprefixer-core'),
 	postcss 	= require('gulp-postcss'),
@@ -25,8 +25,8 @@ var	gulp		= require('gulp'),
 /* paths */
 
 var mask = {
-		html: 'dev/**/*.html',
-		scss: 'dev/**/*.scss',
+		html: ['dev/html/**/*', 'dev/includes/*.html', 'dev/blocks/**/*.html'],
+		scss: 'dev/blocks/**/*.scss',
 		css: 'dev/css/**/*.css',
 		js_f: 'dev/js/**/*', 
 		js_b: 'dev/blocks/**/*.js',
@@ -36,8 +36,9 @@ var mask = {
 		main: ['public/**', '!public']
 	},
 	input = {
+		html: 'dev/html/**/*.html',
 		css: 'dev/css',
-		scss: 'dev/blocks/main.scss'
+		scss: 'dev/blocks/main.scss',
 	},
 	output = {
 		main: 'public',
@@ -57,11 +58,10 @@ gulp.task('offline', ['build', 'serverOffline', 'watch']);
 gulp.task('build', ['html', 'scss', 'css', 'js', 'images', 'files', 'fonts']);
 
 gulp.task('html', function() {
-	gulp.src(mask.html)
+	gulp.src(input.html)
 		.pipe(fileinclude())
 		.on('error', util.log)
 		.pipe(cache('htmling'))
-		.pipe(filter(['*', '!dev/blocks', '!dev/includes']))
 		.pipe(gulp.dest(output.main))
 		.pipe(browserSync.stream());
 });
@@ -114,13 +114,10 @@ gulp.task('files', function() {
 
 gulp.task('js', function() {
 	gulp.src(mask.js_f)
-		.pipe(cache('jsfing'))
-		.pipe(ifelse(isProduction || isDeploy, uglify()))
-		.pipe(gulp.dest(output.js))
-		.pipe(browserSync.stream());
-
-	gulp.src(mask.js_b) 
 		.pipe(concat('main.js'))
+		.pipe(addsrc(mask.js_b))
+		.pipe(concat('main.js'))
+		.pipe(cache('jsing'))
 		.pipe(ifelse(isProduction || isDeploy, uglify()))
 		.pipe(gulp.dest(output.js))
 		.pipe(browserSync.stream());

@@ -91,7 +91,7 @@ $b: '.news';
 		color: #000;
 		font-size: 1.25rem;
 		font-weight: 700;
-		font-family: "PT Serif", Arial, sans-serif;
+		font-family: $serif;
 	}
 
 	&__info {
@@ -112,7 +112,7 @@ $b: '.news';
 
 		color: #666;
 		font-style: italic;
-		font-family: "PT Serif", Arial, sans-serif;
+		font-family: $serif;
 		
 		text-align: center;
 	}

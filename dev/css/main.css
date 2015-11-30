@@ -1,4 +1,5 @@
 @charset "UTF-8";
+/* vars */
 /* common blocks */
 @import url(http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic&subset=latin,cyrillic);
 @import url(http://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic,700italic&subset=latin,cyrillic);
@@ -38,6 +39,40 @@
   box-shadow: 2px 2px 8px rgba(241, 211, 159, 0.9);
   color: #8c5d08;
   cursor: pointer; }
+
+.form__input {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 300px;
+  max-width: 100%;
+  height: 26px;
+  padding: 3px 5px;
+  margin-right: 7px;
+  margin-bottom: 7px;
+  outline: none;
+  border: 1px solid #ccc;
+  font-size: 13px; }
+  .form__input:focus {
+    border-color: #999; }
+  @media (max-width: 600px) {
+    .form__input {
+      width: 100%; } }
+
+.form__button {
+  width: 80px;
+  height: 26px;
+  background: none;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 200ms; }
+  .form__button:focus, .form__button:hover {
+    border-color: #999;
+    background: #ccc; }
+  .form__button:active {
+    border-color: #777;
+    background: #aaa; }
 
 /* main blocks */
 .page {
@@ -142,7 +177,7 @@
   color: #000;
   font-size: 1.25rem;
   font-weight: 700;
-  font-family: "PT Serif", Arial, sans-serif; }
+  font-family: "PT Serif", Georgia, sans-serif; }
 
 .news__info {
   margin-top: 4px;
@@ -158,7 +193,7 @@
   display: none;
   color: #666;
   font-style: italic;
-  font-family: "PT Serif", Arial, sans-serif;
+  font-family: "PT Serif", Georgia, sans-serif;
   text-align: center; }
 
 .news__body {
@@ -350,40 +385,6 @@
   margin-top: 10px;
   font-size: 0; }
 
-.form__input {
-  display: inline-block;
-  box-sizing: border-box;
-  width: 300px;
-  max-width: 100%;
-  height: 26px;
-  padding: 3px 5px;
-  margin-right: 7px;
-  margin-bottom: 7px;
-  outline: none;
-  border: 1px solid #ccc;
-  font-size: 13px; }
-  .form__input:focus {
-    border-color: #999; }
-  @media (max-width: 600px) {
-    .form__input {
-      width: 100%; } }
-
-.form__button {
-  width: 80px;
-  height: 26px;
-  background: none;
-  border: 1px solid #ccc;
-  outline: none;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 200ms; }
-  .form__button:focus, .form__button:hover {
-    border-color: #999;
-    background: #ccc; }
-  .form__button:active {
-    border-color: #777;
-    background: #aaa; }
-
 .login {
   max-width: 200px;
   margin: 0 auto; }
@@ -398,7 +399,6 @@
   padding: 50px 0;
   text-align: center; }
 
-/* support blocks */
 /* fonts */
 /* fixes */
 html, body {

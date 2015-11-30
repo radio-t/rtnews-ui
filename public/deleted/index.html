@@ -1,15 +1,34 @@
-@@include('./includes/head_admin.html',{
-	"title": "Удалённые — Новости для Радио-Т"
-})
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Удалённые — Новости для Радио-Т</title>
+	<link rel="stylesheet" href="/css/main.css">
+
+	<script>
+		var login = localStorage.getItem('login'),
+			pass = localStorage.getItem('password'),
+			admin = true;
+
+		if (! (login && pass)) {
+			location.href = '/login/?back=' + location.href;
+		}
+	</script>
+
+	<script src="//yastatic.net/jquery/2.1.4/jquery.min.js"></script>
+	
+	<script src="/js/main.js"></script>
+</head>
 <body class="page">
 	<div class="header wrapper page__header">
 		<div class="header__title">Новости для Радио-Т</div>
 		<ul class="header__menu menu">
-			<li class="menu__item" id="all-wrap"><a href="admin.html" class="link">Все темы</a></li>
-			<li class="menu__item" id="geek-wrap"><a href="#geek" class="link" id="geek">Гиковские</a></li>
+			<li class="menu__item" id="all-wrap"><a href="/admin/" class="link">Все темы</a></li>
+			<li class="menu__item" id="geek-wrap"><a href="/admin/#geek" class="link" id="geek">Гиковские</a></li>
 			<li class="menu__item" id="dels-wrap">Удалённые</li>
-			<li class="menu__item"><a href="add.html" class="link">Добавить новость</a></li>
-			<li class="menu__item"><a href="feeds.html" class="link">Управление фидами</a></li>
+			<li class="menu__item"><a href="/add/" class="link">Добавить новость</a></li>
+			<li class="menu__item"><a href="/feeds/" class="link">Управление фидами</a></li>
 			<li class="menu__item"><a href="#update" id="update-feeds" class="link">Обновить базу</a></li>
 			<li class="menu__item menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
 		</ul>
@@ -40,9 +59,8 @@
 		</div>
 	</div>
 
-	@@include('./blocks/footer/footer.html')
-	<script>
-		var admin = true;
-	</script>
+	<div class="footer wrapper page__footer">
+	<a href="http://radio-t.com" class="link footer__copyright">Radio-T</a>, <script>document.write((new Date()).getFullYear());</script>
+</div>
 </body>
 </html>

@@ -9,7 +9,7 @@ $b: '.header';
 	&__title {
 		font-size: 1.75rem;
 		font-weight: 700;
-		font-family: "PT Serif", Georgia, sans-serif;
+		font-family: $serif;
 	}
 
 	&__menu {

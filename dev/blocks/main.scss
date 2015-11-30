@@ -1,9 +1,12 @@
+/* vars */
+$serif: "PT Serif", Georgia, sans-serif;;
+
 /* common blocks */
-// @import 'row/row';
 @import 'wrapper/wrapper';
 @import 'link/link';
 @import 'sortable/sortable';
 @import 'notify/notify';
+@import 'form/form';
 
 /* main blocks */
 @import 'page/page';
@@ -12,14 +15,8 @@
 @import 'menu/menu';
 @import 'news/news';
 @import 'feeds/feeds';
-@import 'form/form';
 @import 'login/login';
 @import 'add/add';
-
-/* support blocks */
-// @import 'pattern/pattern';
-// @import 'sprite/sprite';
-@import 'mixins/mixins';
 
 /* fonts */
 @import '../fonts/pt-sans/pt-sans';

@@ -4,13 +4,11 @@ $(function() {
 			var $form = $(this);
 
 			$.ajax({
-				url: 'http://master.radio-t.com:8778/api/v1/news',
+				url: APIPath + '/news',
 				type: 'POST',
 				async: true,
 				data: '{ "link": "' + $('#add__url').val() + '" }',
-				headers: {
-				    "Authorization": "Basic " + btoa(login + ":" + pass)
-				}
+				headers: authHeaders
 			})
 			.done(function() {
 				$form.trigger('reset');

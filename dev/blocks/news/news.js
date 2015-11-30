@@ -9,143 +9,26 @@ $(function() {
 
 		isAdmin = typeof admin !== "undefined" && admin,
 		isMobile =  /Android|iPhone|iPad|iPod|IEMobile|Windows Phone|Opera Mini/i.test(navigator.userAgent),
-		oldTitle = document.title;
+		oldTitle = document.title,
 
-	function extractDomain(url) {
-	    var domain;
-	    if (url.indexOf("://") > -1) {
-	        domain = url.split('/')[2];
-	    }
-	    else {
-	        domain = url.split('/')[0];
-	    }
+		updateInterval;
 
-	    return domain.split(':')[0];
-	}
+	if ($('#news__list').length) {
+		if (isMobile) {
+			$('.news').addClass('news_mobile');
+		}
 
-	function toggleArticle($link) {
-		$link.siblings('.news__full').slideToggle();
-		$link.text(function(i, text) {
-			return text == 'Подробнее' ? 'Скрыть' : 'Подробнее';
-		});
-	}
+		if ($('.news_deleted').length) {
+			loadDeleted();
+		} else {
+			load();
 
-	function moveArticle($item) {
-		var $items = $('#news__list .news__item'),
-			length = $items.length,
-			pos = $item.data('pos'),
-			index = $item.index(),
-			offset = length - pos - index - 1;
-
-		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/move/' + pos + '/' + offset,
-			type: 'PUT',
-			headers: {
-			    "Authorization": "Basic " + btoa(login + ":" + pass)
-			}
-		})
-		.fail(function(response) {
-			console.log("error while moving news");
-			console.log(response);
-		});
-
-		for (var i = $items.length - 1; i >= 0; i--) {
-			$items.eq(i).data('pos', $items.length - $items.eq(i).index() - 1)
-		};
-	}
-
-	function togeekArticle($el) {
-		var $item = $el.closest('.news__item');
-
-		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/geek/' + $item.data('id'),
-			type: 'PUT',
-			headers: {
-			    "Authorization": "Basic " + btoa(login + ":" + pass)
-			}
-		})
-		.done(function() {
-			$item.data('geek', true)
-				 .addClass('news__item_geek');
-			$el.removeClass('news__button_togeek')
-			   .addClass('news__button_ingeek')
-			   .off()
-			   .click(function(event) {
-			   		event.preventDefault();
-
-			   		nogeekArticle($(this));
-			   });
-		})
-		.fail(function(response) {
-			console.log("error while geeking news");
-			console.log(response);
-		});
-	}
-
-	function nogeekArticle($el) {
-		var $item = $el.closest('.news__item');
-
-		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/nogeek/' + $item.data('id'),
-			type: 'PUT',
-			headers: {
-			    "Authorization": "Basic " + btoa(login + ":" + pass)
-			}
-		})
-		.done(function() {
-			$item.data('geek', false)
-				 .removeClass('news__item_geek');
-			$el.removeClass('news__button_ingeek')
-			   .addClass('news__button_togeek')
-			   .off()
-			   .click(function(event) {
-			   		event.preventDefault();
-
-			   		togeekArticle($(this));
-			   });
-		})
-		.fail(function(response) {
-			console.log("error while nogeeking news");
-			console.log(response);
-		});
-	}
-
-	function restoreArticle($el) {
-		var $item = $el.closest('.news__item');
-
-		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/undelete/' + $item.data('id'),
-			type: 'PUT',
-			headers: {
-			    "Authorization": "Basic " + btoa(login + ":" + pass)
-			}
-		})
-		.done(function() {
-			$item.remove();
-		})
-		.fail(function(response) {
-			console.log("error while deleting news");
-			console.log(response);
-		});
-	}
-
-	function delArticle($el) {
-		var $item = $el.closest('.news__item');
-
-		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/' + $item.data('id'),
-			type: 'DELETE',
-			headers: {
-			    "Authorization": "Basic " + btoa(login + ":" + pass)
-			}
-		})
-		.done(function() {
-			$item.remove();
-		})
-		.fail(function(response) {
-			console.log("error while deleting news");
-			console.log(response);
-		});
+			$(document).on('news-loaded', function() {
+				setTimeout(function() {
+					updateInterval = setInterval(updateCurrent, 3000);
+				}, 10000);
+			})
+		}
 	}
 
 	function JSON2DOM(json) {
@@ -158,11 +41,14 @@ $(function() {
 				   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
 
 
-			$curItem.find('.news__title').attr('href', json[i].link)
-										 .text(json[i].title)
+			$curItem.find('.news__title')
+					.attr('href', json[i].link)
+					.text(json[i].title)
 					.end()
+					
 					.find('.news__info').html(info)
 					.end()
+					
 					.find('.news__desc').html(json[i].snippet);
 
 			if (json[i].pic) {
@@ -190,11 +76,13 @@ $(function() {
 			if (json[i].content) {
 				$curItem.find('.news__full').html(json[i].content)
 						.end()
+
 						.find('.news__light').click(function(event) {
 							event.preventDefault();
 							toggleArticle($(this));
 						})
 						.end()
+
 						.find('.news__footer').show();
 			}
 
@@ -211,6 +99,7 @@ $(function() {
 							.removeClass('news__button_togeek')
 							.addClass('news__button_ingeek')
 							.end()
+
 							.addClass('news__item_geek');
 				}
 			}
@@ -223,7 +112,7 @@ $(function() {
 
 	function load() {
 		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news',
+			url: APIPath + '/news',
 			type: 'GET',
 			dataType: 'json',
 			cache: false,
@@ -253,11 +142,9 @@ $(function() {
 						var $item = $(this).closest('.news__item');
 
 						$.ajax({
-							url: 'http://master.radio-t.com:8778/api/v1/news/active/' + $item.data('id'),
+							url: APIPath + '/news/active/' + $item.data('id'),
 							type: 'PUT',
-							headers: {
-							    "Authorization": "Basic " + btoa(login + ":" + pass)
-							}
+							headers: authHeaders
 						})
 						.done(function() {
 							$('.news__item').removeClass('news__item_current');
@@ -316,7 +203,6 @@ $(function() {
 				}
 			});
 
-			console.log(json);
 			JSON2DOM(json);
 		})
 		.fail(function(response) {
@@ -328,7 +214,7 @@ $(function() {
 
 	function loadDeleted() {
 		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/del',
+			url: APIPath + '/news/del',
 			type: 'GET',
 			dataType: 'json',
 			cache: false,
@@ -352,7 +238,6 @@ $(function() {
 				}
 			});
 
-			console.log(json);
 			JSON2DOM(json);
 		})
 		.fail(function(response) {
@@ -364,7 +249,7 @@ $(function() {
 
 	function updateCurrent() {
 		$.ajax({
-			url: 'http://master.radio-t.com:8778/api/v1/news/active/id',
+			url: APIPath + '/news/active/id',
 			type: 'GET',
 			dataType: 'json'
 		})
@@ -387,7 +272,7 @@ $(function() {
 				}
 			} else {
 				document.title = "** Ошибка **";
-				notify('Текущей темы нет в этом списке. Вероятно, он устарел. Нажмите, чтобы обновить список.', function() {
+				notify('Текущей темы нет в этом списке. Вероятно, он устарел. Нажмите, чтобы его обновить.', function() {
 					$('#news__list').html('');
 					load();
 
@@ -403,24 +288,131 @@ $(function() {
 			}
 		});
 	}
-
-	var updateInterval;
-
-	if ($('#news__list').length) {
-		if (isMobile) {
-			$('.news').addClass('news_mobile');
-		}
-
-		if ($('.news_deleted').length) {
-			loadDeleted();
-		} else {
-			load();
-
-			$(document).on('news-loaded', function() {
-				setTimeout(function() {
-					updateInterval = setInterval(updateCurrent, 3000);
-				}, 10000);
-			})
-		}
-	}
 });
+
+function extractDomain(url) {
+    var domain;
+    if (url.indexOf("://") > -1) {
+        domain = url.split('/')[2];
+    }
+    else {
+        domain = url.split('/')[0];
+    }
+
+    return domain.split(':')[0];
+}
+
+function toggleArticle($link) {
+	$link.siblings('.news__full').slideToggle();
+	$link.text(function(i, text) {
+		return text == 'Подробнее' ? 'Скрыть' : 'Подробнее';
+	});
+}
+
+function moveArticle($item) {
+	var $items = $('#news__list .news__item'),
+		length = $items.length,
+		pos = $item.data('pos'),
+		index = $item.index(),
+		offset = length - pos - index - 1;
+
+	$.ajax({
+		url: APIPath + '/news/move/' + pos + '/' + offset,
+		type: 'PUT',
+		headers: authHeaders
+	})
+	.fail(function(response) {
+		console.log("error while moving news");
+		console.log(response);
+	});
+
+	for (var i = $items.length - 1; i >= 0; i--) {
+		$items.eq(i).data('pos', $items.length - $items.eq(i).index() - 1)
+	};
+}
+
+function togeekArticle($el) {
+	var $item = $el.closest('.news__item');
+
+	$.ajax({
+		url: APIPath + '/news/geek/' + $item.data('id'),
+		type: 'PUT',
+		headers: authHeaders
+	})
+	.done(function() {
+		$item.data('geek', true)
+			 .addClass('news__item_geek');
+		$el.removeClass('news__button_togeek')
+		   .addClass('news__button_ingeek')
+		   .off()
+		   .click(function(event) {
+		   		event.preventDefault();
+
+		   		nogeekArticle($(this));
+		   });
+	})
+	.fail(function(response) {
+		console.log("error while geeking news");
+		console.log(response);
+	});
+}
+
+function nogeekArticle($el) {
+	var $item = $el.closest('.news__item');
+
+	$.ajax({
+		url: APIPath + '/news/nogeek/' + $item.data('id'),
+		type: 'PUT',
+		headers: authHeaders
+	})
+	.done(function() {
+		$item.data('geek', false)
+			 .removeClass('news__item_geek');
+		$el.removeClass('news__button_ingeek')
+		   .addClass('news__button_togeek')
+		   .off()
+		   .click(function(event) {
+		   		event.preventDefault();
+
+		   		togeekArticle($(this));
+		   });
+	})
+	.fail(function(response) {
+		console.log("error while nogeeking news");
+		console.log(response);
+	});
+}
+
+function restoreArticle($el) {
+	var $item = $el.closest('.news__item');
+
+	$.ajax({
+		url: APIPath + '/news/undelete/' + $item.data('id'),
+		type: 'PUT',
+		headers: authHeaders
+	})
+	.done(function() {
+		$item.remove();
+	})
+	.fail(function(response) {
+		console.log("error while deleting news");
+		console.log(response);
+	});
+}
+
+function delArticle($el) {
+	var $item = $el.closest('.news__item');
+
+	$.ajax({
+		url: APIPath + '/news/' + $item.data('id'),
+		type: 'DELETE',
+		headers: authHeaders
+	})
+	.done(function() {
+		$item.remove();
+	})
+	.fail(function(response) {
+		console.log("error while deleting news");
+		console.log(response);
+	});
+}

@@ -4,18 +4,19 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>@@title</title>
-	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="/css/main.css">
 
 	<script>
 		var login = localStorage.getItem('login'),
-			pass = localStorage.getItem('password');
+			pass = localStorage.getItem('password'),
+			admin = true;
 
 		if (! (login && pass)) {
-			location.href = 'login.html?back=' + location.href;
+			location.href = '/login/?back=' + location.href;
 		}
 	</script>
 
 	<script src="//yastatic.net/jquery/2.1.4/jquery.min.js"></script>
 	
-	<script src="js/main.js"></script>
+	<script src="/js/main.js"></script>
 </head>

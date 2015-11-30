@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Вход — Новости для Радио-Т</title>
-	<link rel="stylesheet" href="css/main.css">
-
-	<script src="//yastatic.net/jquery/2.1.4/jquery.min.js"></script>
-	
-	<script src="js/main.js"></script>
-</head>
+@@include('../../includes/head.html',{
+	"title": "Вход — Новости для Радио-Т"
+})
 <body class="page">
 	<div class="header wrapper page__header">
 		<div class="header__title">Новости для Радио-Т</div>
@@ -25,8 +16,6 @@
 		</form>
 	</div>
 
-	<div class="footer wrapper page__footer">
-	<a href="http://radio-t.com" class="link footer__copyright">Radio-T</a>, <script>document.write((new Date()).getFullYear());</script>
-</div>
+	@@include('../../blocks/footer/footer.html')
 </body>
 </html>
