@@ -39,15 +39,11 @@ $(function() {
 				info = json[i].author 
 					   + ' (' + extractDomain(json[i].link) + ')'
 					   + ', '
-					   + date.toLocaleDateString() 
-					   + '&nbsp;в&nbsp;'
-					   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+					   + formatDate(date);
 			} else {
 				info = extractDomain(json[i].link)
 					   + ', '
-					   + date.toLocaleDateString() 
-					   + '&nbsp;в&nbsp;'
-					   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+					   + formatDate(date)
 			}
 			
 			$curItem.find('.news__title')

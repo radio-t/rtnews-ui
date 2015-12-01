@@ -42,9 +42,7 @@ function loadFeeds() {
 
 		for (var i = 0; i < json.length; i++) {
 			date.setTime(Date.parse(json[i].updated));
-			updated = date.toLocaleDateString() 
-			     	+ ' в&nbsp;'
-			     	+ date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+			updated = formatDate(date);
 
 			$row = $('<tr/>').data('id', json[i].id);
 

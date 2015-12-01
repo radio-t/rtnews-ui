@@ -10,6 +10,16 @@ function getParameterByName(name) {
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+
+function formatDate(date) {
+	var day = ('0' + date.getDate()).slice(-2),
+		month = ('0' + (date.getMonth() + 1)).slice(-2),
+		year = date.getFullYear(),
+		hours = ('0' + date.getHours()).slice(-2),
+		mins = ('0' + date.getMinutes()).slice(-2);
+
+	return day + '.' + month + '.' + year + ' в&nbsp;' + hours + ':' + mins;
+}
 $(function() {
 	if ($('#add-news').length) {
 		$('#add-news').submit(function(event) {
@@ -130,9 +140,7 @@ function loadFeeds() {
 
 		for (var i = 0; i < json.length; i++) {
 			date.setTime(Date.parse(json[i].updated));
-			updated = date.toLocaleDateString() 
-			     	+ ' в&nbsp;'
-			     	+ date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+			updated = formatDate(date);
 
 			$row = $('<tr/>').data('id', json[i].id);
 
@@ -295,15 +303,11 @@ $(function() {
 				info = json[i].author 
 					   + ' (' + extractDomain(json[i].link) + ')'
 					   + ', '
-					   + date.toLocaleDateString() 
-					   + '&nbsp;в&nbsp;'
-					   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+					   + formatDate(date);
 			} else {
 				info = extractDomain(json[i].link)
 					   + ', '
-					   + date.toLocaleDateString() 
-					   + '&nbsp;в&nbsp;'
-					   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+					   + formatDate(date)
 			}
 			
 			$curItem.find('.news__title')

@@ -10,3 +10,13 @@ function getParameterByName(name) {
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+
+function formatDate(date) {
+	var day = ('0' + date.getDate()).slice(-2),
+		month = ('0' + (date.getMonth() + 1)).slice(-2),
+		year = date.getFullYear(),
+		hours = ('0' + date.getHours()).slice(-2),
+		mins = ('0' + date.getMinutes()).slice(-2);
+
+	return day + '.' + month + '.' + year + ' в&nbsp;' + hours + ':' + mins;
+}
