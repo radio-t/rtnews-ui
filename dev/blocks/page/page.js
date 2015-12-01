@@ -1,5 +1,5 @@
 $(function() {
-	if ($('#news__list').length && !$('.news__deleted').length) {
+	if ($('#news__list').length && !$('.news_deleted').length) {
 		$('#geek').click(function(event) {
 			event.preventDefault();
 			geekNews();
