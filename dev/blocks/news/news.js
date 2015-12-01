@@ -34,13 +34,22 @@ $(function() {
 	function JSON2DOM(json) {
 		for (var i = 0; i < json.length; i++) {
 			date.setTime(Date.parse(json[i].ts));
-			info = extractDomain(json[i].link)
-				   + ', '
-				   + date.toLocaleDateString() 
-				   + '&nbsp;в&nbsp;'
-				   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
 
-
+			if (json[i].author) {
+				info = json[i].author 
+					   + ' (' + extractDomain(json[i].link) + ')'
+					   + ', '
+					   + date.toLocaleDateString() 
+					   + '&nbsp;в&nbsp;'
+					   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+			} else {
+				info = extractDomain(json[i].link)
+					   + ', '
+					   + date.toLocaleDateString() 
+					   + '&nbsp;в&nbsp;'
+					   + date.toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, '');
+			}
+			
 			$curItem.find('.news__title')
 					.attr('href', json[i].link)
 					.text(json[i].title)
