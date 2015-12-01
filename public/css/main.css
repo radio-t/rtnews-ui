@@ -113,12 +113,6 @@
   margin-bottom: 50px;
 }
 
-@media (max-width: 500px) {
-  .page__header {
-    margin-bottom: 90px;
-  }
-}
-
 .page__footer {
   margin-top: 40px;
 }
@@ -201,7 +195,7 @@
 
 @media (max-width: 500px) {
   .news_admin .news__item {
-    margin-bottom: 90px;
+    margin-top: 80px;
   }
 }
 
