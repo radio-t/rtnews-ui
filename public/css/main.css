@@ -55,6 +55,12 @@
   cursor: pointer;
 }
 
+@media (max-width: 300px) {
+  .notify {
+    top: 0;
+  }
+}
+
 .form__input {
   display: inline-block;
   box-sizing: border-box;
@@ -169,7 +175,7 @@
   margin-left: 15px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 960px) {
   .menu__item_right {
     float: none;
     margin-right: 15px;
@@ -571,8 +577,25 @@
 }
 
 .add {
-  padding: 50px 0;
+  margin-top: 90px;
+  padding: 20px 0 50px;
   text-align: center;
+}
+
+.add__bookmark {
+  position: relative;
+  bottom: -50px;
+  left: 0;
+  right: 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.add__tip {
+  margin-top: 20px;
+  margin-bottom: 5px;
+  color: #999;
+  font-size: 12px;
 }
 
 /* fonts */
