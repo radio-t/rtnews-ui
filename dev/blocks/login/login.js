@@ -9,8 +9,11 @@ $(function() {
 			$.ajax({
 				url: APIPath + '/news/reload',
 				type: 'PUT',
+				cache: false,
+				username: login,
+				password: pass,
 				headers: {
-					"Authorization": "Basic " + btoa(login + ":" + pass)
+					'Authorization': 'Basic ' + btoa(login + ':' + pass)
 				}
 			})
 			.done(function(response) {

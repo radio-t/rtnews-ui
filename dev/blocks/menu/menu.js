@@ -22,8 +22,11 @@ $(function() {
 		$.ajax({
 			url: APIPath + '/news/reload',
 			type: 'PUT',
+			cache: false,
+			username: 'login',
+			password: 'password',
 			headers: {
-			    "Authorization": "Basic " + btoa('colloportus')
+			   'Authorization': 'Basic ' + btoa('colloportus')
 			}
 		})
 		.fail(function(response) {
