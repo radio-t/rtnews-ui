@@ -125,6 +125,7 @@ $(function() {
 			type: 'GET',
 			dataType: 'json',
 			cache: false,
+			async: true,
 			beforeSend: function() {
 				$topStatus.text('Загружаю..')
 						  .show();
@@ -227,6 +228,7 @@ $(function() {
 			type: 'GET',
 			dataType: 'json',
 			cache: false,
+			async: true,
 			beforeSend: function() {
 				$topStatus.text('Загружаю..')
 						  .show();
@@ -260,7 +262,8 @@ $(function() {
 		$.ajax({
 			url: APIPath + '/news/active/id',
 			type: 'GET',
-			dataType: 'json'
+			dataType: 'json',
+			async: true
 		})
 		.done(function(json) {
 			var $current = $('.news__item[data-id=' + json.id + ']');
