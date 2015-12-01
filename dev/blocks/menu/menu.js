@@ -19,20 +19,19 @@ $(function() {
 	$('#logout').click(function(event) {
 		event.preventDefault();
 
-		$.ajax({
-			url: APIPath + '/news/reload',
-			type: 'PUT',
-			cache: false,
-			username: 'login',
-			password: 'password',
-			headers: {
-			   'Authorization': 'Basic ' + btoa('colloportus')
-			}
-		})
-		.fail(function(response) {
-			location.href = '/login/';
-			localStorage.removeItem('login');
-			localStorage.removeItem('password');
-		});
+		var request = new XMLHttpRequest();   
+
+		request.open('PUT', APIPath + '/news/reload', true, 'harry', 'colloportus');                                                                                                                               
+		    
+	    request.onreadystatechange = function(event) {  
+	        if (request.readyState === 4) {  
+				localStorage.removeItem('login');
+				localStorage.removeItem('password');
+
+				location.href = '/login/';
+	        }  
+	    }; 
+
+	    request.send();    
 	});
 });
