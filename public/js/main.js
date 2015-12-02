@@ -274,14 +274,22 @@ $(function() {
 		var request = new XMLHttpRequest();   
 
 		request.open('PUT', APIPath + '/news/reload', false, 'harry', 'colloportus');                                                                                                                               
-	    request.send();    
-		    
-        if (request.readyState === 4) {  
-			localStorage.removeItem('login');
+	    
+	    try {
+		    request.send();    
+			    
+	        if (request.readyState === 4) {  
+				localStorage.removeItem('login');
+				localStorage.removeItem('password');
+
+				location.href = '/login/';
+	        }  
+	    } catch (err) {
+	    	localStorage.removeItem('login');
 			localStorage.removeItem('password');
 
 			location.href = '/login/';
-        }  
+	    }
 	});
 });
 $(function() {
