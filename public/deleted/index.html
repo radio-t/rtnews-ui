@@ -7,13 +7,8 @@
 	<title>Удалённые — Новости для Радио-Т</title>
 
 	<script>
-		var regexLogin = new RegExp("[\\?&]" + 'login' + "=([^&#]*)"),
-		    resultsLogin = regexLogin.exec(location.search),
-		    regexPassword = new RegExp("[\\?&]" + 'password' + "=([^&#]*)"),
-		    resultsPassword = regexPassword.exec(location.search),
-
-		    login = resultsLogin || localStorage.getItem('login'),
-			pass = resultsPassword || localStorage.getItem('password'),
+		var login = localStorage.getItem('login'),
+			pass = localStorage.getItem('password'),
 			admin = true;
 
 		if (! (login && pass)) {
