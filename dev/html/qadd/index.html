@@ -13,14 +13,6 @@
 
 	<script>
 		window.onload = function() {
-			function getParameterByName(name) {
-			    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-			    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-			        results = regex.exec(location.search);
-
-			    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-			}
-
 			var login = getParameterByName('login'),
 				password = getParameterByName('password'),
 				url = getParameterByName('url'),
