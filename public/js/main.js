@@ -748,6 +748,13 @@ $(function() {
 
 		slug = getSlug();
 
+		login = localStorage.getItem('login'),
+		pass = localStorage.getItem('password');
+
+	if (login && pass) {
+		$('#menu__back-link').attr('href', '/admin/');
+	}
+
 	if ($('#onenews').length) {
 		if (typeof slug !== 'undefined' && slug.length > 0) {
 			load();
@@ -773,7 +780,7 @@ $(function() {
 
 			JSON2DOM(json);
 			document.title = json.title;
-			
+
 			(function() { 
 				var d = document, s = d.createElement('script');
 				s.src = '//' + disqusID + '.disqus.com/embed.js';

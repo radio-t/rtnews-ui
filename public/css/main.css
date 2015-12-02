@@ -302,6 +302,7 @@
 
 .news__comments-counter {
   float: right;
+  font-size: 0.9rem;
 }
 
 .news__image[style] {

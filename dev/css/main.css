@@ -212,7 +212,8 @@
   font-size: 0.9rem; }
 
 .news__comments-counter {
-  float: right; }
+  float: right;
+  font-size: 0.9rem; }
 
 .news__image[style] {
   float: right;
