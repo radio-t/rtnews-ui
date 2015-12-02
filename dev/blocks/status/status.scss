@@ -1,0 +1,11 @@
+$b: '.status';
+
+#{$b} {
+	display: none;
+
+	color: #666;
+	font-style: italic;
+	font-family: $serif;
+	
+	text-align: center;
+}

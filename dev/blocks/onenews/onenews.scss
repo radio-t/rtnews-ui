@@ -1,0 +1,36 @@
+@import '../link/link';
+
+$b: '.onenews';
+
+#{$b} {
+	&__title {
+		margin-top: -20px;
+		margin-bottom: 0;
+
+		color: #000;
+		font-size: 2rem;
+		font-weight: 700;
+		font-family: $serif;
+	}
+
+	&__info {
+		margin-top: 4px;
+		
+		color: #666;
+		font-size: 0.85rem;
+		letter-spacing: 1px;
+	}
+
+	&__body {
+		margin-top: 25px;
+		margin-bottom: 35px;
+	}
+
+	&__comments {
+		margin-top: 45px;
+	}
+
+	#disqus_thread a {
+		@extend .link;
+	}
+}

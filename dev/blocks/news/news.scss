@@ -61,17 +61,6 @@ $b: '.news';
 			position: relative;
 			
 			background: #FBE2BD;
-			
-			&:after {
-				content: 'Текущая тема';
-				
-				position: absolute;
-				right: 10px;
-				bottom: 10px;
-				
-				color: darken(#fff5e6, 65);
-				font-size: 0.9rem;
-			}
 
 			#{$b}__button_current {
 				display: none;
@@ -123,13 +112,17 @@ $b: '.news';
 	}
 
 	&__footer {
-		display: none;
-		
-		margin-top: -20px;
+		margin-top: -15px;
 	}
 
 	&__light {
+		display: none;
+		
 		font-size: 0.9rem;
+	}
+
+	&__comments-counter {
+		float: right;
 	}
 
 	&__image[style] {
@@ -157,24 +150,6 @@ $b: '.news';
 		
 		background: rgba(200, 200, 200, .2);
 		border-radius: 3px;
-		
-		p {
-			&:first-of-type {
-				margin-top: 0;
-			}
-
-			&:last-of-type {
-				margin-bottom: 0;
-			}
-		}
-
-		a {
-			@extend .link;
-		}
-
-		img {
-			max-width: 100%;
-		}
 	}
 
 	&__manage {

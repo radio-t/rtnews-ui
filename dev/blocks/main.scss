@@ -7,6 +7,8 @@ $serif: "PT Serif", Georgia, sans-serif;;
 @import 'sortable/sortable';
 @import 'notify/notify';
 @import 'form/form';
+@import 'status/status';
+@import 'content/content';
 
 /* main blocks */
 @import 'page/page';
@@ -17,6 +19,7 @@ $serif: "PT Serif", Georgia, sans-serif;;
 @import 'feeds/feeds';
 @import 'login/login';
 @import 'add/add';
+@import 'onenews/onenews';
 
 /* fonts */
 @import '../fonts/pt-sans/pt-sans';

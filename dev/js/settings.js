@@ -1,4 +1,5 @@
 var APIPath = 'http://master.radio-t.com:8778/api/v1',
+	disqusID = 'radiotnewstest',
 	authHeaders = {
 		'Authorization': 'Basic ' + btoa(localStorage.getItem('login') + ':' + localStorage.getItem('password'))
 	};
@@ -9,6 +10,18 @@ function getParameterByName(name) {
         results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function getSlug() {
+	var path = location.pathname;
+
+	if (path.substr(-1) === '/') {
+		path = path.substr(0, path.length - 1);
+	}
+
+	var parts = path.split('/');
+
+	return parts[parts.length - 1];
 }
 
 function formatDate(date) {

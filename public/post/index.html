@@ -19,29 +19,25 @@
 	<div class="header wrapper page__header">
 		<div class="header__title">Новости для Радио-Т</div>
 		<ul class="header__menu menu">
-			<li class="menu__item menu__item_to-current" id="to-current"><a href="#current" class="link">К текущей теме</a></li>
+			<li class="menu__item"><a href="/" class="link">К списку новостей</a></li>
 		</ul>
 	</div>
 
 	<div class="wrapper">
-		<div class="news">
-			<div class="status" id="news__top-status"></div>
-			<div class="news__list" id="news__list">
-				
-			</div>
-			<div class="news__item" id="news__skeleton">
-				<div class="news__body">
-					<img class="news__image-hidden">
-					<div class="news__image"></div>
-					<a href="#" class="link news__title" target="_blank"></a>
-					<div class="news__info"></div>
-					<div class="news__desc"></div>
-				</div>
-				<div class="news__footer">
-					<a href="#" class="link news__comments-counter">Комментариев нет</a>
-					<a href="#" class="link news__light">Подробнее</a>
-					<div class="news__full content"></div>
-				</div>
+		<div class="onenews" id="onenews">
+			<div class="status" id="onenews__top-status"></div>
+			<h1 class="onenews__title"></h1>
+			<div class="onenews__info"></div>
+			<div class="onenews__body content"></div>
+			<div class="onenews__comments">
+				<div id="disqus_thread"></div>
+				<script>
+				var disqus_config = function () {
+					this.page.url = location.href;
+					this.page.identifier = getSlug();
+					this.language = "ru";
+				};
+				</script>
 			</div>
 		</div>
 	</div>

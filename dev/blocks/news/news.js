@@ -86,19 +86,22 @@ $(function() {
 							event.preventDefault();
 							toggleArticle($(this));
 						})
+						.show()
 						.end()
 
-						.find('.news__footer').show();
+						.find('.news__comments-counter')
+						.attr('href', '/post/' + json[i].slug + '#disqus_thread');
 			}
 
 			$curItem.appendTo($newsList)
 					.show()
-					.attr('draggable', true)
-					.attr('data-id', json[i].id)
-					.data('pos', json[i].position)
-					.data('geek', json[i].geek);
+					.attr('data-id', json[i].id);
 
 			if (isAdmin) {
+				$curItem.attr('draggable', true)
+						.data('geek', json[i].geek)
+						.data('pos', json[i].position);
+
 				if (json[i].geek) {
 					$curItem.find('.news__button_togeek')
 							.removeClass('news__button_togeek')
@@ -130,6 +133,12 @@ $(function() {
 		.done(function(json) {
 			$(document).on('news-loaded', function() {
 				$topStatus.hide();
+
+				$('<script/>', {
+					id: 'dsq-count-scr',
+					src: '//' + disqusID + '.disqus.com/count.js',
+					async: true
+				}).appendTo('body');
 
 				if (isAdmin) {
 					if (! isMobile) {

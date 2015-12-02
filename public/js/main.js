@@ -1,4 +1,5 @@
 var APIPath = 'http://master.radio-t.com:8778/api/v1',
+	disqusID = 'radiotnewstest',
 	authHeaders = {
 		'Authorization': 'Basic ' + btoa(localStorage.getItem('login') + ':' + localStorage.getItem('password'))
 	};
@@ -9,6 +10,18 @@ function getParameterByName(name) {
         results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function getSlug() {
+	var path = location.pathname;
+
+	if (path.substr(-1) === '/') {
+		path = path.substr(0, path.length - 1);
+	}
+
+	var parts = path.split('/');
+
+	return parts[parts.length - 1];
 }
 
 function formatDate(date) {
@@ -350,19 +363,22 @@ $(function() {
 							event.preventDefault();
 							toggleArticle($(this));
 						})
+						.show()
 						.end()
 
-						.find('.news__footer').show();
+						.find('.news__comments-counter')
+						.attr('href', '/post/' + json[i].slug + '#disqus_thread');
 			}
 
 			$curItem.appendTo($newsList)
 					.show()
-					.attr('draggable', true)
-					.attr('data-id', json[i].id)
-					.data('pos', json[i].position)
-					.data('geek', json[i].geek);
+					.attr('data-id', json[i].id);
 
 			if (isAdmin) {
+				$curItem.attr('draggable', true)
+						.data('geek', json[i].geek)
+						.data('pos', json[i].position);
+
 				if (json[i].geek) {
 					$curItem.find('.news__button_togeek')
 							.removeClass('news__button_togeek')
@@ -394,6 +410,12 @@ $(function() {
 		.done(function(json) {
 			$(document).on('news-loaded', function() {
 				$topStatus.hide();
+
+				$('<script/>', {
+					id: 'dsq-count-scr',
+					src: '//' + disqusID + '.disqus.com/count.js',
+					async: true
+				}).appendTo('body');
 
 				if (isAdmin) {
 					if (! isMobile) {
@@ -720,6 +742,82 @@ function notify(message, cb, timeout) {
 		}, timeout);
 	}
 }
+$(function() {
+	var $topStatus = $('#onenews__top-status'),
+		$onenews = $('#onenews'),
+
+		slug = getSlug();
+
+	if ($('#onenews').length) {
+		if (typeof slug !== 'undefined' && slug.length > 0) {
+			load();
+		} else {
+			location.href = '/';
+		}
+	}
+
+	function load() {
+		$.ajax({
+			url: APIPath + '/news/slug/' + slug,
+			type: 'GET',
+			dataType: 'json',
+			cache: true,
+			async: true,
+			beforeSend: function() {
+				$topStatus.text('Загружаю..')
+						  .show();
+			}
+		})
+		.done(function(json) {
+			$topStatus.hide();
+
+			JSON2DOM(json);
+			document.title = json.title;
+			
+			(function() { 
+				var d = document, s = d.createElement('script');
+				s.src = '//' + disqusID + '.disqus.com/embed.js';
+				s.setAttribute('data-timestamp', +new Date());
+				(d.head || d.body).appendChild(s);
+			})();
+		})
+		.fail(function(response) {
+			$topStatus.text('Ошибка при загрузке, попробуйте обновить страницу')
+					  .slideDown();
+			console.log(response);
+		});
+		
+	}
+
+	function JSON2DOM(json) {
+		var info,
+			date = new Date();
+
+		date.setTime(Date.parse(json.ts));
+
+		if (json.author) {
+			info = json.author
+				   + ' (' + extractDomain(json.link) + ')'
+				   + ', '
+				   + formatDate(date);
+		} else {
+			info = extractDomain(json.link)
+				   + ', '
+				   + formatDate(date);
+		}
+
+		$onenews.find('.onenews__title')
+				.text(json.title)
+				.end()
+
+				.find('.onenews__info')
+				.html(info)
+				.end()
+
+				.find('.onenews__body')
+				.html(json.content);
+	}
+});
 $(function() {
 	if ($('#news__list').length && !$('.news_deleted').length) {
 		$('#geek').click(function(event) {

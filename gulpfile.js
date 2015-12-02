@@ -18,9 +18,12 @@ var	gulp		= require('gulp'),
 	addsrc 		= require('gulp-add-src'),
 
 	sass 	 	= require('gulp-sass'),
+	importOnce	= require('node-sass-import-once'),
 	autoprefixr	= require('autoprefixer-core'),
 	postcss 	= require('gulp-postcss'),
-	minifyCSS	= require('gulp-minify-css');
+	minifyCSS	= require('gulp-minify-css'),
+
+	modRewrite	= require('connect-modrewrite');
 
 /* paths */
 
@@ -49,7 +52,15 @@ var mask = {
 		fonts: 'public/fonts'
 	},
 	isProduction = (util.env.type == 'production'),
-	isDeploy = (util.env.type == 'deploy');
+	isDeploy = (util.env.type == 'deploy'),
+	serverConf = {
+		baseDir: output.main,
+		middleware: [
+			modRewrite([
+				'^/post/(.*)$ /post/index.html [L]'
+			])
+		]
+	};
 
 gulp.task('default', ['build', 'server', 'watch']);
 
@@ -68,7 +79,9 @@ gulp.task('html', function() {
 
 gulp.task('scss', function() {
 	gulp.src(input.scss)
-		.pipe(sass().on('error', util.log))
+		.pipe(sass({
+			importer: importOnce
+		}).on('error', util.log))
 		.pipe(gulp.dest(input.css))
 });
 
@@ -132,7 +145,7 @@ gulp.task('fonts', function() {
 
 gulp.task('server', function() {
 	browserSync.init({
-		server: output.main,
+		server: serverConf,
 		open: false,
 		browser: "browser",
 		reloadOnRestart: true,
@@ -142,7 +155,7 @@ gulp.task('server', function() {
 
 gulp.task('serverOffline', function() {
 	browserSync.init({
-		server: output.main,
+		server: serverConf,
 		open: false,
 		browser: "browser",
 		reloadOnRestart: true,

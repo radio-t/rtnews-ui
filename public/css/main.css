@@ -14,7 +14,8 @@
 }
 
 .link,
-.news__full a {
+.content a,
+.onenews #disqus_thread a {
   border-bottom: 1px solid rgba(0, 96, 160, 0.2);
   color: #0060a0;
   text-decoration: none;
@@ -23,7 +24,8 @@
 }
 
 .link:hover,
-.news__full a:hover {
+.content a:hover,
+.onenews #disqus_thread a:hover {
   border-color: rgba(224, 80, 32, 0.9);
   color: #e05020;
   -webkit-transition: all 0ms;
@@ -108,6 +110,26 @@
   background: #aaa;
 }
 
+.status {
+  display: none;
+  color: #666;
+  font-style: italic;
+  font-family: "PT Serif", Georgia, sans-serif;
+  text-align: center;
+}
+
+.content p:first-of-type {
+  margin-top: 0;
+}
+
+.content p:last-of-type {
+  margin-bottom: 0;
+}
+
+.content img {
+  max-width: 100%;
+}
+
 /* main blocks */
 
 .page {
@@ -183,14 +205,6 @@
   }
 }
 
-.common__list-nostyle,
-.menu,
-.news__list {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
 .news_mobile .news__manage {
   display: block;
 }
@@ -233,15 +247,6 @@
 .news__item_current {
   position: relative;
   background: #FBE2BD;
-}
-
-.news__item_current:after {
-  content: 'Текущая тема';
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  color: #9a5c00;
-  font-size: 0.9rem;
 }
 
 .news__item_current .news__button_current {
@@ -287,12 +292,16 @@
 }
 
 .news__footer {
-  display: none;
-  margin-top: -20px;
+  margin-top: -15px;
 }
 
 .news__light {
+  display: none;
   font-size: 0.9rem;
+}
+
+.news__comments-counter {
+  float: right;
 }
 
 .news__image[style] {
@@ -317,18 +326,6 @@
   margin: 10px 0 25px;
   background: rgba(200, 200, 200, 0.2);
   border-radius: 3px;
-}
-
-.news__full p:first-of-type {
-  margin-top: 0;
-}
-
-.news__full p:last-of-type {
-  margin-bottom: 0;
-}
-
-.news__full img {
-  max-width: 100%;
 }
 
 .news__manage {
@@ -596,6 +593,31 @@
   margin-bottom: 5px;
   color: #999;
   font-size: 12px;
+}
+
+.onenews__title {
+  margin-top: -20px;
+  margin-bottom: 0;
+  color: #000;
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: "PT Serif", Georgia, sans-serif;
+}
+
+.onenews__info {
+  margin-top: 4px;
+  color: #666;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.onenews__body {
+  margin-top: 25px;
+  margin-bottom: 35px;
+}
+
+.onenews__comments {
+  margin-top: 45px;
 }
 
 /* fonts */
