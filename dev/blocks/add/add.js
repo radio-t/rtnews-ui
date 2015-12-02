@@ -7,7 +7,7 @@ $(function() {
 				url: APIPath + '/news',
 				type: 'POST',
 				async: true,
-				data: '{ "link": "' + $('#add__url').val() + '" }',
+				data: '{ "link": "' + decodeURIComponent($('#add__url').val()) + '" }',
 				headers: authHeaders
 			})
 			.done(function() {
@@ -40,7 +40,11 @@ $(function() {
 						i = d.createElement('iframe'),
 						s = i.style;
 
-					i.src = "#LOCATION#" + '?url=' + location.href + '#add__form';
+					i.src = '#LOCATION#'
+							+ '?url=' + encodeURIComponent(location.href)
+							+ '&login=' + '#LOGIN#'
+							+ '&password=' + '#PASSWORD#'
+							+ '#add__form';
 					i.scrolling = 'no';
 
 					s.background = '#fff';
@@ -66,7 +70,10 @@ $(function() {
 					}, 3000);
 				}
 
-				var href = hrefFunc.toString().replace(/#LOCATION#/g, location.href);
+				var href = hrefFunc.toString()
+								   .replace(/#LOCATION#/g, location.href)
+								   .replace(/#LOGIN#/g, login)
+								   .replace(/#PASSWORD#/g, password);
 
 				return "javascript:(" + encodeURIComponent(href) + ")();";
 			});

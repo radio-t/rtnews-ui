@@ -7,8 +7,13 @@
 	<title>@@title</title>
 
 	<script>
-		var login = localStorage.getItem('login'),
-			pass = localStorage.getItem('password'),
+		var regexLogin = new RegExp("[\\?&]" + 'login' + "=([^&#]*)"),
+		    resultsLogin = regexLogin.exec(location.search),
+		    regexPassword = new RegExp("[\\?&]" + 'password' + "=([^&#]*)"),
+		    resultsPassword = regexPassword.exec(location.search),
+
+		    login = resultsLogin || localStorage.getItem('login'),
+			pass = resultsPassword || localStorage.getItem('password'),
 			admin = true;
 
 		if (! (login && pass)) {

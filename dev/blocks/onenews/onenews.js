@@ -4,10 +4,7 @@ $(function() {
 
 		slug = getSlug();
 
-		login = localStorage.getItem('login'),
-		pass = localStorage.getItem('password');
-
-	if (login && pass) {
+	if (login && password) {
 		$('#menu__back-link').attr('href', '/admin/');
 	}
 
