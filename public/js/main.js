@@ -80,35 +80,35 @@ $(function() {
 					i.src = '#LOCATION#'
 							+ '?url=' + encodeURIComponent(location.href)
 							+ '&login=' + '#LOGIN#'
-							+ '&password=' + '#PASSWORD#'
-							+ '#add__form';
+							+ '&password=' + '#PASSWORD#';
 					i.scrolling = 'no';
 
-					s.background = '#fff';
-					s.position = 'absolute';
-					s.top = '50%';
-					s.transform = 'translateY(-50%)';
-					s.left = 0;
-					s.right = 0; 
-					s.width = '300px';
-					s.height = '130px';
-					s.margin = '0 auto';
-					s.border = '1px solid #ccc';
-					s.borderRadius = '3px';
-					s.boxShadow = '2px 2px 10px #eee';
-					s.overflow = 'hidden';
+					s.transition = 'all 200ms';
+					s.position = 'fixed';
+					s.left = '0';
+					s.right = '0';
+					s.top = '0';
 					s.zIndex = 99999;
-					
-					d.body.appendChild(i);
+					s.height = '70px';
+					s.width = '100%';
+					s.overflow = 'hidden';
+					s.background = '#fff';
+					s.borderBottom = '1px solid #bdbdbd';
+					s.boxShadow = '0 0 30px #828282';
 
+					d.body.appendChild(i);
+					
 					w.setTimeout(function() {
-						s.display = 'none';
-						delete i;
+						s.height = '0';
+
+						w.setTimeout(function() {
+							i.parentNode.removeChild(i);
+						}, 300);
 					}, 3000);
 				}
 
 				var href = hrefFunc.toString()
-								   .replace(/#LOCATION#/g, location.href)
+								   .replace(/#LOCATION#/g, location.protocol + '//' + location.host + '/qadd/')
 								   .replace(/#LOGIN#/g, login)
 								   .replace(/#PASSWORD#/g, password);
 

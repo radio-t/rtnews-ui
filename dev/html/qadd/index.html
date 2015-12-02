@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Добавление новости в список Радио-Т</title>
+
+	<script src="/js/main.js"></script>
+</head>
+<body>
+	<div id="status">Сохраняю..</div>
+
+	<script>
+		window.onload = function() {
+			function getParameterByName(name) {
+			    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+			    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			        results = regex.exec(location.search);
+
+			    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+			}
+
+			var login = getParameterByName('login'),
+				password = getParameterByName('password'),
+				url = getParameterByName('url'),
+			    s = document.getElementById('status');
+			
+			if (! (login && password)) {
+				s.innerHTML = 'Не указаны авторизационные данные';
+				s.classList.add('error');
+			} else if (!url) {
+				s.innerHTML = 'Не указан адрес страницы';
+				s.classList.add('error');
+			} else {
+				var request = new XMLHttpRequest();  
+
+				request.open('POST', APIPath + '/news', false, login, password); 
+				request.setRequestHeader('Authorization', 'Basic ' + btoa(login + ':' + password)); 
+
+				try {
+					request.send('{ "link": "' + decodeURIComponent(url) + '" }');
+
+			        if (request.readyState === 4) { 
+			        	if (request.status !== 200) {
+			        		s.innerHTML = 'Не смог сохранить';
+							s.classList.add('error');
+			        	}  else {
+			        		s.innerHTML = 'Сохранил';
+							s.classList.add('success');
+			        	}
+			        } else {
+			        	s.innerHTML = 'Не смог достучаться до сервера';
+						s.classList.add('error');
+			        }
+				} catch (err) {
+					s.innerHTML = 'Не смог сохранить';
+					s.classList.add('error');
+					console.log(err);
+				}
+			}
+		}
+	</script>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			
+			background: #fff;
+		}
+
+		div {
+			height: 70px;
+			
+			color: #232323;
+			font-size: 30px;
+			font-weight: 700;
+			font-family: 'PT Serif', Georgia, serif;
+			line-height: 67px;
+			
+			text-align: center;
+		}
+
+		.error {
+			color: #d00;
+		}
+
+		.success {
+			color: #090;
+		}
+	</style>
+</body>
+</html>
