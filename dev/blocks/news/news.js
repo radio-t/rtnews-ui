@@ -45,7 +45,7 @@ $(function() {
 					   + ', '
 					   + formatDate(date)
 			}
-			
+
 			$curItem.find('.news__title')
 					.attr('href', json[i].link)
 					.text(json[i].title)

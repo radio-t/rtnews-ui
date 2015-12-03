@@ -51,7 +51,7 @@ $(function() {
 					s.left = '0';
 					s.right = '0';
 					s.top = '0';
-					s.zIndex = 99999;
+					s.zIndex = 16777271;
 					s.height = '70px';
 					s.width = '100%';
 					s.overflow = 'hidden';
