@@ -4,7 +4,8 @@ var APIPath = 'https://master.radio-t.com:8778/api/v1',
 	password = localStorage.getItem('password'),
 	authHeaders = {
 		'Authorization': 'Basic ' + btoa(login + ':' + password)
-	};
+	},
+	isMobile =  /Android|iPhone|iPad|iPod|IEMobile|Windows Phone|Opera Mini/i.test(navigator.userAgent);
 
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");

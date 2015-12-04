@@ -4,7 +4,8 @@ var APIPath = 'https://master.radio-t.com:8778/api/v1',
 	password = localStorage.getItem('password'),
 	authHeaders = {
 		'Authorization': 'Basic ' + btoa(login + ':' + password)
-	};
+	},
+	isMobile =  /Android|iPhone|iPad|iPod|IEMobile|Windows Phone|Opera Mini/i.test(navigator.userAgent);
 
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -302,7 +303,6 @@ $(function() {
 		date = new Date(),
 
 		isAdmin = typeof admin !== "undefined" && admin,
-		isMobile =  /Android|iPhone|iPad|iPod|IEMobile|Windows Phone|Opera Mini/i.test(navigator.userAgent),
 		oldTitle = document.title,
 
 		updateInterval;
@@ -621,29 +621,31 @@ function toggleArticle($link) {
 	if ($full.is(':visible')) {
 		$full.stop().slideUp();
 	} else {
-		var $visibleNews = $('.news__full:visible'),
-			$visibleLink = $visibleNews.siblings('.news__light');
+		if (! isMobile) {
+			var $visibleNews = $('.news__full:visible'),
+				$visibleLink = $visibleNews.siblings('.news__light');
 
-		if ($visibleNews.length) {
-			if ($full.offset().top > $visibleNews.offset().top) {
-				$visibleNews.stop().slideUp({
-					step: function(now, tween) {
-			            if(tween.prop == "height"){
-			                if (v == 0){
-			                    v = now;
-			                } else {
-			                    var k = v - now;
-			                    body.scrollTop -= k;
-			                    v = now;
-			                }
-			            }
-			        }
-			    });
-			} else {
-				$visibleNews.stop().slideUp();
+			if ($visibleNews.length) {
+				if ($full.offset().top > $visibleNews.offset().top) {
+					$visibleNews.stop().slideUp({
+						step: function(now, tween) {
+				            if(tween.prop == "height"){
+				                if (v == 0){
+				                    v = now;
+				                } else {
+				                    var k = v - now;
+				                    body.scrollTop -= k;
+				                    v = now;
+				                }
+				            }
+				        }
+				    });
+				} else {
+					$visibleNews.stop().slideUp();
+				}
+
+				toggleArticleLink($visibleLink);
 			}
-
-			toggleArticleLink($visibleLink);
 		}
 		
 		$full.stop().slideDown();
