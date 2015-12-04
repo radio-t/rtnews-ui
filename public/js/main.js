@@ -614,7 +614,45 @@ function extractDomain(url) {
 }
 
 function toggleArticle($link) {
-	$link.siblings('.news__full').slideToggle();
+	var $full = $link.siblings('.news__full'),
+		body = $('body')[0],
+		v = 0;
+
+	if ($full.is(':visible')) {
+		$full.stop().slideUp();
+	} else {
+		var $visibleNews = $('.news__full:visible'),
+			$visibleLink = $visibleNews.siblings('.news__light');
+
+		if ($visibleNews.length) {
+			if ($full.offset().top > $visibleNews.offset().top) {
+				$visibleNews.stop().slideUp({
+					step: function(now, tween) {
+			            if(tween.prop == "height"){
+			                if (v == 0){
+			                    v = now;
+			                } else {
+			                    var k = v - now;
+			                    body.scrollTop -= k;
+			                    v = now;
+			                }
+			            }
+			        }
+			    });
+			} else {
+				$visibleNews.stop().slideUp();
+			}
+
+			toggleArticleLink($visibleLink);
+		}
+		
+		$full.stop().slideDown();
+	}
+	
+	toggleArticleLink($link);
+}
+
+function toggleArticleLink($link) {
 	$link.text(function(i, text) {
 		return text == 'Подробнее' ? 'Скрыть' : 'Подробнее';
 	});
