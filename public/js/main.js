@@ -727,6 +727,38 @@ function delArticle($el) {
 		console.log(response);
 	});
 }
+function notify(message, cb, timeout) {
+	$('.notify').remove();
+
+	var $message = $('<div/>', {
+		class: 'notify',
+		text: message
+	});
+
+	$message.appendTo('body')
+			.slideDown('500')
+			.click(function(event) {
+				$(this).slideUp(500, function() {
+					$message.remove();
+				});
+
+				if (cb) {
+					cb();
+				}
+			});
+
+	if (timeout) {
+		setTimeout(function() {
+			$message.slideUp(500, function() {
+				$message.remove();
+			});
+
+			if (cb) {
+				cb();
+			}
+		}, timeout);
+	}
+}
 $(function() {
 	var $topStatus = $('#onenews__top-status'),
 		$onenews = $('#onenews'),
@@ -807,38 +839,6 @@ $(function() {
 				.html(json.content);
 	}
 });
-function notify(message, cb, timeout) {
-	$('.notify').remove();
-
-	var $message = $('<div/>', {
-		class: 'notify',
-		text: message
-	});
-
-	$message.appendTo('body')
-			.slideDown('500')
-			.click(function(event) {
-				$(this).slideUp(500, function() {
-					$message.remove();
-				});
-
-				if (cb) {
-					cb();
-				}
-			});
-
-	if (timeout) {
-		setTimeout(function() {
-			$message.slideUp(500, function() {
-				$message.remove();
-			});
-
-			if (cb) {
-				cb();
-			}
-		}, timeout);
-	}
-}
 $(function() {
 	if ($('#news__list').length && !$('.news_deleted').length) {
 		$('#geek').click(function(event) {
