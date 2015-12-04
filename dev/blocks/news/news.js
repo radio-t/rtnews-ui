@@ -8,9 +8,7 @@ $(function() {
 		date = new Date(),
 
 		isAdmin = typeof admin !== "undefined" && admin,
-		oldTitle = document.title,
-
-		updateInterval;
+		oldTitle = document.title;
 
 	if ($('#news__list').length) {
 		if (isMobile) {
@@ -23,9 +21,7 @@ $(function() {
 			load();
 
 			$(document).on('news-loaded', function() {
-				setTimeout(function() {
-					updateInterval = setInterval(updateCurrent, 3000);
-				}, 10000);
+				updateCurrent();
 			})
 		}
 	}
@@ -158,11 +154,13 @@ $(function() {
 						$.ajax({
 							url: APIPath + '/news/active/' + $item.data('id'),
 							type: 'PUT',
-							headers: authHeaders
+							headers: authHeaders,
+							async: false
 						})
 						.done(function() {
-							$('.news__item').removeClass('news__item_current');
-							$item.addClass('news__item_current');
+							$item.addClass('news__item_current')
+								 .siblings('.news__item')
+								 .removeClass('news__item_current');
 						})
 						.fail(function(response) {
 							console.log("error while activating news");
@@ -263,8 +261,10 @@ $(function() {
 	}
 
 	function updateCurrent() {
+		var timeout = 295;
+
 		$.ajax({
-			url: APIPath + '/news/active/id',
+			url: APIPath + '/news/active/wait/' + timeout,
 			type: 'GET',
 			dataType: 'json',
 			async: true
@@ -286,6 +286,8 @@ $(function() {
 						document.title = oldTitle;
 					});
 				}
+				
+				updateCurrent();
 			} else {
 				document.title = "** Ошибка **";
 				notify('Текущей темы нет в этом списке. Вероятно, он устарел. Нажмите, чтобы его обновить.', function() {
@@ -300,8 +302,10 @@ $(function() {
 
 					document.title = oldTitle;
 				});
-				clearInterval(updateInterval);
 			}
+		})
+		.fail(function(response) {
+			updateCurrent();
 		});
 	}
 });
