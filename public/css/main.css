@@ -222,6 +222,7 @@
 .news__item {
   position: relative;
   display: none;
+  min-height: 80px;
   padding: 10px 15px;
   margin: -10px -15px 40px;
   border-radius: 5px;
