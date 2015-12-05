@@ -141,6 +141,7 @@ $(function() {
 							animation: 150,
 							draggable: '.news__item',
 							ghostClass: 'news__item_sortable',
+							scrollSensitivity: 70,
 							onUpdate: function(event) {
 								moveArticle($(event.item));
 							}
