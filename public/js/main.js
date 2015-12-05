@@ -848,7 +848,17 @@ $(function() {
 				(d.head || d.body).appendChild(s);
 			})();
 
-			$('#menu__item_to-comments').css('display', 'inline-block');
+			$('#menu__item_to-comments')
+				.css('display', 'inline-block')
+
+				.find('.link')
+				.click(function(event) {
+					event.preventDefault();
+
+					$('html,body').animate({
+						scrollTop: $($(this).attr('href')).offset().top
+					}, 500);
+				});
 		})
 		.fail(function(response) {
 			$topStatus.text('Ошибка при загрузке, попробуйте обновить страницу')
