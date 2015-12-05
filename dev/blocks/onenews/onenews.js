@@ -68,6 +68,7 @@ $(function() {
 
 		$onenews.find('.onenews__title')
 				.text(json.title)
+				.attr('href', json.link)
 				.end()
 
 				.find('.onenews__info')
