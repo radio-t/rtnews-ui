@@ -1,4 +1,4 @@
-var APIPath = 'https://master.radio-t.com:8778/api/v1',
+var APIPath = 'https://news.radio-t.com/api/v1',
 	disqusID = 'radiotnewstest',
 	login = localStorage.getItem('login'),
 	password = localStorage.getItem('password'),
@@ -381,7 +381,8 @@ $(function() {
 						.end()
 
 						.find('.news__comments-counter')
-						.attr('href', '/post/' + json[i].slug + '#disqus_thread');
+						.attr('href', '/post/' + json[i].slug)
+						.attr('data-disqus-identifier', json[i].slug);
 			}
 
 			$curItem.appendTo($newsList)
@@ -846,6 +847,8 @@ $(function() {
 				s.setAttribute('data-timestamp', +new Date());
 				(d.head || d.body).appendChild(s);
 			})();
+
+			$('#menu__item_to-comments').css('display', 'inline-block');
 		})
 		.fail(function(response) {
 			$topStatus.text('Ошибка при загрузке, попробуйте обновить страницу')

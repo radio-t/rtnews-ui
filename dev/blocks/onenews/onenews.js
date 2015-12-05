@@ -40,6 +40,8 @@ $(function() {
 				s.setAttribute('data-timestamp', +new Date());
 				(d.head || d.body).appendChild(s);
 			})();
+
+			$('#menu__item_to-comments').css('display', 'inline-block');
 		})
 		.fail(function(response) {
 			$topStatus.text('Ошибка при загрузке, попробуйте обновить страницу')

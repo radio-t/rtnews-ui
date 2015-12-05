@@ -85,7 +85,8 @@ $(function() {
 						.end()
 
 						.find('.news__comments-counter')
-						.attr('href', '/post/' + json[i].slug + '#disqus_thread');
+						.attr('href', '/post/' + json[i].slug)
+						.attr('data-disqus-identifier', json[i].slug);
 			}
 
 			$curItem.appendTo($newsList)

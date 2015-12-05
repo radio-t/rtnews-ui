@@ -125,6 +125,8 @@
   margin-top: 5px; }
   .menu__item_to-current {
     display: none; }
+  .menu__item_to-comments {
+    display: none; }
   .menu__item_right {
     float: right;
     margin-right: 0;

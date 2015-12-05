@@ -1,4 +1,4 @@
-var APIPath = 'https://master.radio-t.com:8778/api/v1',
+var APIPath = 'https://news.radio-t.com/api/v1',
 	disqusID = 'radiotnewstest',
 	login = localStorage.getItem('login'),
 	password = localStorage.getItem('password'),
