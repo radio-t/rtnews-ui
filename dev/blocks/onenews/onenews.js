@@ -31,6 +31,20 @@ $(function() {
 		.done(function(json) {
 			$topStatus.hide();
 
+			$(document).on('news-loaded', function() {
+				$('#menu__item_to-comments')
+					.css('display', 'inline-block')
+
+					.find('.link')
+					.click(function(event) {
+						event.preventDefault();
+
+						$('html,body').animate({
+							scrollTop: $($(this).attr('href')).offset().top
+						}, 500);
+					});
+			});
+
 			JSON2DOM(json);
 			document.title = json.title;
 
@@ -40,18 +54,6 @@ $(function() {
 				s.setAttribute('data-timestamp', +new Date());
 				(d.head || d.body).appendChild(s);
 			})();
-
-			$('#menu__item_to-comments')
-				.css('display', 'inline-block')
-
-				.find('.link')
-				.click(function(event) {
-					event.preventDefault();
-
-					$('html,body').animate({
-						scrollTop: $($(this).attr('href')).offset().top
-					}, 500);
-				});
 		})
 		.fail(function(response) {
 			$topStatus.text('Ошибка при загрузке, попробуйте обновить страницу')
@@ -89,5 +91,7 @@ $(function() {
 
 				.find('.onenews__body')
 				.html(json.content);
+
+		$(document).trigger('news-loaded');
 	}
 });
