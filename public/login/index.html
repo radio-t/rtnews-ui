@@ -16,6 +16,17 @@
 	<script src="/js/main.js"></script>
 </head>
 <body class="page">
+	<script>
+		var back = getParameterByName('back');
+
+		if (login && password) {
+			if (back) {
+				location.href = back;
+			} else {
+				location.href = '/admin/';
+			}
+		}
+	</script>
 	<div class="header wrapper page__header">
 		<div class="header__title">Новости для Радио-Т</div>
 	</div>
