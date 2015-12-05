@@ -71,6 +71,12 @@ $b: '.news';
 		&_geek {
 			border-color: rgba(darken(#33aaff, 10), .75);
 		}
+
+		&_sortable {
+			border: 1px dashed #ddd;
+			background: rgba(#eee, .3);
+			opacity: 0.7;
+		}
 	}
 
 	&__title {

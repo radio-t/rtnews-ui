@@ -93,8 +93,7 @@ $(function() {
 					.attr('data-id', json[i].id);
 
 			if (isAdmin) {
-				$curItem.attr('draggable', true)
-						.data('geek', json[i].geek)
+				$curItem.data('geek', json[i].geek)
 						.data('pos', json[i].position);
 
 				if (json[i].geek) {
@@ -137,13 +136,14 @@ $(function() {
 
 				if (isAdmin) {
 					if (! isMobile) {
-						$('#news__list')
-							.sortable({
-								items: '.news__item'
-							})
-							.bind('sortupdate', function(e, $ui) {
-								moveArticle($ui.item);
-							});
+						var sortable = new Sortable($('#news__list')[0], {
+							animation: 150,
+							draggable: '.news__item',
+							ghostClass: 'news__item_sortable',
+							onUpdate: function(event) {
+								moveArticle($(event.item));
+							}
+						});
 					}
 
 					$('.news__button_current').click(function(event) {
@@ -338,8 +338,8 @@ function toggleArticle($link) {
 				if ($full.offset().top > $visibleNews.offset().top) {
 					$visibleNews.stop().slideUp({
 						step: function(now, tween) {
-				            if(tween.prop == "height"){
-				                if (v == 0){
+				            if(tween.prop == "height") {
+				                if (v == 0) {
 				                    v = now;
 				                } else {
 				                    var k = v - now;
