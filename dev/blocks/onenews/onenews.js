@@ -29,6 +29,7 @@ $(function() {
 			}
 		})
 		.done(function(json) {
+			document.title = json.title;
 			$topStatus.hide();
 
 			$(document).on('news-loaded', function() {
@@ -45,15 +46,14 @@ $(function() {
 					});
 			});
 
-			JSON2DOM(json);
-			document.title = json.title;
-
 			(function() { 
 				var d = document, s = d.createElement('script');
 				s.src = '//' + disqusID + '.disqus.com/embed.js';
 				s.setAttribute('data-timestamp', +new Date());
 				(d.head || d.body).appendChild(s);
 			})();
+			
+			JSON2DOM(json);
 		})
 		.fail(function(response) {
 			$topStatus.text('Ошибка при загрузке, попробуйте обновить страницу')
