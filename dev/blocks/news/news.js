@@ -136,7 +136,7 @@ $(function() {
 
 				if (isAdmin) {
 					if (! isMobile) {
-						var sortable = new Sortable($('#news__list')[0], {
+						sortableList = new Sortable($('#news__list')[0], {
 							animation: 150,
 							draggable: '.news__item',
 							ghostClass: 'news__item_sortable',

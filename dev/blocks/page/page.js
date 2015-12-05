@@ -58,8 +58,8 @@ function allNews() {
 
 	createLink($('#geek-wrap'), 'geek');
 
-	$('#news__list').sortable('enable');
 	$('.news__mobile-buttons').css('display', '');
+	sortableList.option('disabled', false);
 
 	$('#geek').click(function(event) {
 		event.preventDefault();
@@ -76,9 +76,8 @@ function geekNews() {
 
 	createLink($('#all-wrap'), 'all');
 
-	$('#news__list').sortable('disable');
-
 	$('.news__mobile-buttons').css('display', 'none');
+	sortableList.option('disabled', true);
 
 	$('#all').click(function(event) {
 		event.preventDefault();

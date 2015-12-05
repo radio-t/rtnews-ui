@@ -5,7 +5,8 @@ var APIPath = 'https://master.radio-t.com:8778/api/v1',
 	authHeaders = {
 		'Authorization': 'Basic ' + btoa(login + ':' + password)
 	},
-	isMobile =  /Android|iPhone|iPad|iPod|IEMobile|Windows Phone|Opera Mini/i.test(navigator.userAgent);
+	isMobile =  /Android|iPhone|iPad|iPod|IEMobile|Windows Phone|Opera Mini/i.test(navigator.userAgent),
+	sortableList;
 
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -431,7 +432,7 @@ $(function() {
 
 				if (isAdmin) {
 					if (! isMobile) {
-						var sortable = new Sortable($('#news__list')[0], {
+						sortableList = new Sortable($('#news__list')[0], {
 							animation: 150,
 							draggable: '.news__item',
 							ghostClass: 'news__item_sortable',
@@ -943,8 +944,8 @@ function allNews() {
 
 	createLink($('#geek-wrap'), 'geek');
 
-	$('#news__list').sortable('enable');
 	$('.news__mobile-buttons').css('display', '');
+	sortableList.option('disabled', false);
 
 	$('#geek').click(function(event) {
 		event.preventDefault();
@@ -961,9 +962,8 @@ function geekNews() {
 
 	createLink($('#all-wrap'), 'all');
 
-	$('#news__list').sortable('disable');
-
 	$('.news__mobile-buttons').css('display', 'none');
+	sortableList.option('disabled', true);
 
 	$('#all').click(function(event) {
 		event.preventDefault();
