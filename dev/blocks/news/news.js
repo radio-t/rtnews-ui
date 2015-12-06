@@ -332,62 +332,26 @@ function toggleArticle($link) {
 		v = 0;
 
 	if ($full.is(':visible')) {
-		if (! isMobile) {
-			$full.stop().slideUp();
-		} else {
-			$full.hide();
-		}
+		$full.hide();
 	} else {
-		if (! isMobile) {
-			var $visibleNews = $('.news__full:visible'),
-				$visibleLink = $visibleNews.siblings('.news__light');
+		var $visibleNews = $('.news__full:visible'),
+			$visibleLink = $visibleNews.siblings('.news__light');
 
-			if ($visibleNews.length) {
-				if ($full.offset().top > $visibleNews.offset().top) {
-					var height = $visibleNews.outerHeight(true),
-						st = $(document).scrollTop() - height;
+		if ($visibleNews.length) {
+			if ($full.offset().top > $visibleNews.offset().top) {
+				var height = $visibleNews.outerHeight(true),
+					st = $(document).scrollTop() - height;
 
-					$('html,body').animate({
-						scrollTop: st
-					}, 700, 'linear');
-					$visibleNews.animate({
-						height: 0,
-						margin: 0,
-						padding: 0
-					}, 700, 'linear', function() {
-						$visibleNews.hide()
-				    				.css('height', '')
-				    				.css('margin', '')
-				    				.css('padding', '');
-				    })
-				} else {
-					$visibleNews.stop().slideUp();
-				}
-
-				toggleArticleLink($visibleLink);
+			    $(document).scrollTop(st);
+				$visibleNews.hide();
+			} else {
+				$visibleNews.hide();
 			}
-			
-			$full.stop().slideDown();
-		} else {
-			var $visibleNews = $('.news__full:visible'),
-				$visibleLink = $visibleNews.siblings('.news__light');
 
-			if ($visibleNews.length) {
-				if ($full.offset().top > $visibleNews.offset().top) {
-					var height = $visibleNews.outerHeight(true),
-						st = $(document).scrollTop() - height;
-
-				    $(document).scrollTop(st);
-					$visibleNews.hide();
-				} else {
-					$visibleNews.hide();
-				}
-
-				toggleArticleLink($visibleLink);
-			}
-			
-			$full.show();
+			toggleArticleLink($visibleLink);
 		}
+		
+		$full.show();
 	}
 	
 	toggleArticleLink($link);
