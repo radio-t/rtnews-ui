@@ -7,6 +7,8 @@ $b: '.link';
 	text-decoration: none;
 	
 	transition: all .5s;
+	
+	outline: none;
 
 	&:hover {
 	    border-color: rgba(224, 80, 32, .9);

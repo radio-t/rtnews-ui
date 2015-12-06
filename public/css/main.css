@@ -21,6 +21,7 @@
   text-decoration: none;
   -webkit-transition: all .5s;
   transition: all .5s;
+  outline: none;
 }
 
 .link:hover,
@@ -125,6 +126,7 @@
 /* main blocks */
 
 .page {
+  overflow-x: hidden;
   padding: 0 10px;
   font-family: "PT Sans", Arial, sans-serif;
 }
@@ -328,6 +330,7 @@
   display: none;
   padding: 5px 10px;
   margin: 10px 0 25px;
+  overflow: hidden;
   background: rgba(200, 200, 200, 0.2);
   border-radius: 3px;
 }
