@@ -429,11 +429,12 @@ $(function() {
 			$(document).on('news-loaded', function() {
 				$topStatus.hide();
 
-				$('<script/>', {
-					id: 'dsq-count-scr',
-					src: '//' + disqusID + '.disqus.com/count.js',
-					async: true
-				}).appendTo('body');
+				var s = document.createElement('script');
+				s.async = true;
+				s.type = 'text/javascript';
+				s.src = '//' + disqusID + '.disqus.com/count.js';
+				
+				(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
 
 				if (isAdmin) {
 					if (! isMobile) {
