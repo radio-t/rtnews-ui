@@ -274,6 +274,12 @@ $(function() {
 			async: true
 		})
 		.done(function(json) {
+			if (typeof json == 'undefined') {
+				// if 304 then update again
+				updateCurrent();
+				return;
+			}
+
 			var $current = $('.news__item[data-id=' + json.id + ']');
 
 			if ($current.length) {
