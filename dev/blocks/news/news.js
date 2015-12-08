@@ -27,22 +27,34 @@ $(function() {
 	}
 
 	function JSON2DOM(json) {
+		var $a;
+
 		for (var i = 0; i < json.length; i++) {
 			date.setTime(Date.parse(json[i].ts));
 
+			$a = $('<a/>', {
+				href: json[i].link,
+				class: 'link',
+				title: json[i].title,
+				text: extractDomain(json[i].link),
+				target: '_blank'
+			});
+
 			if (json[i].author) {
 				info = json[i].author 
-					   + ' (' + extractDomain(json[i].link) + ')'
+					   + ' (' 
+					   + $a.prop('outerHTML')
+					   + ')'
 					   + ', '
 					   + formatDate(date);
 			} else {
-				info = extractDomain(json[i].link)
+				info = $a.prop('outerHTML')
 					   + ', '
 					   + formatDate(date)
 			}
 
 			$curItem.find('.news__title')
-					.attr('href', json[i].link)
+					.attr('href', '/post/' + json[i].slug)
 					.text(json[i].title)
 					.end()
 					
@@ -85,7 +97,7 @@ $(function() {
 						.end()
 
 						.find('.news__comments-counter')
-						.attr('href', '/post/' + json[i].slug)
+						.attr('href', '/post/' + json[i].slug + '#to-comments')
 						.attr('data-disqus-identifier', json[i].slug);
 			}
 

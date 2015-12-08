@@ -32,17 +32,29 @@ $(function() {
 			$topStatus.hide();
 
 			$(document).on('news-loaded', function() {
-				$('#menu__item_to-comments')
-					.css('display', 'inline-block')
+				var dqinterval = setInterval(function() {
+				    var disqusHeight = $('#disqus_thread').height();
+				    // 250 ≈ height of empty disqus
+				    if (disqusHeight > 250) {
+				    	$('#menu__item_to-comments')
+				    		.css('display', 'inline-block')
 
-					.find('.link')
-					.click(function(event) {
-						event.preventDefault();
+				    		.find('.link')
+				    		.click(function(event) {
+				    			event.preventDefault();
 
-						$('html,body').animate({
-							scrollTop: $($(this).attr('href')).offset().top
-						}, 500);
-					});
+				    			$('html,body').animate({
+				    				scrollTop: $($(this).attr('href')).offset().top
+				    			}, 500);
+				    		});
+
+				    	if (location.hash == '#to-comments') {
+				    		$('#menu__item_to-comments .link').click();
+				    	}
+
+				        clearInterval(dqinterval);
+				    }
+				}, 100);
 			});
 
 			JSON2DOM(json);
@@ -69,13 +81,23 @@ $(function() {
 
 		date.setTime(Date.parse(json.ts));
 
+		var $a = $('<a/>', {
+			href: json.link,
+			class: 'link',
+			title: json.title,
+			text: extractDomain(json.link),
+			target: '_blank'
+		});
+
 		if (json.author) {
 			info = json.author
-				   + ' (' + extractDomain(json.link) + ')'
+				   + ' ('
+				   + $a.prop('outerHTML')
+				   + ')'
 				   + ', '
 				   + formatDate(date);
 		} else {
-			info = extractDomain(json.link)
+			info = $a.prop('outerHTML')
 				   + ', '
 				   + formatDate(date);
 		}
@@ -83,6 +105,7 @@ $(function() {
 		$onenews.find('.onenews__title')
 				.text(json.title)
 				.attr('href', json.link)
+				.attr('target', '_blank')
 				.end()
 
 				.find('.onenews__info')
