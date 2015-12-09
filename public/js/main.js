@@ -1,4 +1,4 @@
-var APIPath = 'https://news.radio-t.com/api/v1',
+var APIPath = 'http://master.radio-t.com:8780/api/v1',
 	disqusID = 'radiotnewstest',
 	login = localStorage.getItem('login'),
 	password = localStorage.getItem('password'),
@@ -36,6 +36,18 @@ function formatDate(date) {
 		mins = ('0' + date.getMinutes()).slice(-2);
 
 	return day + '.' + month + '.' + year + ' в&nbsp;' + hours + ':' + mins;
+}
+
+function extractDomain(url) {
+    var domain;
+    if (url.indexOf("://") > -1) {
+        domain = url.split('/')[2];
+    }
+    else {
+        domain = url.split('/')[0];
+    }
+
+    return domain.split(':')[0];
 }
 $(function() {
 	if ($('#add-news').length) {
@@ -344,17 +356,19 @@ $(function() {
 				target: '_blank'
 			});
 
+			info = '<span class="news__geek" title="Гиковская тема"></span>';
+
 			if (json[i].author) {
-				info = json[i].author 
-					   + ' (' 
-					   + $a.prop('outerHTML')
-					   + ')'
-					   + ', '
-					   + formatDate(date);
+				info +=	json[i].author 
+						+ ' (' 
+						+ $a.prop('outerHTML')
+						+ ')'
+						+ ', '
+						+ formatDate(date);
 			} else {
-				info = $a.prop('outerHTML')
-					   + ', '
-					   + formatDate(date)
+				info +=	$a.prop('outerHTML')
+						+ ', '
+						+ formatDate(date)
 			}
 
 			$curItem.find('.news__title')
@@ -407,7 +421,8 @@ $(function() {
 
 			$curItem.appendTo($newsList)
 					.show()
-					.attr('data-id', json[i].id);
+					.attr('data-id', json[i].id)
+					.attr('id', '');
 
 			if (isAdmin) {
 				$curItem.data('geek', json[i].geek)
@@ -420,6 +435,10 @@ $(function() {
 							.end()
 
 							.addClass('news__item_geek');
+				}
+			} else {
+				if (json[i].geek) {
+					$curItem.addClass('news__item_geek-light');
 				}
 			}
 
@@ -635,18 +654,6 @@ $(function() {
 		});
 	}
 });
-
-function extractDomain(url) {
-    var domain;
-    if (url.indexOf("://") > -1) {
-        domain = url.split('/')[2];
-    }
-    else {
-        domain = url.split('/')[0];
-    }
-
-    return domain.split(':')[0];
-}
 
 function toggleArticle($link) {
 	var $full = $link.siblings('.news__full'),

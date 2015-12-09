@@ -77,6 +77,12 @@ $b: '.news';
 			background: rgba(#eee, .3);
 			opacity: 0.7;
 		}
+
+		&_geek-light {
+			#{$b}__geek {
+				display: inline-block;
+			}
+		}
 	}
 
 	&__title {
@@ -303,5 +309,17 @@ $b: '.news';
 	    		border-color: #ccc;
 	    	}
 	    }
+	}
+
+	&__geek {
+		position: relative;
+		top: 2px;
+		
+		display: none;
+		margin-right: 5px;
+		
+		&:after {
+			content: url(../files/geek.svg);
+		}
 	}
 }			

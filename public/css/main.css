@@ -262,6 +262,10 @@
   opacity: 0.7;
 }
 
+.news__item_geek-light .news__geek {
+  display: inline-block;
+}
+
 .news__title {
   margin-right: 60px;
   border-color: rgba(0, 0, 0, 0.2);
@@ -463,6 +467,17 @@
 
 .news__button_down:active {
   border-color: #ccc;
+}
+
+.news__geek {
+  position: relative;
+  top: 2px;
+  display: none;
+  margin-right: 5px;
+}
+
+.news__geek:after {
+  content: url("../files/geek.svg");
 }
 
 .common__table-nostyle,

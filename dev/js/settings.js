@@ -1,4 +1,4 @@
-var APIPath = 'https://news.radio-t.com/api/v1',
+var APIPath = 'http://master.radio-t.com:8780/api/v1',
 	disqusID = 'radiotnewstest',
 	login = localStorage.getItem('login'),
 	password = localStorage.getItem('password'),
@@ -36,4 +36,16 @@ function formatDate(date) {
 		mins = ('0' + date.getMinutes()).slice(-2);
 
 	return day + '.' + month + '.' + year + ' в&nbsp;' + hours + ':' + mins;
+}
+
+function extractDomain(url) {
+    var domain;
+    if (url.indexOf("://") > -1) {
+        domain = url.split('/')[2];
+    }
+    else {
+        domain = url.split('/')[0];
+    }
+
+    return domain.split(':')[0];
 }
