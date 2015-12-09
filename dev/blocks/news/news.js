@@ -23,7 +23,7 @@ $(function() {
 			$(document).on('news-loaded', function() {
 				var today = (new Date()).getDay();
 
-				if (today == 6 || today == 0) {
+				if (today == 6 || today == 0 || isAdmin) {
 					updateCurrent();
 				}
 			})
