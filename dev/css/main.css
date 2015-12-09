@@ -449,6 +449,14 @@
 .onenews__comments {
   margin-top: 45px; }
 
+.onenews__geek {
+  position: relative;
+  top: 2px;
+  display: none;
+  margin-right: 5px; }
+  .onenews__geek:after {
+    content: url(../files/geek.svg); }
+
 /* fonts */
 /* fixes */
 html, body {

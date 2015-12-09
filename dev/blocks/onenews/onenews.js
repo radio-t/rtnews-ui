@@ -89,17 +89,19 @@ $(function() {
 			target: '_blank'
 		});
 
+		info = '<span class="onenews__geek" title="Гиковская тема"></span>';
+
 		if (json.author) {
-			info = json.author
-				   + ' ('
-				   + $a.prop('outerHTML')
-				   + ')'
-				   + ', '
-				   + formatDate(date);
+			info +=	json.author
+					+ ' ('
+					+ $a.prop('outerHTML')
+					+ ')'
+					+ ', '
+					+ formatDate(date);
 		} else {
-			info = $a.prop('outerHTML')
-				   + ', '
-				   + formatDate(date);
+			info +=	$a.prop('outerHTML')
+					+ ', '
+					+ formatDate(date);
 		}
 
 		$onenews.find('.onenews__title')
@@ -114,6 +116,10 @@ $(function() {
 
 				.find('.onenews__body')
 				.html(json.content);
+
+		if (json.geek) {
+			$onenews.find('.onenews__geek').show();
+		}
 
 		$(document).trigger('news-loaded');
 	}
