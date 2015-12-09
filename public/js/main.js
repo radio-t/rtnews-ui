@@ -321,7 +321,11 @@ $(function() {
 			load();
 
 			$(document).on('news-loaded', function() {
-				updateCurrent();
+				var today = (new Date()).getDay();
+
+				if (today == 6 || today == 0) {
+					updateCurrent();
+				}
 			})
 		}
 	}
