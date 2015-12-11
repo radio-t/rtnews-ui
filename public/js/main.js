@@ -379,7 +379,14 @@ $(function() {
 					.find('.news__info').html(info)
 					.end()
 					
-					.find('.news__desc').html(json[i].snippet);
+					.find('.news__desc').html(json[i].snippet)
+					.end()
+
+					.find('.news__comments-counter').text(
+						json[i].comments > 0
+						? 'Коммментарии: ' + json[i].comments
+						: 'Комментариев нет'
+					);
 
 			if (json[i].pic) {
 				$curItem.find('.news__image-hidden')
@@ -415,8 +422,7 @@ $(function() {
 						.end()
 
 						.find('.news__comments-counter')
-						.attr('href', '/post/' + json[i].slug + '#to-comments')
-						.attr('data-disqus-identifier', json[i].slug);
+						.attr('href', '/post/' + json[i].slug + '#to-comments');
 			}
 
 			$curItem.appendTo($newsList)
@@ -463,14 +469,6 @@ $(function() {
 		.done(function(json) {
 			$(document).on('news-loaded', function() {
 				$topStatus.hide();
-
-				var s = document.createElement('script');
-				s.async = true;
-				s.type = 'text/javascript';
-				s.id = 'dsq-count-scr';
-				s.src = '//' + disqusID + '.disqus.com/count.js';
-				
-				(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
 
 				if (isAdmin) {
 					if (! isMobile) {
