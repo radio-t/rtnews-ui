@@ -26,11 +26,57 @@ $(function() {
 				if (today == 6 || today == 0 || isAdmin) {
 					updateCurrent();
 				}
+
+				$('#news__sort')
+					.show()
+
+					.find('.link')
+					.click(function(event) {
+						event.preventDefault();
+
+						var type = $(this).data('sort');
+
+						if (! $(this).hasClass('link_active')) {
+							sortNews(type);
+
+							$('#news__sort .link_active').removeClass('link_active');
+							$(this).addClass('link_active');
+
+							if (type == 'priority') {
+								localStorage.removeItem('sorting');
+
+								if (isAdmin) {
+									$('.news').removeClass('news_sorted');
+									sortableList.option('disabled', false);
+								}
+							} else {
+								localStorage.setItem('sorting', type);
+
+								if (isAdmin) {
+									$('.news').addClass('news_sorted');
+									sortableList.option('disabled', true);
+								}
+							}
+						}
+					});
 			})
 		}
+
+		if (sorting) {
+			activeSorting = sorting;
+			$('.news').addClass('news_sorted');
+		} else {
+			activeSorting = 'priority';
+		}
+
+		$('#news__sort .link[data-sort="' + activeSorting + '"]').addClass('link_active');
 	}
 
 	function JSON2DOM(json) {
+		if (sorting && sorting != 'priority') {
+			sortJSON(json, sorting);
+		}
+
 		var $a;
 
 		for (var i = 0; i < json.length; i++) {
@@ -116,11 +162,13 @@ $(function() {
 			$curItem.appendTo($newsList)
 					.show()
 					.attr('data-id', json[i].id)
-					.attr('id', '');
+					.attr('id', '')
+					.data('comments', json[i].comments)
+					.data('ats', json[i].ats)
+					.data('pos', json[i].position);
 
 			if (isAdmin) {
-				$curItem.data('geek', json[i].geek)
-						.data('pos', json[i].position);
+				$curItem.data('geek', json[i].geek);
 
 				if (json[i].geek) {
 					$curItem.find('.news__button_togeek')
@@ -165,6 +213,7 @@ $(function() {
 							draggable: '.news__item',
 							ghostClass: 'news__item_sortable',
 							scrollSensitivity: 70,
+							disabled: !!sorting,
 							onUpdate: function(event) {
 								moveArticle($(event.item));
 							}
@@ -239,6 +288,10 @@ $(function() {
 					});
 				}
 			});
+
+			if (sorting) {
+				sortJSON(json);
+			}
 
 			JSON2DOM(json);
 		})
@@ -338,6 +391,41 @@ $(function() {
 		.fail(function(response) {
 			updateCurrent();
 		});
+	}
+
+	function sortNews(type) {
+		var $items = $('#news__list .news__item');
+
+		switch (type) {
+			case 'comments':
+				// X → x sort by comments count
+				$items.sort(function(a, b) {
+					return $(b).data('comments') - $(a).data('comments');
+				}).appendTo($newsList);
+				break;
+
+			case 'recent':
+				// X → x sort by adding date
+				$items.sort(function(a, b) {
+					if ($(a).data('ats') > $(b).data('ats')) {
+						return -1;
+					}
+
+					if ($(a).data('ats') < $(b).data('ats')) {
+						return 1;
+					}
+
+					return 0;
+				}).appendTo($newsList);
+				break;
+
+			case 'priority':
+				// X → x sort by admin's priority
+				$items.sort(function(a, b) {
+					return $(b).data('pos') - $(a).data('pos');
+				}).appendTo($newsList);
+				break;
+		}
 	}
 });
 
@@ -484,4 +572,37 @@ function delArticle($el) {
 		console.log("error while deleting news");
 		console.log(response);
 	});
+}
+
+function sortJSON(json, type) {
+	switch (type) {
+		case 'comments':
+			// X → x sort by comments count
+			json.sort(function(a, b) {
+				return b.comments - a.comments;
+			});
+			break;
+
+		case 'recent':
+			// X → x sort by adding date
+			json.sort(function(a, b) {
+				if (a.ats > b.ats) {
+					return -1;
+				}
+
+				if (a.ats < b.ats) {
+					return 1;
+				}
+
+				return 0;
+			});
+			break;
+
+		case 'priority':
+			// X → x sort by admin's priority
+			json.sort(function(a, b) {
+				return b.position - a.position;
+			});
+			break;
+	}
 }

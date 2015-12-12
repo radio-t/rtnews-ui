@@ -132,7 +132,7 @@
 }
 
 .page__header {
-  margin-bottom: 50px;
+  margin-bottom: 15px;
 }
 
 .page__footer {
@@ -175,6 +175,41 @@
   list-style: none;
 }
 
+.menu_sort {
+  text-align: right;
+}
+
+.menu_sort .menu__item {
+  margin-left: 15px;
+  margin-right: 0;
+  font-size: 12px;
+}
+
+.menu_sort .link,
+.menu_sort .content a,
+.content .menu_sort a,
+.menu_sort .onenews #disqus_thread a,
+.onenews #disqus_thread .menu_sort a {
+  border-color: rgba(162, 162, 162, 0.2);
+  color: #919191;
+  font-weight: 700;
+}
+
+.menu_sort .link:hover,
+.menu_sort .content a:hover,
+.content .menu_sort a:hover,
+.menu_sort .onenews #disqus_thread a:hover,
+.onenews #disqus_thread .menu_sort a:hover {
+  border-color: rgba(162, 162, 162, 0.7);
+  color: #333;
+}
+
+.menu_sort .link_active,
+.menu_sort .link_active:hover {
+  color: #000;
+  border-color: transparent;
+}
+
 .menu__item {
   display: inline-block;
   margin-right: 15px;
@@ -211,9 +246,33 @@
   display: inline-block;
 }
 
+.news_sorted .news__mobile-buttons {
+  display: none;
+}
+
 @media (max-width: 500px) {
   .news_admin .news__item {
     margin-top: 80px;
+  }
+}
+
+.news_deleted {
+  margin-top: 40px;
+}
+
+.news_deleted .news__manage {
+  top: -20px;
+}
+
+@media (max-width: 500px) {
+  .news_deleted .news__manage {
+    top: -15px;
+  }
+}
+
+@media (max-width: 500px) {
+  .news_deleted .news__item {
+    margin-top: 40px;
   }
 }
 
@@ -288,11 +347,7 @@
 }
 
 .news__status {
-  display: none;
-  color: #666;
-  font-style: italic;
-  font-family: "PT Serif", Georgia, sans-serif;
-  text-align: center;
+  margin-top: 40px;
 }
 
 .news__body {
@@ -480,6 +535,11 @@
   content: url("../files/geek.svg");
 }
 
+.news__sort {
+  display: none;
+  margin-bottom: 45px;
+}
+
 .common__table-nostyle,
 .feeds__table {
   border: none;
@@ -491,6 +551,10 @@
   border: none;
   border-spacing: 0;
   vertical-align: top;
+}
+
+.feeds {
+  padding-top: 20px;
 }
 
 .feeds__table {
@@ -617,9 +681,11 @@
   font-size: 12px;
 }
 
+.onenews {
+  padding-top: 20px;
+}
+
 .onenews__title {
-  margin-top: -20px;
-  margin-bottom: 0;
   border-color: rgba(0, 0, 0, 0.2);
   color: #000;
   font-size: 2rem;
@@ -628,14 +694,14 @@
 }
 
 .onenews__info {
-  margin-top: 4px;
+  margin-top: 20px;
   color: #666;
   font-size: 0.85rem;
   letter-spacing: 1px;
 }
 
 .onenews__body {
-  margin-top: 25px;
+  margin-top: 20px;
   margin-bottom: 35px;
 }
 

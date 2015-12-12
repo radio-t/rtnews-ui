@@ -93,7 +93,7 @@
   padding: 0 10px;
   font-family: "PT Sans", Arial, sans-serif; }
   .page__header {
-    margin-bottom: 50px; }
+    margin-bottom: 15px; }
   .page__footer {
     margin-top: 40px; }
     @media (max-width: 500px) {
@@ -121,6 +121,23 @@
   margin: 0;
   list-style: none; }
 
+.menu_sort {
+  text-align: right; }
+  .menu_sort .menu__item {
+    margin-left: 15px;
+    margin-right: 0;
+    font-size: 12px; }
+  .menu_sort .link, .menu_sort .content a, .content .menu_sort a, .menu_sort .onenews #disqus_thread a, .onenews #disqus_thread .menu_sort a {
+    border-color: rgba(162, 162, 162, 0.2);
+    color: #919191;
+    font-weight: 700; }
+    .menu_sort .link:hover, .menu_sort .content a:hover, .content .menu_sort a:hover, .menu_sort .onenews #disqus_thread a:hover, .onenews #disqus_thread .menu_sort a:hover {
+      border-color: rgba(162, 162, 162, 0.7);
+      color: #333; }
+    .menu_sort .link_active, .menu_sort .link_active:hover {
+      color: #000;
+      border-color: transparent; }
+
 .menu__item {
   display: inline-block;
   margin-right: 15px;
@@ -145,9 +162,23 @@
 .news_mobile .news__mobile-buttons {
   display: inline-block; }
 
+.news_sorted .news__mobile-buttons {
+  display: none; }
+
 @media (max-width: 500px) {
   .news_admin .news__item {
     margin-top: 80px; } }
+
+.news_deleted {
+  margin-top: 40px; }
+  .news_deleted .news__manage {
+    top: -20px; }
+    @media (max-width: 500px) {
+      .news_deleted .news__manage {
+        top: -15px; } }
+  @media (max-width: 500px) {
+    .news_deleted .news__item {
+      margin-top: 40px; } }
 
 .news__item {
   position: relative;
@@ -198,11 +229,7 @@
   margin-bottom: 5px; }
 
 .news__status {
-  display: none;
-  color: #666;
-  font-style: italic;
-  font-family: "PT Serif", Georgia, sans-serif;
-  text-align: center; }
+  margin-top: 40px; }
 
 .news__body {
   overflow: hidden;
@@ -333,6 +360,10 @@
   .news__geek:after {
     content: url(../files/geek.svg); }
 
+.news__sort {
+  display: none;
+  margin-bottom: 45px; }
+
 .common__table-nostyle, .feeds__table {
   border: none;
   border-spacing: 0; }
@@ -341,64 +372,62 @@
     border-spacing: 0;
     vertical-align: top; }
 
-.feeds__table {
-  width: 100%;
-  max-width: 770px;
-  margin: 0 auto;
-  table-layout: fixed;
-  border-spacing: 10px 4px; }
-  @media (max-width: 850px) {
-    .feeds__table {
-      max-width: none;
-      table-layout: auto; } }
-  .feeds__table th {
-    text-align: left; }
-
-.feeds__urls {
-  width: 500px;
-  max-width: 500px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis; }
-  @media (max-width: 850px) {
-    .feeds__urls {
-      width: auto;
-      max-width: 300px; } }
-  @media (max-width: 600px) {
-    .feeds__urls {
-      max-width: 150px;
-      overflow: visible;
-      white-space: normal;
-      word-wrap: break-word; } }
-  @media (max-width: 350px) {
-    .feeds__urls {
-      max-width: 100px;
-      overflow: visible;
-      white-space: normal;
-      word-wrap: break-word; } }
-
-.feeds__update {
-  width: 170px;
-  max-width: 170px;
-  white-space: nowrap; }
-  @media (max-width: 850px) {
-    .feeds__update {
-      width: auto; } }
-  @media (max-width: 600px) {
-    .feeds__update {
-      max-width: 70px;
-      white-space: normal; } }
-
-.feeds__del {
-  width: 100px;
-  max-width: 100px; }
-  @media (max-width: 850px) {
-    .feeds__del {
-      width: auto; } }
-
-.feeds__add-form {
-  margin-top: 10px;
-  font-size: 0; }
+.feeds {
+  padding-top: 20px; }
+  .feeds__table {
+    width: 100%;
+    max-width: 770px;
+    margin: 0 auto;
+    table-layout: fixed;
+    border-spacing: 10px 4px; }
+    @media (max-width: 850px) {
+      .feeds__table {
+        max-width: none;
+        table-layout: auto; } }
+    .feeds__table th {
+      text-align: left; }
+  .feeds__urls {
+    width: 500px;
+    max-width: 500px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; }
+    @media (max-width: 850px) {
+      .feeds__urls {
+        width: auto;
+        max-width: 300px; } }
+    @media (max-width: 600px) {
+      .feeds__urls {
+        max-width: 150px;
+        overflow: visible;
+        white-space: normal;
+        word-wrap: break-word; } }
+    @media (max-width: 350px) {
+      .feeds__urls {
+        max-width: 100px;
+        overflow: visible;
+        white-space: normal;
+        word-wrap: break-word; } }
+  .feeds__update {
+    width: 170px;
+    max-width: 170px;
+    white-space: nowrap; }
+    @media (max-width: 850px) {
+      .feeds__update {
+        width: auto; } }
+    @media (max-width: 600px) {
+      .feeds__update {
+        max-width: 70px;
+        white-space: normal; } }
+  .feeds__del {
+    width: 100px;
+    max-width: 100px; }
+    @media (max-width: 850px) {
+      .feeds__del {
+        width: auto; } }
+  .feeds__add-form {
+    margin-top: 10px;
+    font-size: 0; }
 
 .login {
   max-width: 200px;
@@ -427,35 +456,31 @@
     color: #999;
     font-size: 12px; }
 
-.onenews__title {
-  margin-top: -20px;
-  margin-bottom: 0;
-  border-color: rgba(0, 0, 0, 0.2);
-  color: #000;
-  font-size: 2rem;
-  font-weight: 700;
-  font-family: "PT Serif", Georgia, sans-serif; }
-
-.onenews__info {
-  margin-top: 4px;
-  color: #666;
-  font-size: 0.85rem;
-  letter-spacing: 1px; }
-
-.onenews__body {
-  margin-top: 25px;
-  margin-bottom: 35px; }
-
-.onenews__comments {
-  margin-top: 45px; }
-
-.onenews__geek {
-  position: relative;
-  top: 2px;
-  display: none;
-  margin-right: 5px; }
-  .onenews__geek:after {
-    content: url(../files/geek.svg); }
+.onenews {
+  padding-top: 20px; }
+  .onenews__title {
+    border-color: rgba(0, 0, 0, 0.2);
+    color: #000;
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: "PT Serif", Georgia, sans-serif; }
+  .onenews__info {
+    margin-top: 20px;
+    color: #666;
+    font-size: 0.85rem;
+    letter-spacing: 1px; }
+  .onenews__body {
+    margin-top: 20px;
+    margin-bottom: 35px; }
+  .onenews__comments {
+    margin-top: 45px; }
+  .onenews__geek {
+    position: relative;
+    top: 2px;
+    display: none;
+    margin-right: 5px; }
+    .onenews__geek:after {
+      content: url(../files/geek.svg); }
 
 /* fonts */
 /* fixes */

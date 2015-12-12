@@ -13,10 +13,34 @@ $b: '.news';
 		}
 	}
 
+	&_sorted {
+		#{$b}__mobile-buttons {
+			display: none;
+		}
+	}
+
 	&_admin {
 		#{$b}__item {
 			@media (max-width: 500px) {
 				margin-top: 80px;
+			}
+		}
+	}
+
+	&_deleted {
+		margin-top: 40px;
+		
+		#{$b}__manage {
+		    top: -20px;
+		    
+		    @media (max-width: 500px) {
+		    	top: -15px;
+		    }
+		}
+		
+		#{$b}__item {
+			@media (max-width: 500px) {
+				margin-top: 40px;
 			}
 		}
 	}
@@ -110,13 +134,7 @@ $b: '.news';
 	}	
 
 	&__status {
-		display: none;
-
-		color: #666;
-		font-style: italic;
-		font-family: $serif;
-		
-		text-align: center;
+		margin-top: 40px;
 	}
 
 	&__body {
@@ -321,5 +339,10 @@ $b: '.news';
 		&:after {
 			content: url(../files/geek.svg);
 		}
+	}
+
+	&__sort {
+		display: none;
+		margin-bottom: 45px;
 	}
 }			

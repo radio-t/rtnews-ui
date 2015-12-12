@@ -3,10 +3,9 @@
 $b: '.onenews';
 
 #{$b} {
+	padding-top: 20px;
+	
 	&__title {
-		margin-top: -20px;
-		margin-bottom: 0;
-
 		border-color: rgba(0, 0, 0, 0.2);
 
 		color: #000;
@@ -16,7 +15,7 @@ $b: '.onenews';
 	}
 
 	&__info {
-		margin-top: 4px;
+		margin-top: 20px;
 		
 		color: #666;
 		font-size: 0.85rem;
@@ -24,7 +23,7 @@ $b: '.onenews';
 	}
 
 	&__body {
-		margin-top: 25px;
+		margin-top: 20px;
 		margin-bottom: 35px;
 	}
 

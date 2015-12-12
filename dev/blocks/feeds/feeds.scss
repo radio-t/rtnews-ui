@@ -3,6 +3,8 @@
 $b: '.feeds';
 
 #{$b} {
+	padding-top: 20px;
+	
 	&__table {
 		@extend .common__table-nostyle;	
 		
@@ -21,9 +23,6 @@ $b: '.feeds';
 		
 		th { 
 			text-align: left;
-		}
-
-		td {
 		}
 	}
 

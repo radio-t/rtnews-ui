@@ -2,6 +2,7 @@ var APIPath = 'http://master.radio-t.com:8780/api/v1',
 	disqusID = 'radiotnewstest',
 	login = localStorage.getItem('login'),
 	password = localStorage.getItem('password'),
+	sorting = localStorage.getItem('sorting'),
 	authHeaders = {
 		'Authorization': 'Basic ' + btoa(login + ':' + password)
 	},
