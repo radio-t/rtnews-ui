@@ -246,7 +246,7 @@
   display: inline-block;
 }
 
-.news_sorted .news__mobile-buttons {
+.news_disabled-sort .news__mobile-buttons {
   display: none;
 }
 

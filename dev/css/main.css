@@ -162,7 +162,7 @@
 .news_mobile .news__mobile-buttons {
   display: inline-block; }
 
-.news_sorted .news__mobile-buttons {
+.news_disabled-sort .news__mobile-buttons {
   display: none; }
 
 @media (max-width: 500px) {

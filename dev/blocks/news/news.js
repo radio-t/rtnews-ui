@@ -46,15 +46,13 @@ $(function() {
 								localStorage.removeItem('sorting');
 
 								if (isAdmin) {
-									$('.news').removeClass('news_sorted');
-									sortableList.option('disabled', false);
+									enableNewsSortable();
 								}
 							} else {
 								localStorage.setItem('sorting', type);
 
 								if (isAdmin) {
-									$('.news').addClass('news_sorted');
-									sortableList.option('disabled', true);
+									disableNewsSortable();
 								}
 							}
 						}
@@ -64,7 +62,7 @@ $(function() {
 
 		if (sorting) {
 			activeSorting = sorting;
-			$('.news').addClass('news_sorted');
+			$('.news').addClass('news_disabled-sort');
 		} else {
 			activeSorting = 'priority';
 		}
@@ -624,4 +622,14 @@ function sortJSON(json, type) {
 			});
 			break;
 	}
+}
+
+function disableNewsSortable() {
+	$('.news').addClass('news_disabled-sort');
+	$('.news__handler').hide();
+}
+
+function enableNewsSortable() {
+	$('.news').removeClass('news_disabled-sort');
+	$('.news__handler').show();
 }

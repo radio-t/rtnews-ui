@@ -13,7 +13,7 @@ $b: '.news';
 		}
 	}
 
-	&_sorted {
+	&_disabled-sort {
 		#{$b}__mobile-buttons {
 			display: none;
 		}
