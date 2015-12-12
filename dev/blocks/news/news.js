@@ -116,11 +116,20 @@ $(function() {
 					.find('.news__desc').html(json[i].snippet)
 					.end()
 
-					.find('.news__comments-counter').text(
+					.find('.news__comments-counter')
+					.text(
 						json[i].comments > 0
 						? 'Коммментарии: ' + json[i].comments
 						: 'Комментариев нет'
-					);
+					)
+					.attr('href', '/post/' + json[i].slug + '#to-comments')
+					.end()
+
+					.find('.news__light').click(function(event) {
+						event.preventDefault();
+						toggleArticle($(this));
+					})
+					.show();
 
 			if (json[i].pic) {
 				$curItem.find('.news__image-hidden')
@@ -142,21 +151,6 @@ $(function() {
 					// wait for paste element
 					$(document).trigger('current-updated');
 				}, 300);
-			}
-
-			if (json[i].content) {
-				$curItem.find('.news__full').html(json[i].content)
-						.end()
-
-						.find('.news__light').click(function(event) {
-							event.preventDefault();
-							toggleArticle($(this));
-						})
-						.show()
-						.end()
-
-						.find('.news__comments-counter')
-						.attr('href', '/post/' + json[i].slug + '#to-comments');
 			}
 
 			$curItem.appendTo($newsList)
@@ -433,6 +427,7 @@ $(function() {
 
 function toggleArticle($link) {
 	var $full = $link.siblings('.news__full'),
+		$loader = $('.news__full-loader', $full),
 		body = $('body')[0],
 		v = 0;
 
@@ -457,6 +452,27 @@ function toggleArticle($link) {
 		}
 		
 		$full.show();
+
+		if ($loader.is(':visible')) {
+			var id = $full.closest('.news__item').data('id');
+
+			$.ajax({
+				url: APIPath + '/news/id/' + id,
+				type: 'GET',
+				dataType: 'json',
+				async: true
+			})
+			.done(function(json) {
+				if (json.content.length) {
+					$loader.after(json.content).hide();
+				} else {
+					$loader.text('Увы, но у этой новости нет подробного текста');
+				}
+			})
+			.fail(function(response) {
+				$loader.text('Ошибка. Не получилось загрузить новость');
+			});
+		}
 	}
 	
 	toggleArticleLink($link);

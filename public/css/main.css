@@ -540,6 +540,14 @@
   margin-bottom: 45px;
 }
 
+.news__full-loader {
+  padding: 30px 0;
+  color: #999;
+  font-family: "PT Serif", Georgia, sans-serif;
+  font-style: italic;
+  text-align: center;
+}
+
 .common__table-nostyle,
 .feeds__table {
   border: none;
