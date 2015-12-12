@@ -358,7 +358,7 @@ $(function() {
 							if (type == 'priority') {
 								localStorage.removeItem('sorting');
 
-								if (isAdmin) {
+								if (isAdmin && location.hash != '#geek') {
 									enableNewsSortable();
 								}
 							} else {
