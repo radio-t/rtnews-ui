@@ -65,6 +65,8 @@ function allNews() {
 		event.preventDefault();
 		geekNews();
 	});
+
+	history.pushState("", document.title, window.location.pathname);
 }
 
 function geekNews() {
@@ -83,4 +85,6 @@ function geekNews() {
 		event.preventDefault();
 		allNews();
 	});
+
+	history.pushState("", document.title, window.location.pathname + '#geek');
 }
