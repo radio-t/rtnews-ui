@@ -287,6 +287,8 @@ $(function() {
 						delArticle($(this));
 					});
 				}
+
+				$(document).trigger('fullpage-loaded');
 			});
 
 			if (sorting) {

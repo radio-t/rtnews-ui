@@ -600,6 +600,8 @@ $(function() {
 						delArticle($(this));
 					});
 				}
+
+				$(document).trigger('fullpage-loaded');
 			});
 
 			if (sorting) {
@@ -1086,7 +1088,7 @@ $(function() {
 	}
 
 	if (location.hash == '#geek') {
-		$(document).on('news-loaded', function() {
+		$(document).on('fullpage-loaded', function() {
 			$('#geek').click();
 		});
 	}
