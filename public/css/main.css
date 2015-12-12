@@ -548,6 +548,14 @@
   text-align: center;
 }
 
+.news__handler {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 35px;
+  width: 150px;
+}
+
 .common__table-nostyle,
 .feeds__table {
   border: none;

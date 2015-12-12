@@ -206,6 +206,7 @@ $(function() {
 							animation: 150,
 							draggable: '.news__item',
 							ghostClass: 'news__item_sortable',
+							handle: '.news__handler',
 							scrollSensitivity: 70,
 							disabled: !!sorting,
 							onUpdate: function(event) {

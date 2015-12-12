@@ -355,4 +355,13 @@ $b: '.news';
 		
 		text-align: center;
 	}
+
+	&__handler {
+		position: absolute;
+		right: 0;
+		top: 0;
+		bottom: 35px;
+		
+		width: 150px;
+	}
 }			
