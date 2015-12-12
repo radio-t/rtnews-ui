@@ -376,7 +376,8 @@
   right: 0;
   top: 0;
   bottom: 35px;
-  width: 150px; }
+  width: 150px;
+  cursor: move; }
 
 .common__table-nostyle, .feeds__table {
   border: none;
