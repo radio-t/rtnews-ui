@@ -127,7 +127,14 @@ $(function() {
 						event.preventDefault();
 						toggleArticle($(this));
 					})
-					.show();
+					.show()
+					.end()
+
+					.attr('data-id', json[i].id)
+					.attr('id', '')
+					.data('comments', json[i].comments)
+					.data('ats', json[i].ats)
+					.data('pos', json[i].position);
 
 			if (json[i].pic) {
 				$curItem.find('.news__image-hidden')
@@ -141,8 +148,6 @@ $(function() {
 			}
 
 			if (json[i].active) {
-				$('.news__item').removeClass('news__item_current')
-							    .attr('id', '');
 				$curItem.addClass('news__item_current')
 						.attr('id', 'current');
 				setTimeout(function() {
@@ -152,12 +157,7 @@ $(function() {
 			}
 
 			$curItem.appendTo($newsList)
-					.show()
-					.attr('data-id', json[i].id)
-					.attr('id', '')
-					.data('comments', json[i].comments)
-					.data('ats', json[i].ats)
-					.data('pos', json[i].position);
+					.show();
 
 			if (isAdmin) {
 				$curItem.data('geek', json[i].geek);
