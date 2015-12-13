@@ -123,30 +123,79 @@ $(function() {
 				// }
 
 				var hrefFunc = function() {
-					var regex = new RegExp("[\\?&]url=([^&#]*)"),
-					    results = regex.exec(location.search);
+					var w = window,
+						d = document,
+						i = d.createElement('div'),
+						s = i.style;
 
-					url = results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+					s.transition = 'all 200ms';
+					s.position = 'fixed';
+					s.left = '0';
+					s.right = '0';
+					s.top = '0';
+					s.zIndex = 16777271;
+					s.height = '0';
+					s.width = '100%';
+					s.overflow = 'hidden';
+					s.background = '#fff';
+					s.borderBottom = '1px solid #bdbdbd';
+					s.boxShadow = '0 0 30px #828282';
+					s.color = '#232323';
+					s.fontSize = '30px';
+					s.fontWeight = '700';
+					s.fontFamily = '"PT Serif", Georgia, serif';
+					s.lineHeight = '67px';
+					s.textAlign = 'center';
 
-					var request = new XMLHttpRequest();  
+					i.textContent = 'Сохраняю..';
 
-					request.open('POST', '#LOCATION#' + '/news', false, '#LOGIN#', '#PASSWORD#'); 
-					request.setRequestHeader('Authorization', 'Basic ' + btoa('#LOGIN#' + ':' + '#PASSWORD#')); 
+					d.body.appendChild(i);
 
-					try {
-						request.send('{ "link": "' + decodeURIComponent(location.href) + '" }');
+					w.setTimeout(function() {
+						s.height = '70px';
+					}, 100);
 
-				        if (request.readyState === 4) { 
-				        	if (request.status !== 200) {
-				        		alert('Не смог сохранить');
-				        	}  else {
-				        		alert('Сохранил');
-				        	}
-				        } else {
-				        	alert('Не смог достучаться до сервера');
-				        }
-					} catch (err) {
-						alert('Не смог сохранить');
+					w.setTimeout(function() {
+						var rq = new XMLHttpRequest();  
+
+						rq.open('POST', '#LOCATION#' + '/news', false, '#LOGIN#', '#PASSWORD#'); 
+						rq.setRequestHeader('Authorization', 'Basic ' + btoa('#LOGIN#' + ':' + '#PASSWORD#')); 
+
+						try {
+							rq.send('{ "link": "' + decodeURIComponent(location.href) + '" }');
+
+					        if (rq.readyState === 4) { 
+					        	if (rq.status !== 200) {
+					        		e('Не смог сохранить');
+					        		r();
+					        	}  else {
+					        		s.color = '#090';
+					        		i.textContent = 'Сохранил';
+					        		r();
+					        	}
+					        } else {
+					        	e('Не смог достучаться до сервера');
+					        	r();
+					        }
+						} catch (err) {
+					        e('Не смог сохранить');
+					        r();
+						}
+					}, 500);
+
+					function e(t) {
+						s.color = '#d00';
+				        i.textContent = t;
+					}
+
+					function r() {
+						w.setTimeout(function() {
+							s.height = '0';
+
+							w.setTimeout(function() {
+								i.parentNode.removeChild(i);
+							}, 300);
+						}, 500);
 					}
 				}
 
