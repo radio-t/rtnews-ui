@@ -117,7 +117,7 @@ $(function() {
 					.find('.news__comments-counter')
 					.text(
 						json[i].comments > 0
-						? 'Коммментарии: ' + json[i].comments
+						? 'Комментарии: ' + json[i].comments
 						: 'Комментариев нет'
 					)
 					.attr('href', '/post/' + json[i].slug + '#to-comments')
