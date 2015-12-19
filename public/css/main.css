@@ -523,7 +523,7 @@
   position: relative;
   top: 2px;
   display: none;
-  margin-right: 5px;
+  margin-left: 7px;
 }
 
 .news__geek:after {
@@ -552,12 +552,12 @@
   cursor: move;
 }
 
-.news__footer-right {
-  float: right;
-  padding: 3px 6px;
-  margin: -1px 0px;
-  border-radius: 3px;
-  background-color: rgba(193, 210, 228, 0.25);
+.news__info-stat {
+  display: inline-block;
+  padding: 1px 3px;
+  margin-top: 2px;
+  margin-right: 3px;
+  border-bottom: 1px solid transparent;
   color: #3F8BBD;
   font-size: 14px;
   text-decoration: none;
@@ -565,8 +565,8 @@
   transition: all 300ms;
 }
 
-.news__footer-right:hover {
-  background-color: rgba(184, 217, 253, 0.5);
+.news__info-stat:hover {
+  border-bottom: 1px solid rgba(0, 96, 160, 0.2);
 }
 
 .news__likes {

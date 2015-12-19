@@ -445,16 +445,18 @@ $(function() {
 			info = '<span class="news__geek" title="Гиковская тема"></span>';
 
 			if (json[i].author) {
-				info +=	json[i].author 
+				info =	json[i].author 
 						+ ' (' 
 						+ $a.prop('outerHTML')
 						+ ')'
 						+ ', '
-						+ formatDate(date);
+						+ formatDate(date)
+						+ info;
 			} else {
-				info +=	$a.prop('outerHTML')
+				info =	$a.prop('outerHTML')
 						+ ', '
 						+ formatDate(date)
+						+ info;
 			}
 
 			$curItem.find('.news__title')
@@ -462,7 +464,8 @@ $(function() {
 					.text(json[i].title)
 					.end()
 					
-					.find('.news__info').html(info)
+					.find('.news__info')
+					.append(info)
 					.end()
 					
 					.find('.news__desc').html(json[i].snippet)
