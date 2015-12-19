@@ -468,13 +468,12 @@ $(function() {
 					.find('.news__desc').html(json[i].snippet)
 					.end()
 
-					.find('.news__comments-counter')
-					.text(
-						json[i].comments > 0
-						? 'Комментарии: ' + json[i].comments
-						: 'Комментариев нет'
-					)
+					.find('.news__footer-right')
 					.attr('href', '/post/' + json[i].slug + '#to-comments')
+					.end()
+
+					.find('.news__comments')
+					.text(json[i].comments)
 					.end()
 
 					.find('.news__light').click(function(event) {
@@ -484,9 +483,14 @@ $(function() {
 					.show()
 					.end()
 
+					.find('.news__likes')
+					.text(json[i].likes)
+					.end()
+
 					.attr('data-id', json[i].id)
 					.attr('id', '')
 					.data('comments', json[i].comments)
+					.data('likes', json[i].likes)
 					.data('ats', json[i].ats)
 					.data('pos', json[i].position);
 
@@ -753,6 +757,13 @@ $(function() {
 				}).appendTo($newsList);
 				break;
 
+			case 'likes':
+				// X → x sort by likes count
+				$items.sort(function(a, b) {
+					return $(b).data('likes') - $(a).data('likes');
+				}).appendTo($newsList);
+				break;
+
 			case 'recent':
 				// X → x sort by adding date
 				$items.sort(function(a, b) {
@@ -951,6 +962,13 @@ function sortJSON(json, type) {
 			// X → x sort by comments count
 			json.sort(function(a, b) {
 				return b.comments - a.comments;
+			});
+			break;
+
+		case 'likes':
+			// X → x sort by likes count
+			json.sort(function(a, b) {
+				return b.likes - a.likes;
 			});
 			break;
 
