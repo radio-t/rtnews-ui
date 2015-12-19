@@ -471,7 +471,7 @@ $(function() {
 					.find('.news__desc').html(json[i].snippet)
 					.end()
 
-					.find('.news__footer-right')
+					.find('.news__info-stat')
 					.attr('href', '/post/' + json[i].slug + '#to-comments')
 					.end()
 

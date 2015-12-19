@@ -364,13 +364,13 @@ $b: '.news';
 	&__info-stat {
 		display: inline-block;
 		
-		padding: 1px 3px;
+		padding: 1px 0;
 		margin-top: 2px;
 		margin-right: 3px;
 		
 		border-bottom: 1px solid transparent;
 		
-		color: #3F8BBD;
+		color: #666;
 		font-size: 14px;
 		
 		text-decoration: none;
@@ -378,13 +378,11 @@ $b: '.news';
 		transition: all 300ms;
 		
 		&:hover {
-			border-bottom: 1px solid rgba(0, 96, 160, .2);
+			border-bottom: 1px solid rgba(#666, .2);
 		}
 	}
 
 	&__likes {
-		margin-right: 10px;
-
 		&:before {
 			content: url('../files/like.svg');
 			display: inline-block;
@@ -396,6 +394,8 @@ $b: '.news';
 	}
 
 	&__comments {		
+		margin-right: 4px;
+		
 		&:before {
 			content: url('../files/comment.svg');
 			display: inline-block;
