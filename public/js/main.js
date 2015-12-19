@@ -86,42 +86,6 @@ $(function() {
 	if ($('#add__bookmark').length) {
 		$('#add__bookmark')
 			.attr('href', function() {
-				// var hrefFunc = function() {
-				// 	var w = window,
-				// 		d = document,
-				// 		i = d.createElement('iframe'),
-				// 		s = i.style;
-
-				// 	i.src = '#LOCATION#'
-				// 			+ '?url=' + encodeURIComponent(location.href)
-				// 			+ '&login=' + '#LOGIN#'
-				// 			+ '&password=' + '#PASSWORD#';
-				// 	i.scrolling = 'no';
-
-				// 	s.transition = 'all 200ms';
-				// 	s.position = 'fixed';
-				// 	s.left = '0';
-				// 	s.right = '0';
-				// 	s.top = '0';
-				// 	s.zIndex = 16777271;
-				// 	s.height = '70px';
-				// 	s.width = '100%';
-				// 	s.overflow = 'hidden';
-				// 	s.background = '#fff';
-				// 	s.borderBottom = '1px solid #bdbdbd';
-				// 	s.boxShadow = '0 0 30px #828282';
-
-				// 	d.body.appendChild(i);
-					
-				// 	w.setTimeout(function() {
-				// 		s.height = '0';
-
-				// 		w.setTimeout(function() {
-				// 			i.parentNode.removeChild(i);
-				// 		}, 300);
-				// 	}, 3000);
-				// }
-
 				var hrefFunc = function() {
 					var w = window,
 						d = document,
