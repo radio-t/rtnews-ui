@@ -42,6 +42,10 @@ $(function() {
 			$('.news').addClass('news_disabled-sort');
 		} else {
 			activeSorting = 'priority';
+
+			if ($('.news_archive').length) {
+				activeSorting = 'recent';
+			}
 		}
 
 		$('#news__sort .link[data-sort="' + activeSorting + '"]').addClass('link_active');
@@ -274,10 +278,6 @@ $(function() {
 				$(document).trigger('fullpage-loaded');
 			});
 
-			if (sorting) {
-				sortJSON(json);
-			}
-
 			JSON2DOM(json);
 		})
 		.fail(function(response) {
@@ -347,10 +347,6 @@ $(function() {
 					$('.news__manage').remove();
 				}
 			});
-
-			if (sorting) {
-				sortJSON(json);
-			}
 
 			JSON2DOM(json);
 		})
