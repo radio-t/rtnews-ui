@@ -62,5 +62,9 @@ $b: '.menu';
 				margin-left: 0;
 			}
 		}
+
+		&_admin {
+			display: none;
+		}
 	}
 }

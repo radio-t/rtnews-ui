@@ -8,8 +8,7 @@
 
 	<script>
 		var login = localStorage.getItem('login'),
-			pass = localStorage.getItem('password'),
-			admin = true;
+			pass = localStorage.getItem('password');
 
 		if (! (login && pass)) {
 			location.href = '/login/?back=' + location.href;
@@ -25,18 +24,22 @@
 	<script src="/js/main.js"></script>
 </head>
 <body class="page">
+
 	<div class="header wrapper page__header">
-		<div class="header__title">Новости для Радио-Т</div>
-		<ul class="header__menu menu">
-			<li class="menu__item" id="all-wrap">Все темы</li>
-			<li class="menu__item" id="geek-wrap"><a href="#geek" class="link" id="geek">Гиковские</a></li>
-			<li class="menu__item" id="dels-wrap"><a href="/deleted/" class="link">Удалённые</a></li>
-			<li class="menu__item"><a href="/add/" class="link">Добавить новость</a></li>
-			<li class="menu__item"><a href="/feeds/" class="link">Управление фидами</a></li>
-			<li class="menu__item"><a href="#update" id="update-feeds" class="link">Обновить базу</a></li>
-			<li class="menu__item menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
-		</ul>
-	</div>
+	<div class="header__title">Новости для Радио-Т</div>
+	<ul class="header__menu menu">
+		<li class="menu__item menu__item_user"><a href="/" class="link">Все темы</a></li>
+		<li class="menu__item menu__item_admin" id="all-wrap"><a href="/admin/" class="link">Все темы</a></li>
+		<li class="menu__item menu__item_admin" id="geek-wrap"><a href="/admin/#geek" class="link" id="geek">Гиковские</a></li>
+		<li class="menu__item menu__item_admin" id="dels-wrap"><a href="/deleted/" class="link">Удалённые</a></li>
+		<li class="menu__item"><a href="/archive/" class="link">Архив</a></li>
+		<li class="menu__item menu__item_admin"><a href="/add/" class="link">Добавить новость</a></li>
+		<li class="menu__item menu__item_admin"><a href="/feeds/" class="link">Управление фидами</a></li>
+		<li class="menu__item menu__item_admin"><a href="#update" id="update-feeds" class="link">Обновить базу</a></li>
+		<li class="menu__item menu__item_to-current" id="to-current"><a href="#current" class="link">К текущей теме</a></li>
+		<li class="menu__item menu__item_admin menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
+	</ul>
+</div> 
 
 	<div class="wrapper">
 		<div class="news news_admin">
@@ -59,8 +62,8 @@
 					<a href="#" class="news__button news__button_current"></a>
 					<a href="#" class="news__button news__button_togeek"></a>
 					<a href="#" class="news__button news__button_first"></a>
+					<a href="#" class="news__button news__button_archive"></a>
 					<a href="#" class="news__button news__button_del"></a>
-					<a href="#" class="news__button news__button_restore"></a>
 				</div>
 				<div class="news__body">
 					<div class="news__handler"></div>
@@ -69,8 +72,8 @@
 					<a href="#" class="link news__title"></a>
 					<div class="news__info">
 						<a href="#" class="news__info-stat">
-							<span class="news__comments"></span>
-							<span class="news__likes"></span>
+							<span class="news__comments" title="Комментарии"></span>
+							<span class="news__likes" title="Лайки"></span>
 						</a>
 					</div>
 					<div class="news__desc"></div>

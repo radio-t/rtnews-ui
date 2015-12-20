@@ -49,6 +49,20 @@ $b: '.news';
 		}
 	}
 
+	&_archive {
+		#{$b}__item {
+			margin-bottom: 10px;
+		}
+
+		#{$b}__sort {
+			margin-bottom: 25px;
+		}
+
+		#{$b}__manage {
+			top: -15px;
+		}
+	}
+
 	&__list {
 		@extend .common__list-nostyle;
 	}
@@ -244,9 +258,15 @@ $b: '.news';
 	    	}
 	    }
 
-	    &_restore {
-	    	display: none;
+	    &_archive {
+	    	background: #c1c1c1;
 	    	
+	    	&:after {
+	    		content: 'в архив';
+	    	}
+	    }
+
+	    &_restore {
 	    	background: #33cc33;
 	    	
 	    	&:after {

@@ -238,6 +238,10 @@
   }
 }
 
+.menu__item_admin {
+  display: none;
+}
+
 .news_mobile .news__manage {
   display: block;
 }
@@ -281,6 +285,18 @@
   .news_deleted .news__item {
     margin-top: 40px;
   }
+}
+
+.news_archive .news__item {
+  margin-bottom: 10px;
+}
+
+.news_archive .news__sort {
+  margin-bottom: 25px;
+}
+
+.news_archive .news__manage {
+  top: -15px;
 }
 
 .news__item {
@@ -452,8 +468,15 @@
   content: 'удалить';
 }
 
+.news__button_archive {
+  background: #c1c1c1;
+}
+
+.news__button_archive:after {
+  content: 'в архив';
+}
+
 .news__button_restore {
-  display: none;
   background: #33cc33;
 }
 

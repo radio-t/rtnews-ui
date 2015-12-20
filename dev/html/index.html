@@ -2,12 +2,8 @@
 	"title": "Новости для Радио-Т"
 })
 <body class="page">
-	<div class="header wrapper page__header">
-		<div class="header__title">Новости для Радио-Т</div>
-		<ul class="header__menu menu">
-			<li class="menu__item menu__item_to-current" id="to-current"><a href="#current" class="link">К текущей теме</a></li>
-		</ul>
-	</div>
+	
+	@@include('../blocks/header/header.html') 
 
 	<div class="wrapper">
 		<div class="news">
@@ -28,8 +24,8 @@
 					<a href="#" class="link news__title"></a>
 					<div class="news__info">
 						<a href="#" class="news__info-stat">
-							<span class="news__comments"></span>
-							<span class="news__likes"></span>
+							<span class="news__comments" title="Комментарии"></span>
+							<span class="news__likes" title="Лайки"></span>
 						</a>
 					</div>
 					<div class="news__desc"></div>

@@ -7,6 +7,7 @@ var APIPath = 'http://master.radio-t.com:8780/api/v1',
 		'Authorization': 'Basic ' + btoa(login + ':' + password)
 	},
 	isMobile =  /Android|iPhone|iPad|iPod|IEMobile|Windows Phone|Opera Mini/i.test(navigator.userAgent),
+	isAdmin = login && password,
 	sortableList;
 
 function getParameterByName(name) {

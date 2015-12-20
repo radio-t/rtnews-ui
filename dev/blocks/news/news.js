@@ -7,7 +7,6 @@ $(function() {
 		info,
 		date = new Date(),
 
-		isAdmin = typeof admin !== "undefined" && admin,
 		oldTitle = document.title;
 
 	if ($('#news__list').length) {
@@ -17,6 +16,13 @@ $(function() {
 
 		if ($('.news_deleted').length) {
 			loadDeleted();
+		} else if ($('.news_archive').length) {
+			loadArchived();
+
+			$(document).on('news-loaded', function() {
+				showSortLinks();
+			})
+
 		} else {
 			load();
 
@@ -27,36 +33,7 @@ $(function() {
 					updateCurrent();
 				}
 
-				$('#news__sort')
-					.show()
-
-					.find('.link')
-					.click(function(event) {
-						event.preventDefault();
-
-						var type = $(this).data('sort');
-
-						if (! $(this).hasClass('link_active')) {
-							sortNews(type);
-
-							$('#news__sort .link_active').removeClass('link_active');
-							$(this).addClass('link_active');
-
-							if (type == 'priority') {
-								localStorage.removeItem('sorting');
-
-								if (isAdmin && location.hash != '#geek') {
-									enableNewsSortable();
-								}
-							} else {
-								localStorage.setItem('sorting', type);
-
-								if (isAdmin) {
-									disableNewsSortable();
-								}
-							}
-						}
-					});
+				showSortLinks();
 			})
 		}
 
@@ -166,7 +143,7 @@ $(function() {
 			$curItem.appendTo($newsList)
 					.show();
 
-			if (isAdmin) {
+			if (isAdmin && $('.news_archive').length == 0) {
 				$curItem.data('geek', json[i].geek);
 
 				if (json[i].geek) {
@@ -286,6 +263,12 @@ $(function() {
 
 						delArticle($(this));
 					});
+
+					$('.news__button_archive').click(function(event) {
+						event.preventDefault();
+
+						archiveArticle($(this));
+					});
 				}
 
 				$(document).trigger('fullpage-loaded');
@@ -320,16 +303,54 @@ $(function() {
 			$(document).on('news-loaded', function() {
 				$topStatus.hide();
 
-				if (isAdmin) {
-					$('.news__button_restore')
-						.css('display', 'inline-block')
-						.click(function(event) {
-								event.preventDefault();
+				$('.news__button_restore')
+					.click(function(event) {
+							event.preventDefault();
 
-								restoreArticle($(this));
+							restoreArticle($(this));
+					});
+			});
+
+			JSON2DOM(json);
+		})
+		.fail(function(response) {
+			$topStatus.text('Ошибка при загрузке, попробуйте обновить страницу')
+					  .slideDown();
+			console.log(response);
+		});
+	}
+
+	function loadArchived() {
+		$.ajax({
+			url: APIPath + '/news/archive',
+			type: 'GET',
+			dataType: 'json',
+			cache: false,
+			async: true,
+			beforeSend: function() {
+				$topStatus.text('Загружаю..')
+						  .show();
+			}
+		})
+		.done(function(json) {
+			$(document).on('news-loaded', function() {
+				$topStatus.hide();
+
+				if (isAdmin) {
+					$('.news__button_del')
+						.click(function(event) {
+							event.preventDefault();
+
+							delArticle($(this));
 						});
+				} else {
+					$('.news__manage').remove();
 				}
 			});
+
+			if (sorting) {
+				sortJSON(json);
+			}
 
 			JSON2DOM(json);
 		})
@@ -435,6 +456,39 @@ $(function() {
 				}).appendTo($newsList);
 				break;
 		}
+	}
+
+	function showSortLinks() {
+		$('#news__sort')
+			.show()
+
+			.find('.link')
+			.click(function(event) {
+				event.preventDefault();
+
+				var type = $(this).data('sort');
+
+				if (! $(this).hasClass('link_active')) {
+					sortNews(type);
+
+					$('#news__sort .link_active').removeClass('link_active');
+					$(this).addClass('link_active');
+
+					if (type == 'priority') {
+						localStorage.removeItem('sorting');
+
+						if (isAdmin && location.hash != '#geek') {
+							enableNewsSortable();
+						}
+					} else {
+						localStorage.setItem('sorting', type);
+
+						if (isAdmin) {
+							disableNewsSortable();
+						}
+					}
+				}
+			});
 	}
 });
 
@@ -601,6 +655,23 @@ function delArticle($el) {
 	})
 	.fail(function(response) {
 		console.log("error while deleting news");
+		console.log(response);
+	});
+}
+
+function archiveArticle($el) {
+	var $item = $el.closest('.news__item');
+
+	$.ajax({
+		url: APIPath + '/news/archive/' + $item.data('id'),
+		type: 'PUT',
+		headers: authHeaders
+	})
+	.done(function() {
+		$item.remove();
+	})
+	.fail(function(response) {
+		console.log("error while archiving news");
 		console.log(response);
 	});
 }

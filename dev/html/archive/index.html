@@ -1,12 +1,12 @@
-@@include('../../includes/head_admin.html',{
-	"title": "Админ-панель — Новости для Радио-Т"
+@@include('../../includes/head.html',{
+	"title": "Архив — Новости для Радио-Т"
 })
 <body class="page">
-
+	
 	@@include('../../blocks/header/header.html') 
 
 	<div class="wrapper">
-		<div class="news news_admin">
+		<div class="news news_archive">
 			<div class="status news__status" id="news__top-status"></div>
 			<ul class="menu menu_sort news__sort" id="news__sort">
 				<li class="menu__item"><a href="#" class="link" data-sort="priority">по приоритету</a></li>
@@ -14,25 +14,14 @@
 				<li class="menu__item"><a href="#" class="link" data-sort="comments">по комментариям</a></li>
 				<li class="menu__item"><a href="#" class="link" data-sort="likes">по лайкам</a></li>
 			</ul>
-			<ul class="news__list sortable" id="news__list">
+			<div class="news__list" id="news__list">
 				
-			</ul>
-			<li class="news__item" id="news__skeleton">
+			</div>
+			<div class="news__item" id="news__skeleton">
 				<div class="news__manage">
-					<div class="news__mobile-buttons">
-						<a href="#" class="news__button news__button_up"></a>
-						<a href="#" class="news__button news__button_down"></a>
-					</div>
-					<a href="#" class="news__button news__button_current"></a>
-					<a href="#" class="news__button news__button_togeek"></a>
-					<a href="#" class="news__button news__button_first"></a>
-					<a href="#" class="news__button news__button_archive"></a>
 					<a href="#" class="news__button news__button_del"></a>
 				</div>
 				<div class="news__body">
-					<div class="news__handler"></div>
-					<img class="news__image-hidden">
-					<div class="news__image"></div>
 					<a href="#" class="link news__title"></a>
 					<div class="news__info">
 						<a href="#" class="news__info-stat">
@@ -40,15 +29,8 @@
 							<span class="news__likes" title="Лайки"></span>
 						</a>
 					</div>
-					<div class="news__desc"></div>
 				</div>
-				<div class="news__footer">
-					<a href="#" class="link news__light">Подробнее</a>
-					<div class="news__full content">
-						<p class="news__full-loader">Загружаю..</p>
-					</div>
-				</div>
-			</li>
+			</div>
 		</div>
 	</div>
 
