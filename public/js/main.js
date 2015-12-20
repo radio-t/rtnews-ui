@@ -465,7 +465,7 @@ $(function() {
 					.end()
 					
 					.find('.news__info')
-					.append(info)
+					.prepend(info)
 					.end()
 					
 					.find('.news__desc').html(json[i].snippet)
