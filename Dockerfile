@@ -15,6 +15,8 @@ RUN \
 	mv /srv/rtnews-ui/dockerinit.sh /init.sh && \
 	chmod +x /init.sh	
 
+VOLUME ["/var/www/webapp"]
+
 ENTRYPOINT ["/init.sh"]
 
 CMD ["sleep", "100"]
