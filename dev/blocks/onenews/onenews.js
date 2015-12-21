@@ -50,6 +50,7 @@ $(function() {
 
 				    	if (location.hash == '#to-comments') {
 				    		$('#menu__item_to-comments .link').click();
+				    		history.pushState("", document.title, window.location.pathname);
 				    	}
 
 				        clearInterval(dqinterval);

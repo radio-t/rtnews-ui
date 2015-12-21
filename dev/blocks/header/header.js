@@ -10,7 +10,5 @@ $(function() {
 	if (isAdmin) {
 		$('.menu__item_admin').css('display', 'inline-block');
 		$('.menu__item_user').hide();
-	} else {
-		$('#to-current').addClass('menu__item_right');
 	}
 });
