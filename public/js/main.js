@@ -408,7 +408,6 @@ $(function() {
 
 		if (sorting) {
 			activeSorting = sorting;
-			$('.news').addClass('news_disabled-sort');
 		} else {
 			activeSorting = 'priority';
 
@@ -555,6 +554,10 @@ $(function() {
 			$(document).on('news-loaded', function() {
 				$topStatus.hide();
 
+				if (activeSorting != 'priority') {
+					disableNewsSortable();
+				}
+
 				if (isAdmin) {
 					if (! isMobile) {
 						sortableList = new Sortable($('#news__list')[0], {
@@ -563,7 +566,6 @@ $(function() {
 							ghostClass: 'news__item_sortable',
 							handle: '.news__handler',
 							scrollSensitivity: 70,
-							disabled: !!sorting,
 							onUpdate: function(event) {
 								moveArticle($(event.item));
 							}
@@ -1250,7 +1252,9 @@ $(function() {
 	}
 });
 $(function() {
-	if ($('#news__list').length && !$('.news_deleted').length) {
+	if ($('#news__list').length
+		&& !$('.news_deleted').length
+		&& !$('.news_archive').length) {
 		$('#geek').click(function(event) {
 			event.preventDefault();
 			geekNews();
@@ -1309,7 +1313,9 @@ function allNews() {
 
 	createLink($('#geek-wrap'), 'geek');
 
-	enableNewsSortable();
+	if (sorting == 'priority') {
+		enableNewsSortable();
+	}
 
 	$('#geek').click(function(event) {
 		event.preventDefault();

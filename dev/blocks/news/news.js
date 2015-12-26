@@ -39,7 +39,6 @@ $(function() {
 
 		if (sorting) {
 			activeSorting = sorting;
-			$('.news').addClass('news_disabled-sort');
 		} else {
 			activeSorting = 'priority';
 
@@ -186,6 +185,10 @@ $(function() {
 			$(document).on('news-loaded', function() {
 				$topStatus.hide();
 
+				if (activeSorting != 'priority') {
+					disableNewsSortable();
+				}
+
 				if (isAdmin) {
 					if (! isMobile) {
 						sortableList = new Sortable($('#news__list')[0], {
@@ -194,7 +197,6 @@ $(function() {
 							ghostClass: 'news__item_sortable',
 							handle: '.news__handler',
 							scrollSensitivity: 70,
-							disabled: !!sorting,
 							onUpdate: function(event) {
 								moveArticle($(event.item));
 							}

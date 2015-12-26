@@ -1,5 +1,7 @@
 $(function() {
-	if ($('#news__list').length && !$('.news_deleted').length) {
+	if ($('#news__list').length
+		&& !$('.news_deleted').length
+		&& !$('.news_archive').length) {
 		$('#geek').click(function(event) {
 			event.preventDefault();
 			geekNews();
@@ -58,7 +60,9 @@ function allNews() {
 
 	createLink($('#geek-wrap'), 'geek');
 
-	enableNewsSortable();
+	if (sorting == 'priority') {
+		enableNewsSortable();
+	}
 
 	$('#geek').click(function(event) {
 		event.preventDefault();
