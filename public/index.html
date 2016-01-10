@@ -16,6 +16,9 @@
 	<script src="/js/main.js"></script>
 </head>
 <body class="page">
+	<script>
+		if (isAdmin) location.href = '/admin/' + location.search + location.hash;
+	</script>
 	
 	<div class="header wrapper page__header">
 	<div class="header__title">Новости для Радио-Т</div>
