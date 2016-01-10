@@ -13,6 +13,13 @@
   margin: 0 auto;
 }
 
+.icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  vertical-align: -3px;
+}
+
 .link,
 .content a,
 .onenews #disqus_thread a {
@@ -29,6 +36,7 @@
 .onenews #disqus_thread a:hover {
   border-color: rgba(224, 80, 32, 0.9);
   color: #e05020;
+  fill: #e05020;
   -webkit-transition: all 0ms;
   transition: all 0ms;
 }
@@ -549,17 +557,6 @@
   border-color: #ccc;
 }
 
-.news__geek {
-  position: relative;
-  top: 2px;
-  display: none;
-  margin-left: 7px;
-}
-
-.news__geek:after {
-  content: url("../files/geek.svg");
-}
-
 .news__sort {
   display: none;
   margin-bottom: 45px;
@@ -589,36 +586,22 @@
   margin-left: 3px;
   border-bottom: 1px solid transparent;
   color: #666;
+  fill: #aaa;
   font-size: 14px;
-  text-decoration: none;
-  -webkit-transition: all 300ms;
-  transition: all 300ms;
 }
 
 .news__info-stat:hover {
-  border-bottom: 1px solid rgba(102, 102, 102, 0.2);
+  fill: #e36236;
 }
 
-.news__likes:before {
-  content: url("../files/like.svg");
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  margin-right: 4px;
-  vertical-align: -2px;
+.news__geek {
+  display: none;
+  margin-left: 5px;
+  margin-right: 3px;
 }
 
 .news__comments {
   margin-right: 4px;
-}
-
-.news__comments:before {
-  content: url("../files/comment.svg");
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  margin-right: 4px;
-  vertical-align: -2px;
 }
 
 .common__table-nostyle,
@@ -791,14 +774,9 @@
 }
 
 .onenews__geek {
-  position: relative;
-  top: 2px;
   display: none;
-  margin-right: 5px;
-}
-
-.onenews__geek:after {
-  content: url("../files/geek.svg");
+  margin-right: 3px;
+  vertical-align: -1px;
 }
 
 /* fonts */

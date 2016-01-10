@@ -32,15 +32,9 @@ $b: '.onenews';
 	}
 
 	&__geek {
-		position: relative;
-		top: 2px;
-		
 		display: none;
-		margin-right: 5px;
-		
-		&:after {
-			content: url(../files/geek.svg);
-		}
+		margin-right: 3px;
+		vertical-align: -1px;
 	}
 
 	#disqus_thread a {

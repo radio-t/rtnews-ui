@@ -347,18 +347,6 @@ $b: '.news';
 	    }
 	}
 
-	&__geek {
-		position: relative;
-		top: 2px;
-		
-		display: none;
-		margin-left: 7px;
-		
-		&:after {
-			content: url(../files/geek.svg);
-		}
-	}
-
 	&__sort {
 		display: none;
 		margin-bottom: 45px;
@@ -395,38 +383,25 @@ $b: '.news';
 		border-bottom: 1px solid transparent;
 		
 		color: #666;
+		fill: #aaa;
 		font-size: 14px;
 		
-		text-decoration: none;
-		
-		transition: all 300ms;
-		
 		&:hover {
-			border-bottom: 1px solid rgba(#666, .2);
+			fill: lighten(#e05020, 5);
 		}
 	}
 
+	&__geek {
+		display: none;
+		margin-left: 5px;
+		margin-right: 3px;
+	}
+
 	&__likes {
-		&:before {
-			content: url('../files/like.svg');
-			display: inline-block;
-			width: 15px;
-			height: 15px;
-			margin-right: 4px;
-			vertical-align: -2px;
-		}
+		// nothing here :)
 	}
 
 	&__comments {		
 		margin-right: 4px;
-		
-		&:before {
-			content: url('../files/comment.svg');
-			display: inline-block;
-			width: 15px;
-			height: 15px;
-			margin-right: 4px;
-			vertical-align: -2px;
-		}
 	}
 }			

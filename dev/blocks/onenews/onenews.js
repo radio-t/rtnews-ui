@@ -90,17 +90,15 @@ $(function() {
 			target: '_blank'
 		});
 
-		info = '<span class="onenews__geek" title="Гиковская тема"></span>';
-
 		if (json.author) {
-			info +=	json.author
+			info =	json.author
 					+ ' ('
 					+ $a.prop('outerHTML')
 					+ ')'
 					+ ', '
 					+ formatDate(date);
 		} else {
-			info +=	$a.prop('outerHTML')
+			info =	$a.prop('outerHTML')
 					+ ', '
 					+ formatDate(date);
 		}
@@ -112,7 +110,7 @@ $(function() {
 				.end()
 
 				.find('.onenews__info')
-				.html(info)
+				.append(info)
 				.end()
 
 				.find('.onenews__body')

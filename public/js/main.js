@@ -437,21 +437,17 @@ $(function() {
 				target: '_blank'
 			});
 
-			info = '<span class="news__geek" title="Гиковская тема"></span>';
-
 			if (json[i].author) {
 				info =	json[i].author 
 						+ ' (' 
 						+ $a.prop('outerHTML')
 						+ ')'
 						+ ', '
-						+ formatDate(date)
-						+ info;
+						+ formatDate(date);
 			} else {
 				info =	$a.prop('outerHTML')
 						+ ', '
-						+ formatDate(date)
-						+ info;
+						+ formatDate(date);
 			}
 
 			$curItem.find('.news__title')
@@ -471,7 +467,7 @@ $(function() {
 					.end()
 
 					.find('.news__comments')
-					.text(json[i].comments)
+					.append(json[i].comments)
 					.end()
 
 					.find('.news__light').click(function(event) {
@@ -482,7 +478,7 @@ $(function() {
 					.end()
 
 					.find('.news__likes')
-					.text(json[i].likes)
+					.append(json[i].likes)
 					.end()
 
 					.attr('data-id', json[i].id)
@@ -1216,17 +1212,15 @@ $(function() {
 			target: '_blank'
 		});
 
-		info = '<span class="onenews__geek" title="Гиковская тема"></span>';
-
 		if (json.author) {
-			info +=	json.author
+			info =	json.author
 					+ ' ('
 					+ $a.prop('outerHTML')
 					+ ')'
 					+ ', '
 					+ formatDate(date);
 		} else {
-			info +=	$a.prop('outerHTML')
+			info =	$a.prop('outerHTML')
 					+ ', '
 					+ formatDate(date);
 		}
@@ -1238,7 +1232,7 @@ $(function() {
 				.end()
 
 				.find('.onenews__info')
-				.html(info)
+				.append(info)
 				.end()
 
 				.find('.onenews__body')

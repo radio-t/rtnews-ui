@@ -7,6 +7,12 @@
   max-width: 960px;
   margin: 0 auto; }
 
+.icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  vertical-align: -3px; }
+
 .link, .content a, .onenews #disqus_thread a {
   border-bottom: 1px solid rgba(0, 96, 160, 0.2);
   color: #0060a0;
@@ -16,6 +22,7 @@
   .link:hover, .content a:hover, .onenews #disqus_thread a:hover {
     border-color: rgba(224, 80, 32, 0.9);
     color: #e05020;
+    fill: #e05020;
     transition: all 0ms; }
 
 .notify {
@@ -365,14 +372,6 @@
     .news__button_down:active {
       border-color: #ccc; }
 
-.news__geek {
-  position: relative;
-  top: 2px;
-  display: none;
-  margin-left: 7px; }
-  .news__geek:after {
-    content: url(../files/geek.svg); }
-
 .news__sort {
   display: none;
   margin-bottom: 45px; }
@@ -399,29 +398,18 @@
   margin-left: 3px;
   border-bottom: 1px solid transparent;
   color: #666;
-  font-size: 14px;
-  text-decoration: none;
-  transition: all 300ms; }
+  fill: #aaa;
+  font-size: 14px; }
   .news__info-stat:hover {
-    border-bottom: 1px solid rgba(102, 102, 102, 0.2); }
+    fill: #e36236; }
 
-.news__likes:before {
-  content: url("../files/like.svg");
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  margin-right: 4px;
-  vertical-align: -2px; }
+.news__geek {
+  display: none;
+  margin-left: 5px;
+  margin-right: 3px; }
 
 .news__comments {
   margin-right: 4px; }
-  .news__comments:before {
-    content: url("../files/comment.svg");
-    display: inline-block;
-    width: 15px;
-    height: 15px;
-    margin-right: 4px;
-    vertical-align: -2px; }
 
 .common__table-nostyle, .feeds__table {
   border: none;
@@ -534,12 +522,9 @@
   .onenews__comments {
     margin-top: 45px; }
   .onenews__geek {
-    position: relative;
-    top: 2px;
     display: none;
-    margin-right: 5px; }
-    .onenews__geek:after {
-      content: url(../files/geek.svg); }
+    margin-right: 3px;
+    vertical-align: -1px; }
 
 /* fonts */
 /* fixes */

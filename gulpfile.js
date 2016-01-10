@@ -6,6 +6,8 @@ var	gulp		= require('gulp'),
 	browserSync	= require('browser-sync'),
 	cache 		= require('gulp-cached'),
 	concat 		= require('gulp-concat'),
+	svgstore	= require('gulp-svgstore'),
+	inject 		= require('gulp-inject'),
 	fileinclude	= require('gulp-file-include'),
 	filter 		= require('gulp-filter'),
 	rename 		= require('gulp-rename'),
@@ -36,7 +38,8 @@ var mask = {
 		images: 'dev/blocks/**/*.{jpg,png,gif,svg}',
 		files: 'dev/files/**/*',
 		fonts: 'dev/fonts/**/*.{eot,svg,ttf,woff,woff2}',
-		main: ['public/**', '!public']
+		main: ['public/**', '!public'],
+		svg: 'dev/svg/**/*'
 	},
 	input = {
 		html: 'dev/html/**/*.html',
@@ -66,7 +69,7 @@ gulp.task('default', ['build', 'server', 'watch']);
 
 gulp.task('offline', ['build', 'serverOffline', 'watch']);
 
-gulp.task('build', ['html', 'scss', 'css', 'js', 'images', 'files', 'fonts']);
+gulp.task('build', ['html', 'scss', 'css', 'js', 'images', 'files', 'fonts', 'svg']);
 
 gulp.task('html', function() {
 	gulp.src(input.html)
@@ -136,6 +139,18 @@ gulp.task('js', function() {
 		.pipe(browserSync.stream());
 });
 
+gulp.task('svg', function() {
+	var svgs = gulp
+		.src(mask.svg)
+		.pipe(svgstore({ inlineSvg: true}));
+
+	gulp.src('dev/includes/svg.html')
+		.pipe(inject(svgs, { transform: function(filePath, file) {
+			return file.contents.toString();
+		}}))
+		.pipe(gulp.dest('dev/includes'));
+});
+
 gulp.task('fonts', function() {
 	gulp.src(mask.fonts) 
 		.pipe(rename({dirname: ''}))
@@ -171,6 +186,7 @@ gulp.task('watch', function() {
 	gulp.watch(mask.images, ['images']);
 	gulp.watch(mask.files, ['files']);
 	gulp.watch(mask.fonts, ['fonts']);
+	gulp.watch(mask.svg, ['svg']);
 });
 
 gulp.task('clean', function(cb) {
