@@ -21,6 +21,10 @@ $b: '.news';
 		#{$b}__mobile-buttons {
 			display: none;
 		}
+
+		#{$b}__button_first {
+			display: none;
+		}
 	}
 
 	&_admin {

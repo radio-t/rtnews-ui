@@ -177,6 +177,9 @@
 .news_disabled-sort .news__mobile-buttons {
   display: none; }
 
+.news_disabled-sort .news__button_first {
+  display: none; }
+
 @media (max-width: 500px) {
   .news_admin .news__item {
     margin-top: 80px; } }
