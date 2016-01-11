@@ -82,6 +82,10 @@
   border-color: #999;
 }
 
+.form__input_big {
+  height: auto;
+}
+
 @media (max-width: 600px) {
   .form__input {
     width: 100%;
@@ -109,6 +113,12 @@
 .form__button:active {
   border-color: #777;
   background: #aaa;
+}
+
+.form__tip {
+  margin-top: 10px;
+  color: #333;
+  font-size: 13px;
 }
 
 .status {
@@ -838,6 +848,15 @@
 
 .rules__enabled-cell {
   text-align: center;
+}
+
+.rule {
+  width: 300px;
+  margin: 30px auto 10px;
+}
+
+.rule__save {
+  margin-top: 10px;
 }
 
 /* fonts */

@@ -20,7 +20,7 @@ function loadRules() {
 
 			$('<td/>', {
 				class: 'rules__domain-cell',
-				html: '<a href="/rules/edit/?id=' + json[i].id + '" class="link">' + json[i].domain + '</a>'
+				html: '<a href="/rules/edit/?url=' + json[i].domain + '" class="link">' + json[i].domain + '</a>'
 			}).appendTo($row);
 			
 			$('<td/>', {
@@ -43,8 +43,6 @@ function loadRules() {
 
 			toggleRule($(this).closest('tr'));
 		});
-
-		console.log(json);
 	})
 	.fail(function(response) {
 		console.log("error while loading rules");

@@ -326,48 +326,6 @@ $(function() {
 	}
 });
 $(function() {
-	$('#update-feeds').click(function(event) {
-		event.preventDefault();
-
-		$.ajax({
-			url: APIPath + '/news/reload',
-			type: 'PUT',
-			headers: authHeaders
-		})
-		.done(function() {
-			location.reload();
-		})
-		.fail(function(response) {
-			console.log("error while updating feeds");
-			console.log(response);
-		});
-	});
-
-	$('#logout').click(function(event) {
-		event.preventDefault();
-
-		var request = new XMLHttpRequest();   
-
-		request.open('PUT', APIPath + '/news/reload', false, 'harry', 'colloportus');                                                                                                                               
-	    
-	    try {
-		    request.send();    
-			    
-	        if (request.readyState === 4) {  
-				localStorage.removeItem('login');
-				localStorage.removeItem('password');
-
-				location.href = '/login/';
-	        }  
-	    } catch (err) {
-	    	localStorage.removeItem('login');
-			localStorage.removeItem('password');
-
-			location.href = '/login/';
-	    }
-	});
-});
-$(function() {
 	var $topStatus = $('#news__top-status'),	
 		$newsList = $('#news__list'),
 
@@ -1088,6 +1046,48 @@ function enableNewsSortable() {
 	$('.news').removeClass('news_disabled-sort');
 	$('.news__handler').show();
 }
+$(function() {
+	$('#update-feeds').click(function(event) {
+		event.preventDefault();
+
+		$.ajax({
+			url: APIPath + '/news/reload',
+			type: 'PUT',
+			headers: authHeaders
+		})
+		.done(function() {
+			location.reload();
+		})
+		.fail(function(response) {
+			console.log("error while updating feeds");
+			console.log(response);
+		});
+	});
+
+	$('#logout').click(function(event) {
+		event.preventDefault();
+
+		var request = new XMLHttpRequest();   
+
+		request.open('PUT', APIPath + '/news/reload', false, 'harry', 'colloportus');                                                                                                                               
+	    
+	    try {
+		    request.send();    
+			    
+	        if (request.readyState === 4) {  
+				localStorage.removeItem('login');
+				localStorage.removeItem('password');
+
+				location.href = '/login/';
+	        }  
+	    } catch (err) {
+	    	localStorage.removeItem('login');
+			localStorage.removeItem('password');
+
+			location.href = '/login/';
+	    }
+	});
+});
 function notify(message, cb, timeout) {
 	$('.notify').remove();
 
@@ -1338,6 +1338,67 @@ function geekNews() {
 	history.pushState("", document.title, window.location.pathname + '#geek');
 }
 $(function() {
+	var $rule = $('#rule');
+
+	if ($rule.length) {
+		var url = getParameterByName('url');
+		var map = {
+			domain: '.rule__domain',
+			content: '.rule__content'
+		};
+
+		if (url != null) {
+			$.ajax({
+				url: APIPath.slice(0, -6) + 'ureadability/api/v1' + '/rule?url=http://' + url,
+				type: 'GET',
+				dataType: 'json'
+			})
+			.done(function(json) {
+				$rule.data('data', json);
+
+				for (var prop in map) {
+					$(map[prop], $rule).val(json[prop]);
+				}
+			})
+			.fail(function(response) {
+				console.log("error while loading rule");
+				console.log(response);
+			});
+		}
+
+		$('.rule__save').click(function(event) {
+			var json = {};
+			var data = $rule.data('data');
+
+			for (var prop in map) {
+				json[prop] = $(map[prop], $rule).val();
+			}
+
+			if (url != null) {
+				json.enabled = data.enabled;
+				json.id = data.id;
+				json.user = data.user;
+			}
+
+			$.ajax({
+				url: APIPath.slice(0, -6) + 'ureadability/api/v1' + '/rule',
+				type: 'POST',
+				async: true,
+				headers: authHeaders,
+				data: JSON.stringify(json)
+			})
+			.done(function() {
+				location.href = '/rules/';
+			})
+			.fail(function(response) {
+				console.log("error while saving the rule");
+				console.log(response);
+			});
+		});
+	}
+});
+
+$(function() {
 	if ($('#rules__list').length) {
 		loadRules();
 	};
@@ -1359,7 +1420,7 @@ function loadRules() {
 
 			$('<td/>', {
 				class: 'rules__domain-cell',
-				html: '<a href="/rules/edit/?id=' + json[i].id + '" class="link">' + json[i].domain + '</a>'
+				html: '<a href="/rules/edit/?url=' + json[i].domain + '" class="link">' + json[i].domain + '</a>'
 			}).appendTo($row);
 			
 			$('<td/>', {
@@ -1382,8 +1443,6 @@ function loadRules() {
 
 			toggleRule($(this).closest('tr'));
 		});
-
-		console.log(json);
 	})
 	.fail(function(response) {
 		console.log("error while loading rules");

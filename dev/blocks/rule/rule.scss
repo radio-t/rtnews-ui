@@ -1,0 +1,10 @@
+$b: '.rule';
+
+#{$b} {
+	width: 300px;
+	margin: 30px auto 10px;
+	
+	&__save {
+		margin-top: 10px;
+	}
+}

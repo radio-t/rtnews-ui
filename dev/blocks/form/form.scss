@@ -20,6 +20,10 @@ $b: '.form';
 			border-color: #999;
 		}
 
+		&_big {
+			height: auto;
+		}
+
 		@media (max-width: 600px) {
 			width: 100%;
 		}
@@ -49,5 +53,12 @@ $b: '.form';
 			border-color: #777;
 			background: #aaa;
 		}
+	}
+
+	&__tip {
+		margin-top: 10px;
+		
+		color: #333;
+		font-size: 13px;
 	}
 }
