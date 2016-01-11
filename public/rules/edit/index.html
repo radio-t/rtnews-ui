@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-	<title>Управление фидами — Новости для Радио-Т</title>
+	<title>Редактирование правила — Новости для Радио-Т</title>
 
 	<script>
 		var login = localStorage.getItem('login'),
@@ -52,28 +52,9 @@
 </div> 
 
 	<div class="wrapper">
-		<div class="feeds">
-			<table class="feeds__table">
-				<thead>
-					<tr>
-						<th class="feeds__urls">URL</th>
-						<th class="feeds__update">Последнее обновление</th>
-						<th class="feeds__del"></th>
-					</tr>
-				</thead>
-				<tbody id="feeds__list">
-				</tbody>
-				<tfoot>
-					<tr>
-						<td colspan="3">
-							<form class="feeds__add-form form" id="feeds__add-form">
-								<input type="text" placeholder="Добавление нового фида" class="form__input" id="feeds__add" autofocus required>
-								<input type="submit" class="form__button" value="Добавить">
-							</form>
-						</td>
-					</tr>
-				</tfoot>
-			</table>
+		<div class="rule form">
+
+			<input type="button" class="form__button" value="Сохранить">
 		</div>
 	</div>
 

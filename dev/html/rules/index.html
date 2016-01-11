@@ -1,0 +1,33 @@
+@@include('../../includes/head_admin.html',{
+	"title": "Список правил — Новости для Радио-Т"
+})
+<body class="page">
+	
+	@@include('../../blocks/header/header.html') 
+
+	<div class="wrapper">
+		<div class="rules">
+			<table class="rules__table">
+				<thead>
+					<tr>
+						<th>Домен</th>
+						<th>Контент</th>
+						<th>Активность</th>
+					</tr>
+				</thead>
+				<tbody id="rules__list">
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="3" class="rules__add">
+							<a href="/rules/add/" class="link">Добавить</a>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+
+	@@include('../../blocks/footer/footer.html')
+</body>
+</html>
