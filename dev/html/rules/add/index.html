@@ -1,0 +1,21 @@
+@@include('../../../includes/head_admin.html',{
+	"title": "Добавление правила — Новости для Радио-Т"
+})
+<body class="page">
+	
+	@@include('../../../blocks/header/header.html') 
+
+	<div class="wrapper">
+		<div class="rule form" id="rule">
+			<div class="form__tip">Домен:</div>
+			<input type="text" class="form__input rule__domain">
+			<div class="form__tip">Контент:</div>
+			<textarea class="form__input form__input_big rule__content"></textarea>
+			<br>
+			<input type="button" class="form__button rule__save" value="Сохранить">
+		</div>
+	</div>
+
+	@@include('../../../blocks/footer/footer.html')
+</body>
+</html>
