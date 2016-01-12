@@ -326,48 +326,6 @@ $(function() {
 	}
 });
 $(function() {
-	$('#update-feeds').click(function(event) {
-		event.preventDefault();
-
-		$.ajax({
-			url: APIPath + '/news/reload',
-			type: 'PUT',
-			headers: authHeaders
-		})
-		.done(function() {
-			location.reload();
-		})
-		.fail(function(response) {
-			console.log("error while updating feeds");
-			console.log(response);
-		});
-	});
-
-	$('#logout').click(function(event) {
-		event.preventDefault();
-
-		var request = new XMLHttpRequest();   
-
-		request.open('PUT', APIPath + '/news/reload', false, 'harry', 'colloportus');                                                                                                                               
-	    
-	    try {
-		    request.send();    
-			    
-	        if (request.readyState === 4) {  
-				localStorage.removeItem('login');
-				localStorage.removeItem('password');
-
-				location.href = '/login/';
-	        }  
-	    } catch (err) {
-	    	localStorage.removeItem('login');
-			localStorage.removeItem('password');
-
-			location.href = '/login/';
-	    }
-	});
-});
-$(function() {
 	var $topStatus = $('#news__top-status'),	
 		$newsList = $('#news__list'),
 
@@ -1088,6 +1046,48 @@ function enableNewsSortable() {
 	$('.news').removeClass('news_disabled-sort');
 	$('.news__handler').show();
 }
+$(function() {
+	$('#update-feeds').click(function(event) {
+		event.preventDefault();
+
+		$.ajax({
+			url: APIPath + '/news/reload',
+			type: 'PUT',
+			headers: authHeaders
+		})
+		.done(function() {
+			location.reload();
+		})
+		.fail(function(response) {
+			console.log("error while updating feeds");
+			console.log(response);
+		});
+	});
+
+	$('#logout').click(function(event) {
+		event.preventDefault();
+
+		var request = new XMLHttpRequest();   
+
+		request.open('PUT', APIPath + '/news/reload', false, 'harry', 'colloportus');                                                                                                                               
+	    
+	    try {
+		    request.send();    
+			    
+	        if (request.readyState === 4) {  
+				localStorage.removeItem('login');
+				localStorage.removeItem('password');
+
+				location.href = '/login/';
+	        }  
+	    } catch (err) {
+	    	localStorage.removeItem('login');
+			localStorage.removeItem('password');
+
+			location.href = '/login/';
+	    }
+	});
+});
 function notify(message, cb, timeout) {
 	$('.notify').remove();
 
@@ -1347,7 +1347,7 @@ $(function() {
 			content: '.rule__content'
 		};
 
-		if (url.length) {
+		if (url != null) {
 			$.ajax({
 				url: APIPath.slice(0, -6) + 'ureadability/api/v1' + '/rule?url=http://' + url,
 				type: 'GET',
@@ -1374,7 +1374,7 @@ $(function() {
 				json[prop] = $(map[prop], $rule).val();
 			}
 
-			if (url.length) {
+			if (url != null) {
 				json.enabled = data.enabled;
 				json.id = data.id;
 				json.user = data.user;
@@ -1433,9 +1433,6 @@ function loadRules() {
 				html: '<input class="rules__enabled" type="checkbox" ' + ((json[i].enabled) ? 'checked' : '') + '>' 
 			}).appendTo($row);
 
-			if (!json[i].enabled) {
-				$row.addClass('rules__row_disabled');
-			}
 
 			$('#rules__list').append($row);
 		};

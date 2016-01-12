@@ -33,9 +33,6 @@ function loadRules() {
 				html: '<input class="rules__enabled" type="checkbox" ' + ((json[i].enabled) ? 'checked' : '') + '>' 
 			}).appendTo($row);
 
-			if (!json[i].enabled) {
-				$row.addClass('rules__row_disabled');
-			}
 
 			$('#rules__list').append($row);
 		};

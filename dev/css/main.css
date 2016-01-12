@@ -565,8 +565,6 @@
     font-family: monospace; }
   .rules__enabled-cell {
     text-align: center; }
-  .rules__enabled {
-    outline-style: none; }
 
 .rule {
   width: 300px;

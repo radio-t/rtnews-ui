@@ -850,10 +850,6 @@
   text-align: center;
 }
 
-.rules__enabled {
-  outline-style: none;
-}
-
 .rule {
   width: 300px;
   margin: 30px auto 10px;

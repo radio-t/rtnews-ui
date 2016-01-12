@@ -8,7 +8,7 @@ $(function() {
 			content: '.rule__content'
 		};
 
-		if (url.length) {
+		if (url != null) {
 			$.ajax({
 				url: APIPath.slice(0, -6) + 'ureadability/api/v1' + '/rule?url=http://' + url,
 				type: 'GET',
@@ -35,7 +35,7 @@ $(function() {
 				json[prop] = $(map[prop], $rule).val();
 			}
 
-			if (url.length) {
+			if (url != null) {
 				json.enabled = data.enabled;
 				json.id = data.id;
 				json.user = data.user;
