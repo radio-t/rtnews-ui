@@ -557,14 +557,32 @@ function moveArticle($item) {
 		type: 'PUT',
 		headers: authHeaders
 	})
+	.done(function() {
+		$.ajax({
+			url: APIPath + '/news/positions',
+			type: 'GET',
+			dataType: 'json',
+			cache: false,
+			async: true,
+		})
+		.done(function(json) {
+			var item, id;
+			for (var i = 0; i < $items.length; i++) {
+				$item = $items.eq(i);
+				id = $item.data('id');
+
+				$item.data('pos', json[id]);
+			};
+		})
+		.fail(function(response) {
+			console.log("error while gettins positions");
+			console.log(response);
+		});
+	})
 	.fail(function(response) {
 		console.log("error while moving news");
 		console.log(response);
 	});
-
-	for (var i = $items.length - 1; i >= 0; i--) {
-		$items.eq(i).data('pos', $items.length - $items.eq(i).index() - 1)
-	};
 }
 
 function togeekArticle($el) {
