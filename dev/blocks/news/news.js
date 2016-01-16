@@ -558,26 +558,7 @@ function moveArticle($item) {
 		headers: authHeaders
 	})
 	.done(function() {
-		$.ajax({
-			url: APIPath + '/news/positions',
-			type: 'GET',
-			dataType: 'json',
-			cache: false,
-			async: true,
-		})
-		.done(function(json) {
-			var item, id;
-			for (var i = 0; i < $items.length; i++) {
-				$item = $items.eq(i);
-				id = $item.data('id');
-
-				$item.data('pos', json[id]);
-			};
-		})
-		.fail(function(response) {
-			console.log("error while gettins positions");
-			console.log(response);
-		});
+		resetPositions();
 	})
 	.fail(function(response) {
 		console.log("error while moving news");
@@ -664,6 +645,8 @@ function delArticle($el) {
 	})
 	.done(function() {
 		$item.remove();
+
+		resetPositions();
 	})
 	.fail(function(response) {
 		console.log("error while deleting news");
@@ -681,9 +664,37 @@ function archiveArticle($el) {
 	})
 	.done(function() {
 		$item.remove();
+
+		resetPositions();
 	})
 	.fail(function(response) {
 		console.log("error while archiving news");
+		console.log(response);
+	});
+}
+
+function resetPositions() {
+	var $items = $('#news__list .news__item'), item, id;
+
+	$.ajax({
+		url: APIPath + '/news/positions',
+		type: 'GET',
+		dataType: 'json',
+		cache: false,
+		async: true,
+	})
+	.done(function(json) {
+		for (var i = 0; i < $items.length; i++) {
+			$item = $items.eq(i);
+			id = $item.data('id');
+
+			if (!!json[id]) {
+				$item.data('pos', json[id]);
+			}
+		};
+	})
+	.fail(function(response) {
+		console.log("error while gettins positions");
 		console.log(response);
 	});
 }
