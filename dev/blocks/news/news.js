@@ -196,6 +196,10 @@ $(function() {
 					disableNewsSortable();
 				}
 
+				if (filters.geek || filters.recent) {
+					disableNewsSortable();
+				}
+
 				if (isAdmin) {
 					if (! isMobile) {
 						sortableList = new Sortable($('#news__list')[0], {
@@ -520,7 +524,7 @@ $(function() {
 					if (type == 'priority') {
 						localStorage.removeItem('sorting');
 
-						if (isAdmin && location.hash != '#geek') {
+						if (isAdmin) {
 							enableNewsSortable();
 						}
 					} else {
@@ -559,6 +563,12 @@ $(function() {
 				localStorage.setItem('filters', JSON.stringify(filters));
 
 				filterNews();
+
+				if (!filters.geek && !filters.recent) {
+					enableNewsSortable();
+				} else {
+					disableNewsSortable();
+				}
 			});
 	}
 });
