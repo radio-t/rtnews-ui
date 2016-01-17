@@ -47,7 +47,7 @@ $(function() {
 			}
 		}
 
-		$('#news__sort .link[data-sort="' + activeSorting + '"]').addClass('link_active');
+		$('#news__sort .sorter__link[data-sort="' + activeSorting + '"]').addClass('sorter__link_active');
 	}
 
 	function JSON2DOM(json) {
@@ -462,11 +462,11 @@ $(function() {
 
 				var type = $(this).data('sort');
 
-				if (! $(this).hasClass('link_active')) {
+				if (! $(this).hasClass('sorter__link_active')) {
 					sortNews(type);
 
-					$('#news__sort .link_active').removeClass('link_active');
-					$(this).addClass('link_active');
+					$('#news__sort .sorter__link_active').removeClass('sorter__link_active');
+					$(this).addClass('sorter__link_active');
 
 					if (type == 'priority') {
 						localStorage.removeItem('sorting');
