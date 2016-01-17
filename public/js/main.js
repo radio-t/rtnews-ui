@@ -363,6 +363,38 @@ $(function() {
 	    }
 	});
 });
+function notify(message, cb, timeout) {
+	$('.notify').remove();
+
+	var $message = $('<div/>', {
+		class: 'notify',
+		text: message
+	});
+
+	$message.appendTo('body')
+			.slideDown('500')
+			.click(function(event) {
+				$(this).slideUp(500, function() {
+					$message.remove();
+				});
+
+				if (cb) {
+					cb();
+				}
+			});
+
+	if (timeout) {
+		setTimeout(function() {
+			$message.slideUp(500, function() {
+				$message.remove();
+			});
+
+			if (cb) {
+				cb();
+			}
+		}, timeout);
+	}
+}
 $(function() {
 	var $topStatus = $('#news__top-status'),	
 		$newsList = $('#news__list'),
@@ -1194,6 +1226,7 @@ function sortJSON(json, type) {
 function filterJSON(json, filters) {
 	var now = new Date(),
 		day = 1000 * 60 * 60 * 24,
+		week = day * 7,
 		month = day * 30;
 
 	for (var i = json.length - 1; i >= 0; i--) {
@@ -1210,7 +1243,7 @@ function filterJSON(json, filters) {
 			var date = Date.parse(json[i].ats);
 
 			if (filters.geek && json[i].geek) {
-				if ((now - date) / (3 * month) > 1) {
+				if ((now - date) / (2 * month + week) > 1) {
 					json[i].enable = false;
 					continue;
 				}
@@ -1230,38 +1263,6 @@ function disableNewsSortable() {
 function enableNewsSortable() {
 	$('.news').removeClass('news_disabled-sort');
 	$('.news__handler').show();
-}
-function notify(message, cb, timeout) {
-	$('.notify').remove();
-
-	var $message = $('<div/>', {
-		class: 'notify',
-		text: message
-	});
-
-	$message.appendTo('body')
-			.slideDown('500')
-			.click(function(event) {
-				$(this).slideUp(500, function() {
-					$message.remove();
-				});
-
-				if (cb) {
-					cb();
-				}
-			});
-
-	if (timeout) {
-		setTimeout(function() {
-			$message.slideUp(500, function() {
-				$message.remove();
-			});
-
-			if (cb) {
-				cb();
-			}
-		}, timeout);
-	}
 }
 $(function() {
 	var $topStatus = $('#onenews__top-status'),
