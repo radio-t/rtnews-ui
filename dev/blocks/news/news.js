@@ -126,7 +126,8 @@ $(function() {
 					.data('comments', json[i].comments)
 					.data('likes', json[i].likes)
 					.data('ats', json[i].ats)
-					.data('pos', json[i].position);
+					.data('pos', json[i].position)
+					.data('geek', json[i].geek);
 
 			if (json[i].pic) {
 				$curItem.find('.news__image-hidden')
@@ -155,8 +156,6 @@ $(function() {
 			}
 
 			if (isAdmin && $('.news_archive').length == 0) {
-				$curItem.data('geek', json[i].geek);
-
 				if (json[i].geek) {
 					$curItem.find('.news__button_togeek')
 							.removeClass('news__button_togeek')
@@ -467,8 +466,6 @@ $(function() {
 	}
 
 	function filterNews() {
-		if (!filters.geek && !filters.recent) return;
-
 		var $items = $('#news__list .news__item'),
 			now = new Date(),
 			day = 1000 * 60 * 60 * 24,
