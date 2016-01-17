@@ -3,6 +3,8 @@
 $b: '.news';
 
 #{$b} {
+	font-size: 0;
+	
 	&_mobile {
 		#{$b}__manage {
 			display: block;
@@ -31,6 +33,10 @@ $b: '.news';
 		#{$b}__item {
 			@media (max-width: 500px) {
 				margin-top: 80px;
+				
+				&:first-child {
+					margin-top: 20px;
+				}
 			}
 		}
 	}
@@ -153,6 +159,8 @@ $b: '.news';
 
 	&__desc {
 		margin-bottom: 5px;
+		
+		font-size: 16px;
 	}	
 
 	&__status {
@@ -200,6 +208,8 @@ $b: '.news';
 		
 		background: rgba(200, 200, 200, .2);
 		border-radius: 3px;
+		
+		font-size: 16px;
 	}
 
 	&__manage {
@@ -354,6 +364,14 @@ $b: '.news';
 	&__sort {
 		display: none;
 		margin-bottom: 45px;
+	}
+
+	&__menu {
+		display: none;
+		width: 50%;
+		margin-bottom: 45px;
+		
+		vertical-align: top;
 	}
 
 	&__full-loader {

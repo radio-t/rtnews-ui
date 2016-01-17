@@ -6,6 +6,10 @@ $(function() {
 		$curItem = $item.clone(true, true),
 		info,
 		date = new Date(),
+		filters = JSON.parse(localStorage.getItem('filters')) || {
+			recent: false,
+			geek: false
+		},
 
 		oldTitle = document.title;
 
@@ -34,6 +38,7 @@ $(function() {
 				}
 
 				showSortLinks();
+				showFilterLinks();
 			})
 		}
 
@@ -67,6 +72,10 @@ $(function() {
 				text: extractDomain(json[i].link),
 				target: '_blank'
 			});
+
+			if (date.getFullYear() == 1) {
+				date.setTime(Date.parse(json[i].ats));
+			}
 
 			if (json[i].author) {
 				info =	json[i].author 
@@ -139,8 +148,11 @@ $(function() {
 				}, 300);
 			}
 
-			$curItem.appendTo($newsList)
-					.show();
+			$curItem.appendTo($newsList);
+
+			if (json[i].active || json[i].enable || typeof json[i].enable == "undefined") {
+				$curItem.show();
+			}
 
 			if (isAdmin && $('.news_archive').length == 0) {
 				$curItem.data('geek', json[i].geek);
@@ -276,6 +288,7 @@ $(function() {
 				$(document).trigger('fullpage-loaded');
 			});
 
+			filterJSON(json, filters);
 			JSON2DOM(json);
 		})
 		.fail(function(response) {
@@ -377,6 +390,7 @@ $(function() {
 				if (!$current.hasClass('news__item_current')) {
 					$('.news__item_current').removeClass('news__item_current');
 					$current.addClass('news__item_current');
+					filterNews();
 
 					document.title = "** Тема обновилась **";
 					notify('Тема обновилась. Нажмите, чтобы перейти к ней.', function() {
@@ -452,11 +466,49 @@ $(function() {
 		}
 	}
 
+	function filterNews() {
+		if (!filters.geek && !filters.recent) return;
+
+		var $items = $('#news__list .news__item'),
+			now = new Date(),
+			day = 1000 * 60 * 60 * 24,
+			month = day * 30;
+
+		for (var i = 0; i < $items.length; i++) {
+			var $item = $items.eq(i);
+
+			if ($item.hasClass('news__item_current')) continue;
+
+			if (filters.geek) {
+				if (! $item.data('geek')) {
+					$item.hide();
+					continue;
+				}
+			}
+
+			if (filters.recent) {
+				var date = Date.parse($item.data('ats'));
+
+				if (filters.geek && $item.data('geek')) {
+					if ((now - date) / (3 * month) > 1) {
+						$item.hide();
+						continue;
+					}
+				} else if ((now - date) / (21 * day) > 1) {
+					$item.hide();
+					continue;
+				}
+			}
+
+			$item.show();
+		};
+	}
+
 	function showSortLinks() {
 		$('#news__sort')
-			.show()
+			.css('display', $('#news__sort').hasClass('news__sort') ? 'block' : 'inline-block')
 
-			.find('.link')
+			.find('.sorter__link')
 			.click(function(event) {
 				event.preventDefault();
 
@@ -482,6 +534,34 @@ $(function() {
 						}
 					}
 				}
+			});
+	}
+
+	function showFilterLinks() {
+		$('#news__filter')
+			.css('display', 'inline-block')
+
+			.find('.filter__link')
+			.each(function() {
+				var filter = $(this).data('filter');
+
+				for (var filterName in filters) {
+					if (filter == filterName && filters[filterName]) {
+						$(this).parent().addClass('filter__item_active');
+					}
+				}
+			})
+			.click(function(event) {
+				event.preventDefault();
+
+				var type = $(this).data('filter');
+
+				$(this).parent().toggleClass('filter__item_active');
+				filters[$(this).data('filter')] ^= 1;
+
+				localStorage.setItem('filters', JSON.stringify(filters));
+
+				filterNews();
 			});
 	}
 });
@@ -737,6 +817,37 @@ function sortJSON(json, type) {
 			});
 			break;
 	}
+}
+
+function filterJSON(json, filters) {
+	var now = new Date(),
+		day = 1000 * 60 * 60 * 24,
+		month = day * 30;
+
+	for (var i = json.length - 1; i >= 0; i--) {
+		json[i].enable = true;
+
+		if (filters.geek) {
+			if (! json[i].geek) {
+				json[i].enable = false;
+				continue;
+			}
+		}
+
+		if (filters.recent) {
+			var date = Date.parse(json[i].ats);
+
+			if (filters.geek && json[i].geek) {
+				if ((now - date) / (3 * month) > 1) {
+					json[i].enable = false;
+					continue;
+				}
+			} else if ((now - date) / (21 * day) > 1) {
+				json[i].enable = false;
+				continue;
+			}
+		}
+	};
 }
 
 function disableNewsSortable() {
