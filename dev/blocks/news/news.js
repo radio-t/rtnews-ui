@@ -6,9 +6,11 @@ $(function() {
 		$curItem = $item.clone(true, true),
 		info,
 		date = new Date(),
+		// было бы лучше использовать тут тернарные состояния для гиковских
 		filters = JSON.parse(localStorage.getItem('filters')) || {
 			recent: false,
-			geek: false
+			geek: false,
+			common: false
 		},
 
 		oldTitle = document.title;
@@ -196,7 +198,7 @@ $(function() {
 					disableNewsSortable();
 				}
 
-				if (filters.geek || filters.recent) {
+				if (filters.geek || filters.recent || filters.common) {
 					disableNewsSortable();
 				}
 
@@ -487,6 +489,13 @@ $(function() {
 				}
 			}
 
+			if (filters.common) {
+				if ($item.data('geek')) {
+					$item.hide();
+					continue;
+				}
+			}
+
 			if (filters.recent) {
 				var date = Date.parse($item.data('ats'));
 
@@ -524,7 +533,7 @@ $(function() {
 					if (type == 'priority') {
 						localStorage.removeItem('sorting');
 
-						if (isAdmin) {
+						if (isAdmin && !filters.geek && !filters.recent && !filters.common) {
 							enableNewsSortable();
 						}
 					} else {
@@ -542,13 +551,20 @@ $(function() {
 		$('#news__filter')
 			.css('display', 'inline-block')
 
-			.find('.filter__link')
+			.find('[data-filter]')
 			.each(function() {
 				var filter = $(this).data('filter');
 
 				for (var filterName in filters) {
 					if (filter == filterName && filters[filterName]) {
-						$(this).parent().addClass('filter__item_active');
+						$(this).closest('.filter__item')
+							   .addClass('filter__item_active');
+
+						if ($(this).hasClass('filter__dropdown-link')) {
+							$(this).closest('.filter__item')
+								   .find('.filter__current')
+								   .text($(this).text());
+						}
 					}
 				}
 			})
@@ -557,14 +573,40 @@ $(function() {
 
 				var type = $(this).data('filter');
 
-				$(this).parent().toggleClass('filter__item_active');
-				filters[$(this).data('filter')] ^= 1;
+				if (! $(this).hasClass('filter__dropdown-link')) {
+					$(this).closest('.filter__item')
+						   .toggleClass('filter__item_active');
+
+					filters[$(this).data('filter')] ^= 1;
+				} else {
+					$(this).closest('.filter__item')
+						   .find('.filter__dropdown-link')
+						   .each(function(i) {
+						   	if (i != 0) {
+						   		filters[$(this).data('filter')] = false;
+						   	}
+						   });
+
+					if ($(this).parent().index() == 0) {
+						$(this).closest('.filter__item')
+							   .removeClass('filter__item_active');
+					} else {
+						$(this).closest('.filter__item')
+							   .addClass('filter__item_active');
+
+						filters[$(this).data('filter')] = true;
+					}
+
+					$(this).closest('.filter__item')
+						   .find('.filter__current')
+						   .text($(this).text());
+				}
 
 				localStorage.setItem('filters', JSON.stringify(filters));
 
 				filterNews();
 
-				if (!filters.geek && !filters.recent) {
+				if (!filters.geek && !filters.recent && !filters.common) {
 					enableNewsSortable();
 				} else {
 					disableNewsSortable();
@@ -837,6 +879,13 @@ function filterJSON(json, filters) {
 
 		if (filters.geek) {
 			if (! json[i].geek) {
+				json[i].enable = false;
+				continue;
+			}
+		}
+
+		if (filters.common) {
+			if (json[i].geek) {
 				json[i].enable = false;
 				continue;
 			}
