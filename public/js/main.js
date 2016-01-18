@@ -1297,6 +1297,38 @@ function enableNewsSortable() {
 	$('.news').removeClass('news_disabled-sort');
 	$('.news__handler').show();
 }
+function notify(message, cb, timeout) {
+	$('.notify').remove();
+
+	var $message = $('<div/>', {
+		class: 'notify',
+		text: message
+	});
+
+	$message.appendTo('body')
+			.slideDown('500')
+			.click(function(event) {
+				$(this).slideUp(500, function() {
+					$message.remove();
+				});
+
+				if (cb) {
+					cb();
+				}
+			});
+
+	if (timeout) {
+		setTimeout(function() {
+			$message.slideUp(500, function() {
+				$message.remove();
+			});
+
+			if (cb) {
+				cb();
+			}
+		}, timeout);
+	}
+}
 $(function() {
 	var $topStatus = $('#onenews__top-status'),
 		$onenews = $('#onenews'),
@@ -1422,38 +1454,6 @@ $(function() {
 		$(document).trigger('news-loaded');
 	}
 });
-function notify(message, cb, timeout) {
-	$('.notify').remove();
-
-	var $message = $('<div/>', {
-		class: 'notify',
-		text: message
-	});
-
-	$message.appendTo('body')
-			.slideDown('500')
-			.click(function(event) {
-				$(this).slideUp(500, function() {
-					$message.remove();
-				});
-
-				if (cb) {
-					cb();
-				}
-			});
-
-	if (timeout) {
-		setTimeout(function() {
-			$message.slideUp(500, function() {
-				$message.remove();
-			});
-
-			if (cb) {
-				cb();
-			}
-		}, timeout);
-	}
-}
 $(document).on('current-updated', function() {
 	var $currentNews = $('#current'),
 		$toCurrent = $('#to-current');

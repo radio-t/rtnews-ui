@@ -59,8 +59,7 @@ $b: '.filter';
 		position: absolute;
 		z-index: 1;
 		
-		padding: 2px 4px 3px 4px;
-		margin-left: -5px;
+		margin-left: -6px;
 		margin-top: 3px;
 		
 		border-radius: 4px;
@@ -73,10 +72,20 @@ $b: '.filter';
 		}
 	}
 
-	&__dropdown-link {
-		display: inline-block;
-		padding: 1px 0 1px;
+	&__dropdown-item {
+		margin: 0 4px;
 		
+		border-bottom: 1px solid rgba(200, 200, 200, .4);
+		
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	&__dropdown-link {
+		display: block;
+		
+		padding: 4px 1px 5px;
 		font-weight: 400;
 		color: #777;
 		border-bottom: none;
