@@ -320,6 +320,8 @@
   .news__desc {
     margin-bottom: 5px;
     font-size: 16px; }
+    .news__desc img, .news__desc iframe, .news__desc video {
+      display: none; }
   .news__status {
     margin-top: 40px; }
   .news__body {
