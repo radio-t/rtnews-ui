@@ -298,6 +298,7 @@ $(function() {
 					headers: authHeaders
 				})
 				.done(function(json) {
+					$('html, body').scrollTop(0);
 					notify('Поехали!', null, 1500);
 				})
 				.fail(function(response) {
