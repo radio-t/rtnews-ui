@@ -2,78 +2,93 @@
 
 Полное описание задачи можно [подсмотреть здесь](http://p.umputun.com/2015/11/26/vsiem-mirom-dlia-obshchiei-polzy/)
 
-#### API 
+## RT-NEWS API, V1
 
-    GET /api/v1/feeds - список фидов
-    POST /api/v1/feeds - добавить фид {feedlink: url}
+----
+### Feeds API
 
-    GET /api/v1/news - все новости, кроме удаленных
-    DELETE /api/v1/news/:id - удалить (пометить как удаленную)
-    PUT /api/v1/news/move/:pos/:offset - двигать новость вверх/вниз
+* `GET /api/v1/feeds` - list of feeds
+* `POST /api/v1/feeds` - add feed, needs at least {feedlink: url}
+* `DELETE /api/v1/feeds/:id` - delete feed by id
 
-    PUT /api/v1/news/active/:id - пометить как активную
-    GET /api/v1/news/active - взять текущую активную
-    GET /api/v1/news/active/id - взять id текущей активной
-    GET /api/v1/news/active/last/:hrs - список всех что были активны за последние hrs часов
-
-    PUT /api/v1/news/nogeek/:id - пометить как обычную, негиковскую 
-    PUT /api/v1/news/geek/:id - пометить как гиковскую
-
-    PUT /api/v1/news/reload - форс-релоад из фидов (раз в 5 минут делает само)
-
-пример:
+## _feed record_
 ```
-http GET master.radio-t.com:8778/api/v1/news/active/id
-HTTP/1.1 200 OK
-Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With
-Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS
-Access-Control-Allow-Origin: *
-Application-Name: rt-news
-Connection: keep-alive
-Content-Length: 33
-Content-Type: application/json
-Date: Thu, 26 Nov 2015 22:47:17 GMT
-Org: Radio-T
-Server: nginx/1.9.7
-X-Powered-By: go-json-rest
+    {
+        "active": true,
+        "feedlink": "http://www.instapaper.com/folder/1733843/rss/470308/Epogj3Ubs5DdJJnUdVD2HUAKSk",
+        "id": "566283bd4e1ad997adf3f532",
+        "updated": "2015-12-05T06:27:09.449Z"
+    }
+```   
+----
+### News API
 
+* basic news ops
+ * `POST /api/v1/news` - add article
+ * `GET /api/v1/news` - get all news, except deleted. Strps "content" field
+ * `GET /api/v1/news/id/:id` - get full article by id, including "content"
+ * `GET /api/v1/news/last/:count` - get last articles
+ * `GET /api/v1/news/slug/:slug` - get article by slug
+ * `GET /api/v1/news/domain/#domain` - get articles for domain
+ * `DELETE /api/v1/news/:id` - delete by id (mark as deleted)
+
+* delete/archive ops
+ * `PUT /api/v1/news/undelete/:id` - undelete by id (clear deleted status)
+ * `GET /api/v1/news/del` - get deleted articles
+ * `PUT /api/v1/news/archive/:id` - archive article by id
+ * `GET /api/v1/news/archive` - get list of archives articles
+
+* move
+ * `PUT /api/v1/news/move/:pos/:offset` - move from pos with +/- offset 
+ * `PUT /api/v1/news/moveid/:id/:offset` - move from id with +/- offset
+ * `GET /api/v1/news/positions` - get positions as {id:pos, id1:pos1 ...}
+
+* activation
+ * `PUT /api/v1/news/active/:id` - activate article by id
+ * `GET /api/v1/news/active` - get active article
+ * `GET /api/v1/news/active/href` - get active article as {title:foo, url:bar}
+ * `GET /api/v1/news/active/id` - get id of active article as {id:xyz}
+ * `GET /api/v1/news/active/last/:hrs` - get articles activated in last hrs
+ * `DELETE /api/v1/news/active/last/:hrs` - archive all article activate in last :hrs
+ * `GET /api/v1/news/lastmd/:hrs`, - get markdown of recently activated`
+ * `GET /api/v1/news/active/wait/:secs` - wait for change of active up to :secs
+
+* marking
+ * `PUT /api/v1/news/nogeek/:id` - mark as geek-article by id
+ * `PUT /api/v1/news/geek/:id` - mark as regular (non-geek) by id
+ 
+* miscs
+ * `GET /api/v1/news/rss/:count` - get rss feed with last (by time) :count
+ * `PUT /api/v1/news/reload` - force reprocessing of all RSS feeds
+ * `PUT /api/v1/show/start` - save start time (used by markdown request)
+ * `GET /api/v1/show/start` - return saved start time
+
+## _article (news) records_    
+
+```
 {
-    "id": "5657741292d7e8a4ace10c5a"
-}
-```
-
-и еще один:
-```
-http GET master.radio-t.com:8778/api/v1/news/active
-
-HTTP/1.1 200 OK
-Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With
-Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS
-Access-Control-Allow-Origin: *
-Application-Name: rt-news
-Connection: keep-alive
-Content-Length: 676
-Content-Type: application/json
-Date: Thu, 26 Nov 2015 22:49:01 GMT
-Org: Radio-T
-Server: nginx/1.9.7
-X-Powered-By: go-json-rest
-
-{
-    "active": true,
-    "activets": "2015-11-26T22:43:20.24Z",
-    "ats": "2015-11-26T21:05:21.239Z",
-    "content": "",
+    "active": false,
+    "activets": "0001-01-01T00:00:00Z",
+    "archived": false,
+    "ats": "2015-12-05T06:29:05.414Z",
+    "author": "",
+    "comments": 0,
+    "content": "At GitHub we place an emphasis on stability, ....... CAN BE REALLY BIG ..."
     "del": false,
-    "feed": "http://www.instapaper.com/folder/1733843/rss/470308/Epogj3Ubs5DdJJnUdVD2HUAKSk",
-    "geek": false,
-    "id": "5657741292d7e8a4ace10c5a",
-    "link": "http://techcrunch.com/2014/07/07/mit-and-dropbox-alums-launch-inbox-a-next-generation-email-platform/",
-    "pic": "",
-    "position": 6,
-    "snippet": "Founded by Dropbox and MIT alums, a new startup called Inbox is launching out of stealth today, hoping to power the next generation of email applications.…",
-    "title": "MIT And Dropbox Alums Launch Inbox, A Next-Generation Email Platform | TechCrunch",
-    "ts": "2014-07-08T18:10:23Z",
+    "domain": "",
+    "exttitle": "",
+    "feed": "http://www.instapaper.com/rss/94339/obmip3D4ed6h67x3zX1oNbNWCYw",
+    "geek": true,
+    "id": "566284314e1ad997adf3f56a",
+    "likes": 0,
+    "link": "http://githubengineering.com/githubs-metal-cloud/",
+    "origlink": "http://githubengineering.com/githubs-metal-cloud/",
+    "pic": "http://githubengineering.com/images/githubs-metal-cloud/gpanel-chassis-view.png",
+    "position": 0,
+    "slug": "github-s-metal-cloud-github-engineering",
+    "snippet": "At GitHub we place an emphasis on stability, availability, and performance. A large component of ensuring we excel in these areas is deploying services on bare-metal hardware. This allows us to&hellip;",
+    "title": "GitHub's Metal Cloud - GitHub Engineering",
+    "ts": "2015-12-05T05:17:21Z",
     "votes": 0
 }
 ```
