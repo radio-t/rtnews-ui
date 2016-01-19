@@ -828,7 +828,9 @@ $(function() {
 			}
 		})
 		.fail(function(response) {
-			updateCurrent();
+			setTimeout(function() {
+				updateCurrent();
+			}, 1000);
 		});
 	}
 
