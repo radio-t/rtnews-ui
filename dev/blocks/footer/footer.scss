@@ -5,4 +5,9 @@ $b: '.footer';
 	padding-bottom: 20px;
 	
 	border-top: 1px solid rgba(0, 0, 0, .1);
+	
+	&__start {
+		float: right;
+		display: none;
+	}
 }
