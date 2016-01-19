@@ -2,8 +2,6 @@
 
 Полное описание задачи можно [подсмотреть здесь](http://p.umputun.com/2015/11/26/vsiem-mirom-dlia-obshchiei-polzy/)
 
-## RT-NEWS API, V1
-
 ----
 ### Feeds API
 
