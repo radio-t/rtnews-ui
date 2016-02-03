@@ -119,5 +119,19 @@ $(function() {
 				return "javascript:(" + encodeURIComponent(href) + ")();";
 			});
 	}
+
+	if ($('#add__switch-form').length) {
+		$('#add__switch-form').click(function(event) {
+			event.preventDefault();
+
+			$('.add.form').slideToggle();
+
+			var text = $(this).text();
+
+			$(this).text(text == 'вручную'
+							   ? 'по ссылке'
+							   : 'вручную');
+		});
+	}
 });
 

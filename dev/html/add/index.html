@@ -6,6 +6,9 @@
 	@@include('../../blocks/header/header.html') 
 
 	<div class="wrapper">
+		<div class="add__switcher">
+			<a href="#" id="add__switch-form" class="link link_dotted">вручную</a>
+		</div>
 		<form class="add form" id="add-news">
 			<input type="text" class="form__input" placeholder="Ссылка на новость" autofocus required id="add__url">
 			<input type="submit" class="form__button" value="Добавить">
@@ -13,7 +16,10 @@
 				<div class="add__tip">закладка для быстрого добавления новости:</div>
 				<a href="#" class="link" id="add__bookmark">Радио-Т</a>
 			</div>
-		</form>
+		</form>	
+		<form class="add form" id="add-news-manual" style="display: none">
+			чек-чек
+		</form>	
 	</div>
 
 	@@include('../../blocks/footer/footer.html')

@@ -41,6 +41,10 @@
   transition: all 0ms;
 }
 
+.link_dotted {
+  border-bottom-style: dotted;
+}
+
 .notify {
   position: fixed;
   top: 20px;
@@ -882,6 +886,11 @@
   margin-bottom: 5px;
   color: #999;
   font-size: 12px;
+}
+
+.add__switcher {
+  font-size: 13px;
+  text-align: center;
 }
 
 .onenews {
