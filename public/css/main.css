@@ -92,6 +92,10 @@
   }
 }
 
+.form__input_big {
+  height: 80px;
+}
+
 .form__button {
   width: 80px;
   height: 26px;
@@ -870,6 +874,10 @@
   margin-top: 90px;
   padding: 20px 0 50px;
   text-align: center;
+}
+
+.add_by-link {
+  margin-top: 60px;
 }
 
 .add__bookmark {
