@@ -85,6 +85,7 @@
 .status {
   display: none;
   color: #666;
+  font-size: 20px;
   font-style: italic;
   font-family: "PT Serif", Georgia, sans-serif;
   text-align: center; }
