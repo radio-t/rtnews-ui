@@ -552,13 +552,36 @@
 }
 
 .news__full {
+  position: relative;
   display: none;
-  padding: 5px 10px;
+  padding: 5px 40px 5px 10px;
   margin: 10px 0 25px;
   overflow: hidden;
   background: rgba(200, 200, 200, 0.2);
   border-radius: 3px;
   font-size: 16px;
+}
+
+.news__foldup {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: none;
+  width: 30px;
+  background: rgba(0, 0, 0, 0.05);
+  text-align: center;
+  cursor: pointer;
+  -webkit-transition: 250ms all;
+  transition: 250ms all;
+}
+
+.news__foldup:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.news__foldup-icon {
+  margin-top: 15px;
 }
 
 .news__manage {

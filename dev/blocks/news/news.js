@@ -113,7 +113,7 @@ $(function() {
 					.append(json[i].comments)
 					.end()
 
-					.find('.news__light').click(function(event) {
+					.find('.news__light, .news__foldup').click(function(event) {
 						event.preventDefault();
 						toggleArticle($(this));
 					})
@@ -619,13 +619,16 @@ $(function() {
 });
 
 function toggleArticle($link) {
-	var $full = $link.siblings('.news__full'),
+	var $full = $link.closest('.news__footer').find('.news__full'),
 		$loader = $('.news__full-loader', $full),
 		body = $('body')[0],
 		v = 0;
 
 	if ($full.is(':visible')) {
-		$full.hide();
+		$full
+			.hide()
+			.find('.news__foldup')
+			.hide();
 	} else {
 		var $visibleNews = $('.news__full:visible'),
 			$visibleLink = $visibleNews.siblings('.news__light');
@@ -636,17 +639,28 @@ function toggleArticle($link) {
 					st = $(document).scrollTop() - height;
 
 			    $(document).scrollTop(st);
-				$visibleNews.hide();
+				$visibleNews
+					.hide()
+					.find('.news__foldup')
+					.hide();
 			} else {
-				$visibleNews.hide();
+				$visibleNews
+					.hide()
+					.find('.news__foldup')
+					.hide();
 			}
 
-			toggleArticleLink($visibleLink);
+			toggleArticleLink($visibleNews);
 		}
 		
-		$full.show();
+		$full
+			.show()
+			.find('.news__foldup')
+			.show();
 
 		if ($loader.is(':visible')) {
+			$full.find('.news__foldup').hide();
+
 			var id = $full.closest('.news__item').data('id');
 
 			$.ajax({
@@ -658,6 +672,7 @@ function toggleArticle($link) {
 			.done(function(json) {
 				if (json.content.length) {
 					$loader.after(json.content).hide();
+					$full.find('.news__foldup').show();
 				} else {
 					$loader.text('Увы, но у этой новости нет подробного текста');
 				}
@@ -668,11 +683,11 @@ function toggleArticle($link) {
 		}
 	}
 	
-	toggleArticleLink($link);
+	toggleArticleLink($full);
 }
 
-function toggleArticleLink($link) {
-	$link.text(function(i, text) {
+function toggleArticleLink($news) {
+	$news.siblings('.news__light').text(function(i, text) {
 		return text == 'Подробнее' ? 'Скрыть' : 'Подробнее';
 	});
 }
