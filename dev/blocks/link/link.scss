@@ -18,4 +18,8 @@ $b: '.link';
 		
 		transition: all 0ms;
 	}
+
+	&_dotted {
+		border-bottom-style: dotted;
+	}
 }

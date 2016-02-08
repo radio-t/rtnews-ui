@@ -119,5 +119,48 @@ $(function() {
 				return "javascript:(" + encodeURIComponent(href) + ")();";
 			});
 	}
-});
 
+	if ($('#add__switch-form').length) {
+		$('#add__switch-form').click(function(event) {
+			event.preventDefault();
+
+			$('.add.form').slideToggle();
+
+			var text = $(this).text();
+
+			$(this).text(text == 'вручную'
+							   ? 'по ссылке'
+							   : 'вручную');
+		});
+	}
+
+	if ($('#add-news-manual').length) {
+		$('#add-news-manual').submit(function(event) {
+			var $form = $(this),
+				data = {
+					link: decodeURIComponent($form.find('.form__input_link').val()),
+					title: $form.find('.form__input_title').val(),
+					snippet: $form.find('.form__input_snippet').val()
+				};
+
+			$.ajax({
+				url: APIPath + '/news/manual',
+				type: 'POST',
+				async: true,
+				data: JSON.stringify(data),
+				headers: authHeaders
+			})
+			.done(function() {
+				$form.trigger('reset');
+				notify('Новость добавлена', null, 1500);
+			})
+			.fail(function(response) {
+				notify('Ошибка при добавлении новости.');
+				console.log("error while adding news");
+				console.log(response);
+			});
+
+			return false;
+		});
+	}
+});

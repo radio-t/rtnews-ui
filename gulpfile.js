@@ -69,7 +69,7 @@ gulp.task('default', ['build', 'server', 'watch']);
 
 gulp.task('offline', ['build', 'serverOffline', 'watch']);
 
-gulp.task('build', ['html', 'scss', 'css', 'js', 'images', 'files', 'fonts', 'svg']);
+gulp.task('build', ['svg', 'html', 'scss', 'css', 'js', 'images', 'files', 'fonts']);
 
 gulp.task('html', function() {
 	gulp.src(input.html)

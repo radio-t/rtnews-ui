@@ -23,6 +23,10 @@ $b: '.form';
 		@media (max-width: 600px) {
 			width: 100%;
 		}
+
+		&_big {
+			height: 80px;
+		}
 	}
 
 	&__button {
