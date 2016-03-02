@@ -1,0 +1,26 @@
+$b: '.notify';
+
+#{$b} {
+	position: fixed;
+	top: 20px;
+	left: 0;
+	right: 0;
+	
+	box-sizing: border-box;
+	display: none;
+	width: 300px;
+	padding: 10px 20px;
+	margin: 0 auto;
+	
+	border-radius: 3px;
+	background: rgba(#fce5bc, .9);
+	box-shadow: 2px 2px 8px rgba(241, 211, 159, 0.9);
+	
+	color: darken(#f3a820, 25);
+	
+	cursor: pointer;
+	
+	@media (max-width: 300px) {
+		top: 0;
+	}
+}

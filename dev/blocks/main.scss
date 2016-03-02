@@ -1,0 +1,57 @@
+/* vars */
+$serif: "PT Serif", Georgia, sans-serif;;
+
+/* common blocks */
+@import 'wrapper/wrapper';
+@import 'icon/icon';
+@import 'link/link';
+@import 'notify/notify';
+@import 'form/form';
+@import 'status/status';
+@import 'content/content';
+
+/* main blocks */
+@import 'page/page';
+@import 'header/header';
+@import 'footer/footer';
+@import 'menu/menu';
+@import 'sorter/sorter';
+@import 'filter/filter';
+@import 'news/news';
+@import 'feeds/feeds';
+@import 'login/login';
+@import 'add/add';
+@import 'onenews/onenews';
+
+/* fonts */
+@import '../fonts/pt-sans/pt-sans';
+@import '../fonts/pt-serif/pt-serif';
+
+/* fixes */
+
+html, body {
+	height: 100%;
+	margin: 0;
+    padding: 0;  
+}
+
+input, textarea {
+	&:focus {
+		&::placeholder {
+	    	color: transparent;
+		}
+	}
+}
+
+input, textarea {
+	font-family: inherit;
+}
+
+/* ie 9 fixes */
+img {
+	border: 0;
+} 
+
+textarea {
+	overflow: auto;
+}

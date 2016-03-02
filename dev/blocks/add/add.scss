@@ -1,0 +1,37 @@
+$b: '.add';
+
+#{$b} {
+	margin-top: 90px;
+	padding: 20px 0 50px;
+	
+	text-align: center;
+	
+	&_by-link {
+		margin-top: 60px;
+	}
+	
+	&__bookmark {
+		position: relative;
+		bottom: -50px;
+		left: 0;
+		right: 0;
+
+		font-size: 14px;
+		
+		text-align: center;
+	}
+
+	&__tip {
+		margin-top: 20px;
+		margin-bottom: 5px;
+
+		color: #999;
+		font-size: 12px;
+	}
+
+	&__switcher {
+		font-size: 13px;
+		
+		text-align: center;
+	}
+}

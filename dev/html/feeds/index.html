@@ -1,0 +1,36 @@
+@@include('../../includes/head_admin.html',{
+	"title": "Управление фидами — Новости для Радио-Т"
+})
+<body class="page">
+	
+	@@include('../../blocks/header/header.html') 
+
+	<div class="wrapper">
+		<div class="feeds">
+			<table class="feeds__table">
+				<thead>
+					<tr>
+						<th class="feeds__urls">URL</th>
+						<th class="feeds__update">Последнее обновление</th>
+						<th class="feeds__del"></th>
+					</tr>
+				</thead>
+				<tbody id="feeds__list">
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="3">
+							<form class="feeds__add-form form" id="feeds__add-form">
+								<input type="text" placeholder="Добавление нового фида" class="form__input" id="feeds__add" autofocus required>
+								<input type="submit" class="form__button" value="Добавить">
+							</form>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+
+	@@include('../../blocks/footer/footer.html')
+</body>
+</html>

@@ -1,0 +1,35 @@
+@@include('../../includes/head.html',{
+	"title": "Новости для Радио-Т"
+})
+<body class="page">
+	
+	@@include('../../blocks/header/header.html') 
+
+	<div class="wrapper">
+		<div class="onenews" id="onenews">
+			<div class="status" id="onenews__top-status"></div>
+			<a href="#" class="onenews__title link"></a>
+			<div class="onenews__info">
+				<span class="onenews__geek" title="Гиковская тема">
+					<svg class="icon">
+						<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#i-geek"></use>
+					</svg>
+				</span>
+			</div>
+			<div class="onenews__body content"></div>
+			<div class="onenews__comments">
+				<div id="disqus_thread"></div>
+				<script>
+				var disqus_config = function () {
+					this.page.url = location.href;
+					this.page.identifier = getSlug();
+					this.language = "ru";
+				};
+				</script>
+			</div>
+		</div>
+	</div>
+
+	@@include('../../blocks/footer/footer.html')
+</body>
+</html>

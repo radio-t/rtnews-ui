@@ -1,0 +1,57 @@
+$b: '.form';
+
+#{$b} {
+	&__input {
+		display: inline-block;
+		box-sizing: border-box;
+		width: 300px;
+		max-width: 100%;
+		height: 26px;
+		padding: 3px 5px;
+		margin-right: 7px;
+		margin-bottom: 7px;
+		
+		outline: none;
+		border: 1px solid #ccc;
+		
+		font-size: 13px;
+		
+		&:focus {
+			border-color: #999;
+		}
+
+		@media (max-width: 600px) {
+			width: 100%;
+		}
+
+		&_big {
+			height: 80px;
+		}
+	}
+
+	&__button {
+		width: 80px;
+		height: 26px;
+		
+		background: none;
+		border: 1px solid #ccc;
+		outline: none;
+		
+		font-size: 13px;
+		
+		cursor: pointer;
+		
+		transition: background 200ms;
+		
+		&:focus,
+		&:hover {
+			border-color: #999;
+			background: #ccc;
+		}
+
+		&:active {
+			border-color: #777;
+			background: #aaa;
+		}
+	}
+}

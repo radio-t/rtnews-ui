@@ -1,0 +1,25 @@
+$b: '.link';
+
+#{$b} {
+	border-bottom: 1px solid rgba(0, 96, 160, .2);
+	
+	color: #0060a0;
+	text-decoration: none;
+	
+	transition: all .5s;
+	
+	outline: none;
+
+	&:hover {
+	    border-color: rgba(224, 80, 32, .9);
+	    
+		color: #e05020;
+		fill: #e05020;
+		
+		transition: all 0ms;
+	}
+
+	&_dotted {
+		border-bottom-style: dotted;
+	}
+}
