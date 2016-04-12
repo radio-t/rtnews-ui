@@ -9,7 +9,7 @@ RUN \
 	cd /srv/rtnews-ui && \
 	npm i -g gulp && \
 	npm i && \
-	gulp build && \
+	gulp build --type=production && \
 	mkdir -p /var/www && \
 	mv ./public /var/www/webapp && \
 	mv /srv/rtnews-ui/dockerinit.sh /init.sh && \
