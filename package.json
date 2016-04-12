@@ -6,13 +6,16 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/igoradamenko/rtnews-ui.git"
+  }, 
+  "scripts": {
+    "build": "./node_modules/.bin/gulp build --type=production"
   },
   "devDependencies": {
     "autoprefixer-core": "^5.2.0",
     "browser-sync": "^2.7.12",
     "connect-modrewrite": "^0.8.2",
     "del": "^2.0.2",
-    "gulp": "^3.9.0",
+    "gulp": "gulpjs/gulp#4.0",
     "gulp-add-src": "^0.2.0",
     "gulp-cached": "^1.1.0",
     "gulp-combine-mq": "^0.4.0",

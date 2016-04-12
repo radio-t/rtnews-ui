@@ -65,14 +65,8 @@ var mask = {
 		]
 	};
 
-gulp.task('default', ['build', 'server', 'watch']);
-
-gulp.task('offline', ['build', 'serverOffline', 'watch']);
-
-gulp.task('build', ['svg', 'html', 'scss', 'css', 'js', 'images', 'files', 'fonts']);
-
 gulp.task('html', function() {
-	gulp.src(input.html)
+	return gulp.src(input.html)
 		.pipe(fileinclude())
 		.on('error', util.log)
 		.pipe(cache('htmling'))
@@ -81,7 +75,7 @@ gulp.task('html', function() {
 });
 
 gulp.task('scss', function() {
-	gulp.src(input.scss)
+	return gulp.src(input.scss)
 		.pipe(sass({
 			importer: importOnce
 		}).on('error', util.log))
@@ -89,7 +83,7 @@ gulp.task('scss', function() {
 });
 
 gulp.task('css', function() {
-	gulp.src(mask.css)
+	return gulp.src(mask.css)
 		.pipe(cache('cssing'))
 		.pipe(postcss([ autoprefixr({ browsers: [ "> 1%" ] }) ]))
 		.pipe(url({ replace: [/^i-/, '../images/i-'] }))
@@ -107,7 +101,7 @@ gulp.task('css', function() {
 });
 
 gulp.task('images', function() {
-	gulp.src(mask.images)
+	return gulp.src(mask.images)
 		.pipe(cache('imaging'))
 		.pipe(rename({dirname: ''}))
 		.pipe(ifelse(isProduction || isDeploy, 
@@ -123,13 +117,13 @@ gulp.task('images', function() {
 });
 
 gulp.task('files', function() {
-	gulp.src(mask.files) 
+	return gulp.src(mask.files) 
 		.pipe(gulp.dest(output.files))
 		.pipe(browserSync.stream());
 });
 
 gulp.task('js', function() {
-	gulp.src(mask.js_f)
+	return gulp.src(mask.js_f)
 		.pipe(concat('main.js'))
 		.pipe(addsrc(mask.js_b))
 		.pipe(concat('main.js'))
@@ -144,7 +138,7 @@ gulp.task('svg', function() {
 		.src(mask.svg)
 		.pipe(svgstore({ inlineSvg: true}));
 
-	gulp.src('dev/includes/svg.html')
+	return gulp.src('dev/includes/svg.html')
 		.pipe(inject(svgs, { transform: function(filePath, file) {
 			return file.contents.toString();
 		}}))
@@ -152,7 +146,7 @@ gulp.task('svg', function() {
 });
 
 gulp.task('fonts', function() {
-	gulp.src(mask.fonts) 
+	return gulp.src(mask.fonts) 
 		.pipe(rename({dirname: ''}))
 		.pipe(gulp.dest(output.fonts))
 		.pipe(browserSync.stream());
@@ -179,15 +173,21 @@ gulp.task('serverOffline', function() {
 });
 
 gulp.task('watch', function() {
-	gulp.watch(mask.html, ['html']);
-	gulp.watch(mask.scss, ['scss']);
-	gulp.watch(mask.css, ['css']);
-	gulp.watch([mask.js_f, mask.js_b], ['js']);
-	gulp.watch(mask.images, ['images']);
-	gulp.watch(mask.files, ['files']);
-	gulp.watch(mask.fonts, ['fonts']);
-	gulp.watch(mask.svg, ['svg']);
+	gulp.watch(mask.html, gulp.series('html'));
+	gulp.watch(mask.scss, gulp.series('scss'));
+	gulp.watch(mask.css, gulp.series('css'));
+	gulp.watch([mask.js_f, mask.js_b], gulp.series('js'));
+	gulp.watch(mask.images, gulp.series('images'));
+	gulp.watch(mask.files, gulp.series('files'));
+	gulp.watch(mask.fonts, gulp.series('fonts'));
+	gulp.watch(mask.svg, gulp.series('svg'));
 });
+
+gulp.task('build', gulp.series('svg', 'html', 'scss', 'css', 'js', 'images', 'files', 'fonts'));
+
+gulp.task('default', gulp.series('build', 'server', 'watch'));
+
+gulp.task('offline', gulp.series('build', 'serverOffline', 'watch'));
 
 gulp.task('clean', function(cb) {
 	del(mask.main);
