@@ -185,9 +185,9 @@ gulp.task('watch', function() {
 
 gulp.task('build', gulp.series('svg', 'html', 'scss', 'css', 'js', 'images', 'files', 'fonts'));
 
-gulp.task('default', gulp.series('build', 'server', 'watch'));
+gulp.task('default', gulp.series('build', gulp.parallel('server', 'watch')));
 
-gulp.task('offline', gulp.series('build', 'serverOffline', 'watch'));
+gulp.task('offline', gulp.series('build', gulp.parallel('serverOffline', 'watch')));
 
 gulp.task('clean', function(cb) {
 	del(mask.main);
