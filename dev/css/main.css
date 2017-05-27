@@ -162,13 +162,14 @@
     float: right;
     margin-right: 0;
     margin-left: 15px; }
-    @media (max-width: 960px) {
-      .menu__item_right {
-        float: none;
-        margin-right: 15px;
-        margin-left: 0; } }
   .menu__item_admin {
     display: none; }
+
+@media (max-width: 1000px) {
+  .menu__item_right {
+    float: none;
+    margin-right: 15px;
+    margin-left: 0; } }
 
 .sorter {
   text-align: right; }
