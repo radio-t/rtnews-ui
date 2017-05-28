@@ -62,11 +62,3 @@ $b: '.menu';
 		}
 	}
 }
-
-@media (max-width: 1000px) {
-	#{$b}__item_right {
-		float: none;
-		margin-right: 15px;
-		margin-left: 0;
-	}
-}

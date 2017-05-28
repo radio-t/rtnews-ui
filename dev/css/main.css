@@ -165,12 +165,6 @@
   .menu__item_admin {
     display: none; }
 
-@media (max-width: 1000px) {
-  .menu__item_right {
-    float: none;
-    margin-right: 15px;
-    margin-left: 0; } }
-
 .sorter {
   text-align: right; }
   .sorter__item {
