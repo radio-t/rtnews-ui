@@ -3,35 +3,35 @@
 $b: '.menu';
 
 #{$b} {
-	@extend .common__list-nostyle;	
-	
-	&_sort {		
+	@extend .common__list-nostyle;
+
+	&_sort {
 		text-align: right;
-		
+
 		#{$b}__item {
 			margin-left: 15px;
 			margin-right: 0;
-			
+
 			font-size: 12px;
-			
-		}	
+
+		}
 
 		.link {
 			border-color: rgba(162, 162, 162, 0.2);
 
 			color: #919191;
 			font-weight: 700;
-			
+
 			&:hover {
 				border-color: rgba(162, 162, 162, 0.7);
-			
+
 				color: #333;
 			}
 
 			&_active {
 				&, &:hover {
 					color: #000;
-					
+
 					border-color: transparent;
 				}
 			}
@@ -42,7 +42,7 @@ $b: '.menu';
 		display: inline-block;
 		margin-right: 15px;
 		margin-top: 5px;
-		
+
 		&_to-current {
 			display: none;
 		}
@@ -52,15 +52,9 @@ $b: '.menu';
 		}
 
 		&_right {
-			float: right; 
+			float: right;
 			margin-right: 0;
 			margin-left: 15px;
-			
-			@media (max-width: 960px) {
-				float: none;
-				margin-right: 15px;
-				margin-left: 0;
-			}
 		}
 
 		&_admin {

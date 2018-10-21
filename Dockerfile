@@ -7,9 +7,9 @@ ADD . /srv/rtnews-ui
 
 RUN \
 	cd /srv/rtnews-ui && \
-	npm i -g gulp && \
+	npm i -g gulpjs/gulp#4.0 && \
 	npm i && \
-	gulp build && \
+	npm run build && \
 	mkdir -p /var/www && \
 	mv ./public /var/www/webapp && \
 	mv /srv/rtnews-ui/dockerinit.sh /init.sh && \

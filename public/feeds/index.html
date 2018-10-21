@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
+
 	<title>Управление фидами — Новости для Радио-Т</title>
 
 	<script>
@@ -14,13 +14,13 @@
 			location.href = '/login/?back=' + location.href;
 		}
 	</script>
-	
+
 	<link rel="shortcut icon" href="/files/favicon.ico">
 
 	<link rel="stylesheet" href="/css/main.css">
 
-	<script src="//yastatic.net/jquery/2.1.4/jquery.min.js"></script>
-	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
 	<script src="/js/main.js"></script>
 </head>
 <body class="page">
@@ -38,6 +38,7 @@
 <div class="header wrapper page__header">
 	<div class="header__title">Новости для Радио-Т</div>
 	<ul class="header__menu menu">
+		<li class="menu__item menu__item_admin menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
 		<li class="menu__item menu__item_user"><a href="/" class="link">Все темы</a></li>
 		<li class="menu__item menu__item_admin" id="all-wrap"><a href="/admin/" class="link">Все темы</a></li>
 		<li class="menu__item menu__item_admin" id="dels-wrap"><a href="/deleted/" class="link">Удалённые</a></li>
@@ -47,7 +48,7 @@
 		<li class="menu__item menu__item_admin"><a href="#update" id="update-feeds" class="link">Обновить базу</a></li>
 		<li class="menu__item menu__item_to-current" id="to-current"><a href="#current" class="link">К текущей теме</a></li>
 		<li class="menu__item menu__item_to-comments" id="menu__item_to-comments"><a href="#disqus_thread" class="link">К комментариям</a></li>
-		<li class="menu__item menu__item_admin menu__item_right"><a href="#logout" id="logout" class="link">Выйти</a></li>
+		<li class="menu__item menu__item_admin"><a href="#start" id="start" class="link">Поехали!</a></li>
 	</ul>
 </div> 
 
@@ -79,7 +80,6 @@
 
 	<div class="footer wrapper page__footer">
 	<a href="http://radio-t.com" class="link footer__copyright">Radio-T</a>, <script>document.write((new Date()).getFullYear());</script>
-	<a href="#start" id="start" class="link footer__start">Поехали!</a>
 </div>
 
 <script>
@@ -91,5 +91,13 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 ga('create', 'UA-148514-6', 'auto');
 ga('send', 'pageview');
 </script>
+
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'radio-t/chat'
+  };
+</script>
+
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
 </body>
 </html>
