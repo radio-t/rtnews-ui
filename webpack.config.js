@@ -1,0 +1,132 @@
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebPackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+
+const rthost = process.env.RTHOST && JSON.stringify(process.env.RTHOST);
+
+module.exports = (a, args) => {
+	return {
+		entry: "./main.jsx",
+		context: path.resolve(__dirname, "src"),
+		output: {
+			path: path.resolve(__dirname, "public"),
+			publicPath: "/",
+		},
+		mode: args.mode || "production",
+		module: {
+			rules: [
+				{
+					test: /\.js$/,
+					exclude: /node_modules/,
+					use: {
+						loader: "babel-loader",
+						options: {
+							presets: [
+								[
+									"@babel/preset-env",
+									{
+										useBuiltIns: "usage",
+									},
+								],
+							],
+						},
+					},
+				},
+				{
+					test: /\.jsx$/,
+					exclude: /node_modules/,
+					use: {
+						loader: "babel-loader",
+						options: {
+							presets: [
+								[
+									"@babel/preset-env",
+									{
+										useBuiltIns: "usage",
+									},
+								],
+								"@babel/preset-react",
+							],
+						},
+					},
+				},
+				{
+					test: /\.css$/,
+					use: [
+						{
+							loader: MiniCssExtractPlugin.loader,
+						},
+						"css-loader",
+					],
+				},
+				{
+					test: /\.svg$/,
+					use: {
+						loader: "svg-inline-loader",
+						options: {
+							classPrefix: "icon",
+						},
+					},
+				},
+			],
+		},
+		watchOptions: {
+			ignored: /node_modules/,
+		},
+		plugins: [
+			new webpack.DefinePlugin({
+				__REACT_DEVTOOLS_GLOBAL_HOOK__: "({ isDisabled: true })",
+			}),
+			new HtmlWebPackPlugin({
+				template: "./index.html",
+				filename: "index.html",
+				hash: true,
+			}),
+			new MiniCssExtractPlugin({
+				filename: "[name].css",
+				chunkFilename: "[name].css",
+			}),
+			new CopyWebpackPlugin([{ from: "./static", to: "static" }]),
+			new webpack.DefinePlugin({
+				ENV: JSON.stringify(
+					args.mode === "development" ? "development" : "production"
+				),
+				APIROOT:
+					rthost ||
+					(args.mode === "development"
+						? '"http://jess.umputun.com:8780/api/v1"'
+						: '"https://news.radio-t.com/api/v1"'),
+			}),
+		],
+		devServer: {
+			contentBase: path.join(__dirname, "dist"),
+			compress: true,
+			port: 9000,
+			historyApiFallback: true,
+			host: args.remote && args.remote === true ? "0.0.0.0" : null,
+		},
+		resolve: {
+			alias: {
+				react: "preact-compat",
+				"react-dom": "preact-compat",
+			},
+		},
+		optimization: {
+			minimize: !(args.hasOwnProperty("mode") && args.mode === "development"),
+			runtimeChunk: "single",
+			splitChunks: {
+				cacheGroups: {
+					vendors: {
+						test: /[\\/]node_modules[\\/]/,
+						name: "vendors",
+						enforce: true,
+						chunks: "all",
+					},
+				},
+			},
+		},
+		devtool: false,
+	};
+};

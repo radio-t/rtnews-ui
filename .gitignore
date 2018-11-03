@@ -1,5 +1,2 @@
-dev/_blocks/
 node_modules/
 *.sublime-*
-dev/html/test
-public/test
