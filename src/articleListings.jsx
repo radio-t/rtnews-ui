@@ -74,7 +74,15 @@ export class Listing extends React.Component {
 						{!this.state.addFormExpanded && (
 							<span
 								className="pseudo add-form-overlay__control"
-								onClick={() => this.setState({ addFormExpanded: true })}
+								onClick={() => {
+									this.setState({ addFormExpanded: true });
+									setTimeout(() => {
+										const el =
+											document.querySelector(".add-form__article-url") ||
+											document.querySelector(".add-form__article-manual-link");
+										if (el) el.focus();
+									}, 500);
+								}}
 							>
 								Добавить новость
 							</span>
@@ -111,12 +119,12 @@ export class Listing extends React.Component {
 						)
 						.map((x, i) => {
 							const isCurrent = x.id === this.props.activeId;
+							const sortIsDefault =
+								this.state.postRecentness === postRecentness[0] &&
+								this.state.postLevel === postLevels[0] &&
+								this.state.sort === sortings[0];
 							const getControls = () => {
-								const isNotFirst =
-									this.state.postRecentness === postRecentness[0] &&
-									this.state.postLevel === postLevels[0] &&
-									this.state.sort === sortings[0] &&
-									i !== 0;
+								const isNotFirst = sortIsDefault && i !== 0;
 								return [
 									!isCurrent ? "make-current" : null,
 									isNotFirst ? "make-first" : null,
@@ -134,6 +142,8 @@ export class Listing extends React.Component {
 									controls={this.props.isAdmin ? getControls() : []}
 									update={() => this.update()}
 									active={isCurrent}
+									draggable={this.props.isAdmin && sortIsDefault}
+									onMove={() => this.update()}
 								/>
 							);
 						})}

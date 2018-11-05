@@ -3,7 +3,6 @@ import { formatDate } from "./utils.js";
 import { getArticle } from "./api.js";
 import Remark from "./remark.jsx";
 import Loading from "./loading.jsx";
-import FeedLabel from "./feedLabel.jsx";
 
 export default class Article extends React.Component {
 	constructor(props) {
@@ -39,7 +38,6 @@ export default class Article extends React.Component {
 					>
 						{this.state.article.domain}
 					</a>
-					{this.props.isAdmin && <FeedLabel feed={this.state.article.feed} />}
 					<span
 						className="post__timestamp"
 						title={this.state.article.ats}
@@ -49,7 +47,7 @@ export default class Article extends React.Component {
 					/>
 				</div>
 				<div
-					className="full-post__content"
+					className="article-content full-post__content"
 					dangerouslySetInnerHTML={{
 						__html: this.state.article.content || this.state.article.snippet,
 					}}
@@ -59,7 +57,7 @@ export default class Article extends React.Component {
 					className="full-post__comments"
 					id="to-comments"
 					config={{
-						site_id: "radiot",
+						site_id: "rtnews",
 					}}
 				/>
 			</article>

@@ -7,25 +7,29 @@ export const sortings = [
 	{
 		title: "По приоритету",
 		fn(a, b) {
-			return a.position < b.position;
+			if (a.position === b.position) return 0;
+			return a.position > b.position ? -1 : 1;
 		},
 	},
 	{
 		title: "По дате новости",
 		fn(a, b) {
-			return Date.parse(a.ts) < Date.parse(b.ts);
+			if (a.ts === b.ts) return 0;
+			return a.parsedts > b.parsedts ? -1 : 1;
 		},
 	},
 	{
 		title: "По дате добавления",
 		fn(a, b) {
-			return Date.parse(a.ats) < Date.parse(b.ats);
+			if (a.ats === b.ats) return 0;
+			return a.parsedats > b.parsedats ? -1 : 1;
 		},
 	},
 	{
 		title: "По комментариям",
 		fn(a, b) {
-			return a.comments < b.comments;
+			if (a.comments === b.comments) return 0;
+			return a.comments > b.comments ? -1 : 1;
 		},
 	},
 ];

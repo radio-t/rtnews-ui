@@ -7,6 +7,33 @@ import {
 } from "./settings.js";
 import { first } from "./utils.js";
 
+const whitespaceRegex = /(\t|\s)+/g;
+const longWordRegex = /([^\s\\]{16})/gm;
+
+function processArticle(article) {
+	if (typeof article !== "object" || article === null) return article;
+	if (article.hasOwnProperty("snippet")) {
+		article.snippet = article.snippet
+			.replace(whitespaceRegex, " ")
+			.replace(longWordRegex, "$1&shy;");
+	}
+	if (article.hasOwnProperty("ts")) {
+		article.parsedts = Date.parse(article.ts);
+	}
+	if (article.hasOwnProperty("ats")) {
+		article.parsedats = Date.parse(article.ats);
+	}
+	if (article.hasOwnProperty("activets")) {
+		article.parsedactivets = Date.parse(article.activets);
+	}
+	return article;
+}
+
+function processArticles(articles) {
+	if (!Array.isArray(articles)) return articles;
+	return articles.map(processArticle);
+}
+
 function request(endpoint, options = {}) {
 	if (!options.hasOwnProperty("headers")) {
 		options.headers = new Headers();
@@ -44,19 +71,19 @@ export function update() {
 }
 
 export function getNews() {
-	return request("/news");
+	return request("/news").then(processArticles);
 }
 
 export function getArchiveNews() {
-	return request("/news/archive");
+	return request("/news/archive").then(processArticles);
 }
 
 export function getDeletedNews() {
-	return request("/news/del");
+	return request("/news/del").then(processArticles);
 }
 
 export function getArticle(slug) {
-	return request("/news/slug/" + encodeURIComponent(slug));
+	return request("/news/slug/" + encodeURIComponent(slug)).then(processArticle);
 }
 
 export function addArticle(link, title = "", snippet = "") {
@@ -194,6 +221,15 @@ export function setArchiveSorting(value) {
 	localStorage.setItem("archiveSorting", value.title);
 }
 
+export function getTheme() {
+	const s = localStorage.getItem("theme");
+	return s === null ? "day" : s;
+}
+
+export function setTheme(value) {
+	localStorage.setItem("theme", value);
+}
+
 export function login(user, password) {
 	const headers = new Headers();
 	const auth = btoa(user + ":" + password);
@@ -221,23 +257,21 @@ export function loginViaCookies() {
 			c[key] = value;
 			return c;
 		}, {});
-	if (cookies.hasOwnProperty("auth")) {
-		const headers = new Headers();
-		const auth = cookies.auth;
-		headers.append("Authorization", "Basic " + auth);
-		return fetch(apiRoot + "/news/reload", {
-			method: "PUT",
-			headers: headers,
-			credentials: "omit",
-			mode: "cors",
-		})
-			.then(response => response.status === 200)
-			.then(x => {
-				if (!x) logout();
-				return x;
-			});
-	}
-	return Promise.resolve(false);
+	if (!cookies.hasOwnProperty("auth")) return Promise.resolve(false);
+	const headers = new Headers();
+	const auth = cookies.auth;
+	headers.append("Authorization", "Basic " + auth);
+	return fetch(apiRoot + "/news/reload", {
+		method: "PUT",
+		headers: headers,
+		credentials: "omit",
+		mode: "cors",
+	})
+		.then(response => response.status === 200)
+		.then(x => {
+			if (!x) logout();
+			return x;
+		});
 }
 
 export function logout() {

@@ -3,7 +3,7 @@ import "./style.css";
 import React from "react";
 import "./ganalitics.js";
 import { render } from "react-dom";
-import { store, setState } from "./store.jsx";
+import { store, setState, setTheme } from "./store.jsx";
 import { Provider, connect } from "react-redux";
 import Article from "./article.jsx";
 import Head from "./head.jsx";
@@ -13,6 +13,7 @@ import {
 	pollActiveArticle,
 	getAutoScroll,
 	loginViaCookies,
+	getTheme,
 } from "./api.js";
 import AddArticle from "./add.jsx";
 import { Listing, ArchiveListing, DeletedListing } from "./articleListings.jsx";
@@ -109,6 +110,10 @@ class App extends React.Component {
 }
 
 async function main() {
+	const theme = getTheme();
+	document.documentElement.dataset.theme = theme;
+	setTheme(theme);
+
 	const CApp = connect(state => {
 		return state;
 	})(App);
@@ -129,7 +134,7 @@ async function main() {
 					}
 				}, 500);
 			}
-		}, 5000);
+		}, 15000);
 	});
 
 	setState({ autoScroll: getAutoScroll() });

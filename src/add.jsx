@@ -128,7 +128,7 @@ export default class AddArticleForm extends React.Component {
 						<span
 							role="button"
 							className="pseudo"
-							onClick={() => this.setState({ manual: true })}
+							onClick={() => this.onSwitch()}
 						>
 							Вручную
 						</span>
@@ -140,6 +140,7 @@ export default class AddArticleForm extends React.Component {
 							onChange={e => this.setState({ autolink: e.target.value })}
 							placeholder="Ссылка на новость"
 							className="add-form__article-url"
+							ref={ref => (this.autoref = ref)}
 						/>
 						<input
 							className="add-form__submit add-form__submit-auto"
@@ -171,12 +172,16 @@ export default class AddArticleForm extends React.Component {
 				</form>
 			);
 		return (
-			<form className="add-form" onSubmit={e => this.onSubmit(e)}>
+			<form
+				className="add-form"
+				onSubmit={e => this.onSubmit(e)}
+				style={this.props.style}
+			>
 				<p className="add-form__manual-switch">
 					<span
 						role="button"
 						className="pseudo"
-						onClick={() => this.setState({ manual: false })}
+						onClick={() => this.onSwitch()}
 					>
 						По ссылке
 					</span>
@@ -187,6 +192,7 @@ export default class AddArticleForm extends React.Component {
 					onChange={e => this.setState({ manualLink: e.target.value })}
 					placeholder="Ссылка на новость"
 					className="add-form__article-manual-link"
+					ref={ref => (this.manualref = ref)}
 				/>
 				<input
 					type="text"
@@ -221,6 +227,12 @@ export default class AddArticleForm extends React.Component {
 				{this.state.posting && <p className="add-form__posting">добавляю...</p>}
 			</form>
 		);
+	}
+	onSwitch() {
+		this.setState({ manual: !this.state.manual });
+		setTimeout(() => {
+			(this.autoref || this.manualref).focus();
+		}, 500);
 	}
 	onDragover(e) {
 		if (e.dataTransfer.types.indexOf("text/plain") !== -1) {
@@ -259,6 +271,9 @@ export default class AddArticleForm extends React.Component {
 	componentWillMount() {
 		document.body.addEventListener("dragover", this.onDragover, false);
 		document.body.addEventListener("drop", this.onDrop, false);
+		setTimeout(() => {
+			(this.autoref || this.manualref).focus();
+		}, 500);
 	}
 	componentWillUnmount() {
 		document.body.removeEventListener("dragover", this.onDragover, false);

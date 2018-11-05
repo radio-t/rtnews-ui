@@ -6,6 +6,7 @@ const initialState = {
 	notifications: [],
 	activeId: null,
 	autoScroll: false,
+	theme: "day",
 };
 const rootReducer = (state = initialState, action) => {
 	switch (action.type) {
@@ -82,4 +83,9 @@ export function removeNotification(notification) {
 		type: "removeNotification",
 		notification,
 	});
+}
+
+export function setTheme(theme) {
+	setState({ theme });
+	document.documentElement.dataset.theme = theme;
 }

@@ -7,7 +7,6 @@ import SVGInline from "react-svg-inline";
 import CommentsIcon from "./static/svg/i-comment.svg";
 import { Redirect, Link } from "react-router-dom";
 import ArticleButtons from "./articleButtons.js";
-import FeedLabel from "./feedLabel.jsx";
 
 class Item extends React.Component {
 	constructor(props) {
@@ -28,15 +27,45 @@ class Item extends React.Component {
 			"rtnews/article",
 			JSON.stringify(this.props.article)
 		);
+		e.dataTransfer.setData("rtnews/article-id", this.props.article.id);
 	}
 	onDragOver(e) {
-		if (e.dataTransfer.types.indexOf("rtnews/article") !== -1)
-			e.preventDefault();
+		if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
+		e.preventDefault();
+		if (e.dataTransfer.getData("rtnews/article-id") === this.props.article.id) {
+			this.ref.classList.remove("drop-top");
+			this.ref.classList.remove("drop-bottom");
+			return;
+		}
+		let append = (() => {
+			const rect = e.currentTarget.getBoundingClientRect();
+			const y = e.clientY - rect.y;
+			const proportion = (y / rect.height) * 100;
+			return proportion < 60 ? 1 : 0;
+		})();
+		if (append === 1) {
+			this.ref.classList.remove("drop-bottom");
+			this.ref.classList.add("drop-top");
+		} else {
+			this.ref.classList.remove("drop-top");
+			this.ref.classList.add("drop-bottom");
+		}
+	}
+	onDragLeave(e) {
+		this.ref.classList.remove("drop-top");
+		this.ref.classList.remove("drop-bottom");
+	}
+	onDragEnd(e) {
+		this.ref.classList.remove("drop-top");
+		this.ref.classList.remove("drop-bottom");
 	}
 	async onDrop(e) {
+		this.ref.classList.remove("drop-top");
+		this.ref.classList.remove("drop-bottom");
 		if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
 		e.preventDefault();
 		const data = JSON.parse(e.dataTransfer.getData("rtnews/article"));
+		if (data.position === this.props.article.position) return;
 		let append = (() => {
 			const rect = e.currentTarget.getBoundingClientRect();
 			const y = e.clientY - rect.y;
@@ -44,7 +73,6 @@ class Item extends React.Component {
 			return proportion < 60 ? 1 : 0;
 		})();
 		if (data.position < this.props.article.position) append -= 1;
-		if (data.position === this.props.article.position + append) return;
 		await moveArticle(data.position, this.props.article.position + append);
 		this.props.onMove &&
 			this.props.onMove(data.position, this.props.article.position + append);
@@ -58,7 +86,10 @@ class Item extends React.Component {
 				}
 				onDragStartCapture={e => this.onDrag(e)}
 				onDragOver={e => this.onDragOver(e)}
+				onDragLeave={e => this.onDragLeave(e)}
+				onDragEnd={e => this.onDragEnd(e)}
 				onDrop={e => this.onDrop(e)}
+				ref={ref => (this.ref = ref)}
 			>
 				<div className="sorter__item-content">
 					<div className="post-controls sorter__item-controls">
@@ -86,7 +117,10 @@ class Item extends React.Component {
 								•
 							</span>
 						)}
-						<Link to={`${postsPrefix}/${this.props.article.slug}`}>
+						<Link
+							to={`${postsPrefix}/${this.props.article.slug}`}
+							className="sorter__item-link"
+						>
 							{this.props.article.title.trim()}
 						</Link>
 					</div>
@@ -98,10 +132,6 @@ class Item extends React.Component {
 						>
 							{this.props.article.domain}
 						</a>
-						<FeedLabel
-							feed={this.props.article.feed}
-							className="sorter__item-feed"
-						/>
 						<span
 							className="sorter__item-timestamp"
 							title={this.props.article.ats}
@@ -116,6 +146,7 @@ class Item extends React.Component {
 								className="icon sorter__comments-icon"
 								svg={CommentsIcon}
 							/>
+							&nbsp;
 							{this.props.article.comments}
 						</span>
 					</div>

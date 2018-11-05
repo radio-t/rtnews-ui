@@ -60,7 +60,16 @@ export default class ListingActions extends React.Component {
 										className="sortings-list__item sortings-list__current-item"
 										key={x.title}
 									>
-										{x.title}
+										<label className="sortings-list__item-content sortings-list__current-item-content">
+											<input
+												type="radio"
+												className="sortings-list__item-input"
+												checked="true"
+												name="post-sortings"
+												value={x.title}
+											/>
+											{x.title}
+										</label>
 									</li>
 								) : (
 									<li
@@ -72,7 +81,15 @@ export default class ListingActions extends React.Component {
 										}
 										key={x.title}
 									>
-										{x.title}
+										<label className="sortings-list__item-content">
+											<input
+												type="radio"
+												className="sortings-list__item-input"
+												name="post-sortings"
+												value={x.title}
+											/>
+											{x.title}
+										</label>
 									</li>
 								)
 						)}

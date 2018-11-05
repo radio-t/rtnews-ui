@@ -1,7 +1,23 @@
 import React from "react";
 import { NavLink, Route } from "react-router-dom";
-import { logout, update, startShow, setAutoScroll } from "./api.js";
-import { store, setState, addNotification } from "./store.jsx";
+import {
+	logout,
+	update,
+	startShow,
+	setAutoScroll,
+	setTheme as saveTheme,
+} from "./api.js";
+import {
+	store,
+	setState,
+	addNotification,
+	setTheme as commitTheme,
+} from "./store.jsx";
+
+const setTheme = v => {
+	commitTheme(v);
+	saveTheme(v);
+};
 
 export default class Head extends React.Component {
 	render() {
@@ -92,6 +108,26 @@ export default class Head extends React.Component {
 							</span>
 						</li>
 					)}
+					{this.props.isAdmin &&
+						this.props.theme === "day" && (
+							<button
+								onClick={() => setTheme("night")}
+								title="Поставить ночную тему"
+								className="inline-button navigation__item navigation__theme-switcher"
+							>
+								🌚
+							</button>
+						)}
+					{this.props.isAdmin &&
+						this.props.theme === "night" && (
+							<button
+								onClick={() => setTheme("day")}
+								title="Поставить дневную тему"
+								className="inline-button navigation__item navigation__theme-switcher"
+							>
+								🌞
+							</button>
+						)}
 					{this.props.isAdmin && <br />}
 					<Route
 						path="/"
@@ -124,21 +160,45 @@ export default class Head extends React.Component {
 						path="/news/:slug"
 						render={() => (
 							<li className="navigation__item navigation__item_to-comments">
-								<span
+								<a
 									role="button"
+									href="#to-comments"
 									className="pseudo navigation__item-link"
 									onClick={e => {
-										const el = document.getElementById("to-comments");
-										if (el) {
-											el.scrollIntoView({ behavior: "smooth" });
-										}
+										e.preventDefault();
+										setTimeout(() => {
+											const el = document.getElementById("to-comments");
+											if (el) {
+												el.scrollIntoView({ behavior: "smooth" });
+											}
+										}, 200);
 									}}
 								>
 									К комментариям
-								</span>
+								</a>
 							</li>
 						)}
 					/>
+					{!this.props.isAdmin &&
+						this.props.theme === "day" && (
+							<button
+								onClick={() => setTheme("night")}
+								title="Поставить ночную тему"
+								className="inline-button navigation__item navigation__theme-switcher"
+							>
+								🌚
+							</button>
+						)}
+					{!this.props.isAdmin &&
+						this.props.theme === "night" && (
+							<button
+								onClick={() => setTheme("day")}
+								title="Поставить дневную тему"
+								className="inline-button navigation__item navigation__theme-switcher"
+							>
+								🌞
+							</button>
+						)}
 				</ul>
 				<hr />
 			</div>

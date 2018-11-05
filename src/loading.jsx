@@ -15,7 +15,10 @@ export default class Loading extends React.Component {
 	render() {
 		return (
 			<div className="loading" {...this.props}>
-				{this.props.text || "Loading"}.{".".repeat(this.state.numberOfDots)}
+				{this.props.text || "Загружаю"}
+				<span className="loading__dots">
+					.{".".repeat(this.state.numberOfDots)}
+				</span>
 			</div>
 		);
 	}

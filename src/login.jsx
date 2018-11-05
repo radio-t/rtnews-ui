@@ -30,7 +30,7 @@ export default class LoginForm extends React.Component {
 				/>
 				<input
 					className="login-form__password"
-					type="text"
+					type="password"
 					placeholder="Пароль"
 					value={this.state.password}
 					onChange={e => this.setState({ password: e.target.value })}
