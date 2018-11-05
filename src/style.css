@@ -264,6 +264,12 @@ p {
 	vertical-align: -0.1em;
 }
 
+/* feed-label */
+
+.feed-label {
+	margin-right: .4em;
+}
+
 /* feeds */
 
 .feeds {
@@ -680,7 +686,7 @@ a.navigation__item-link.active {
 	margin-left: -1rem;
 }
 
-.post + .post {
+.post+.post {
 	margin-top: 2rem;
 }
 
@@ -727,7 +733,6 @@ a.navigation__item-link.active {
 }
 
 .post__timestamp {
-	margin-left: 0.4em;
 	opacity: 0.8;
 }
 

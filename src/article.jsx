@@ -3,7 +3,7 @@ import { formatDate } from "./utils.js";
 import { getArticle } from "./api.js";
 import Remark from "./remark.jsx";
 import Loading from "./loading.jsx";
-import FeedLabel from "./FeedLabel.jsx";
+import FeedLabel from "./feedLabel.jsx";
 
 export default class Article extends React.Component {
 	constructor(props) {
@@ -39,7 +39,7 @@ export default class Article extends React.Component {
 					>
 						{this.state.article.domain}
 					</a>
-					<FeedLabel feed={this.state.article.feed} />
+					{this.props.isAdmin && <FeedLabel feed={this.state.article.feed} />}
 					<span
 						className="post__timestamp"
 						title={this.state.article.ats}

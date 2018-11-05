@@ -7,7 +7,7 @@ import SVGInline from "react-svg-inline";
 import CommentsIcon from "./static/svg/i-comment.svg";
 import { Redirect, Link } from "react-router-dom";
 import ArticleButtons from "./articleButtons.js";
-import FeedLabel from "./FeedLabel.jsx";
+import FeedLabel from "./feedLabel.jsx";
 
 class Item extends React.Component {
 	constructor(props) {

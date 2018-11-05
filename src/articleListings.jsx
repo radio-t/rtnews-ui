@@ -130,6 +130,7 @@ export class Listing extends React.Component {
 									key={x.id}
 									article={x}
 									archive={false}
+									isAdmin={this.props.isAdmin}
 									controls={this.props.isAdmin ? getControls() : []}
 									update={() => this.update()}
 									active={isCurrent}
@@ -181,6 +182,7 @@ export class ArchiveListing extends React.Component {
 								key={x.id}
 								article={x}
 								archive={true}
+								isAdmin={this.props.isAdmin}
 								controls={this.props.isAdmin ? ["remove"] : []}
 								update={() => this.update()}
 							/>
@@ -220,6 +222,7 @@ export class DeletedListing extends React.Component {
 						<ArticleBrief
 							key={x.id}
 							article={x}
+							isAdmin={this.props.isAdmin}
 							controls={this.props.isAdmin ? ["restore"] : []}
 							update={() => this.update()}
 						/>

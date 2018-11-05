@@ -5,7 +5,7 @@ import CommentsIcon from "./static/svg/i-comment.svg";
 import { postsPrefix } from "./settings.js";
 import { Link } from "react-router-dom";
 import ArticleButtons from "./articleButtons.js";
-import FeedLabel from "./FeedLabel.jsx";
+import FeedLabel from "./feedLabel.jsx";
 
 const noop = () => {};
 
@@ -65,7 +65,7 @@ export default function ArticleBrief(props) {
 				>
 					{props.article.domain}
 				</a>
-				<FeedLabel feed={props.article.feed} />
+				{props.isAdmin && <FeedLabel feed={props.article.feed} />}
 				<span
 					className="post__timestamp"
 					title={props.article.ats}
