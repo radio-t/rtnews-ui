@@ -76,9 +76,6 @@ module.exports = (a, args) => {
 			ignored: /node_modules/,
 		},
 		plugins: [
-			new webpack.DefinePlugin({
-				__REACT_DEVTOOLS_GLOBAL_HOOK__: "({ isDisabled: true })",
-			}),
 			new HtmlWebPackPlugin({
 				template: "./index.html",
 				filename: "index.html",
@@ -90,6 +87,10 @@ module.exports = (a, args) => {
 			}),
 			new CopyWebpackPlugin([{ from: "./static", to: "static" }]),
 			new webpack.DefinePlugin({
+				"process.env.NODE_ENV": JSON.stringify(
+					args.mode === "development" ? "development" : "production"
+				),
+				__REACT_DEVTOOLS_GLOBAL_HOOK__: "({ isDisabled: true })",
 				ENV: JSON.stringify(
 					args.mode === "development" ? "development" : "production"
 				),

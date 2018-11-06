@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Route } from "react-router-dom";
+
 import {
 	logout,
 	update,
@@ -13,6 +13,8 @@ import {
 	addNotification,
 	setTheme as commitTheme,
 } from "./store.jsx";
+
+import { NavLink, Route } from "react-router-dom";
 
 const setTheme = v => {
 	commitTheme(v);

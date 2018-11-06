@@ -1,4 +1,5 @@
 import React from "react";
+
 import { createStore } from "redux";
 
 const initialState = {
@@ -59,6 +60,7 @@ const createNotification = notification => {
 	notification.id = notificationId++;
 	notification = Object.assign(
 		{
+			context: null,
 			level: "default",
 			time: 3000,
 			closable: true,
@@ -75,7 +77,6 @@ export function addNotification(notification) {
 		// fuckery with indirection
 		const n = {};
 		const remover = () => {
-			console.log("hey!");
 			store.dispatch({
 				type: "removeNotification",
 				notification: n,
@@ -116,6 +117,8 @@ export function removeNotificationsWithContext(context) {
 	});
 }
 
+let themeCounter = 0;
+
 export function setTheme(theme, immediate = false) {
 	setState({ theme });
 
@@ -124,11 +127,14 @@ export function setTheme(theme, immediate = false) {
 		return;
 	}
 
+	++themeCounter;
 	document.documentElement.classList.add("switch-transition");
 	setTimeout(() => {
 		document.documentElement.dataset.theme = theme;
 		setTimeout(() => {
-			document.documentElement.classList.remove("switch-transition");
+			--themeCounter;
+			if (themeCounter < 1)
+				document.documentElement.classList.remove("switch-transition");
 		}, 1500);
 	}, 10);
 }

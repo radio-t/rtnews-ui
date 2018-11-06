@@ -1,4 +1,5 @@
 import React from "react";
+
 import { postRecentness, postLevels, sortings } from "./settings.js";
 
 export default class ListingActions extends React.Component {
@@ -7,25 +8,24 @@ export default class ListingActions extends React.Component {
 			<div className={"listing-actions " + (this.props.className || "")}>
 				{this.props.includeFilters ? (
 					<div className="listing-actions__filters">
-						{this.props.postRecentness === postRecentness[0] ? (
+						{this.props.postRecentness && (
 							<button
-								className="listing-actions__news-recent-button"
-								onClick={e =>
-									this.props.onRecentnessChange &&
-									this.props.onRecentnessChange(postRecentness[1])
+								className={
+									"listing-actions__news-recent-button " +
+									(this.props.postRecentness === postRecentness[1]
+										? "listing-actions__news-recent-button-active"
+										: "")
 								}
-							>
-								Свежие
-							</button>
-						) : (
-							<button
-								className="listing-actions__news-recent-button listing-actions__news-recent-button-active"
-								onClick={e =>
+								onClick={e => {
+									const val =
+										this.props.postRecentness === postRecentness[0]
+											? postRecentness[1]
+											: postRecentness[0];
 									this.props.onRecentnessChange &&
-									this.props.onRecentnessChange(postRecentness[0])
-								}
+										this.props.onRecentnessChange(val);
+								}}
 							>
-								Свежие
+								<span style={{ borderBottom: "1px dashed" }}>Свежие</span>
 							</button>
 						)}
 						<select

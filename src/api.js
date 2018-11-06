@@ -136,9 +136,8 @@ export function addArticle(link, title = "", snippet = "") {
 	});
 }
 
-export function moveArticle(from, to) {
-	const offset = to - from;
-	return request(`/news/move/${from}/${offset}`, { method: "PUT" });
+export function moveArticle(id, offset) {
+	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
 }
 
 export function archiveArticle(id) {
@@ -171,7 +170,7 @@ export function makeArticleGeek(id) {
 	return request(`/news/geek/${id}`, { method: "PUT" });
 }
 
-export function makeArticleNoGeek(id) {
+export function makeArticleNotGeek(id) {
 	return request(`/news/nogeek/${id}`, { method: "PUT" });
 }
 

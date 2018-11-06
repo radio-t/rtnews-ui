@@ -1,6 +1,8 @@
 import React from "react";
+
 import { setState } from "./store.jsx";
 import { login, loginViaCookies } from "./api.js";
+
 import { Redirect } from "react-router-dom";
 
 export default class LoginForm extends React.Component {

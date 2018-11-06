@@ -1,14 +1,16 @@
+/**
+ * Provides with different Atricle Listing views (Main, Archive, Deleted, Sorting)
+ */
+
 import React from "react";
-import ArticleBrief from "./articleBrief.jsx";
-import ListingActions from "./listingActions.jsx";
-import { Redirect } from "react-router-dom";
+import { sleep, first } from "./utils.js";
 import {
 	archiveSortings,
 	postRecentness,
 	postLevels,
 	sortings,
+	newsAutoUpdateInterval,
 } from "./settings.js";
-import { first } from "./utils.js";
 import {
 	getNews,
 	getArchiveNews,
@@ -21,12 +23,199 @@ import {
 	setSorting,
 	getArchiveSorting,
 	setArchiveSorting,
+	activateArticle,
+	makeArticleGeek,
+	makeArticleNotGeek,
+	makeArticleFirst,
+	archiveArticle,
+	removeArticle,
+	restoreArticle,
+	moveArticle,
 } from "./api.js";
+import { setState, addNotification, removeNotification } from "./store.jsx";
+
+import { ArticleBrief, ArticleSort } from "./articleViews.jsx";
+import ListingActions from "./listingActions.jsx";
+import { Redirect } from "react-router-dom";
 import AddArticle from "./add.jsx";
 import Loading from "./loading.jsx";
-import { sleep } from "./utils.js";
 
-export class Listing extends React.Component {
+/**
+ * Special symbol which denotes that
+ * article should be deleted in
+ * BaseListing.onArticleChange
+ */
+export const REMOVE_CHANGE = Symbol();
+
+/**
+ * fuction which shows notification, fires function
+ * and upon completition removes notification
+ */
+async function en(message, fn, context = null) {
+	const notification = addNotification({
+		data: message,
+		time: 30000,
+		context,
+	});
+	try {
+		const o = await fn();
+		return o;
+	} finally {
+		setTimeout(() => {
+			removeNotification(notification);
+		}, 500);
+	}
+}
+
+/**
+ * Base for listing components
+ *
+ * Provides onChange handlers such as
+ * "make geek", "make first" etc...
+ *
+ * Provides news autoupdate
+ */
+class BaseListing extends React.Component {
+	/**
+	 *
+	 * Provides articles autoupdate
+	 */
+	constructor(props) {
+		super(props);
+
+		if (newsAutoUpdateInterval === null) return;
+
+		this.updateArticle = this.updateArticle.bind(this);
+		this.onArticleChange = this.onArticleChange.bind(this);
+
+		//auto update functionality
+		this.updateTimestamp = new Date().getTime();
+		const oldupdate = this.update.bind(this);
+		this.update = (...args) => {
+			this.updateTimestamp = new Date().getTime();
+			return oldupdate(...args);
+		};
+
+		const updateInterval = setInterval(() => {
+			let stamp = new Date().getTime();
+			if (stamp - this.updateTimestamp > newsAutoUpdateInterval * 60000) {
+				this.update();
+				this.updateTimestamp = stamp;
+			}
+		}, 30000);
+
+		const oldunmount = this.componentWillUnmount.bind(this);
+		this.componentWillUnmount = (...args) => {
+			clearInterval(updateInterval);
+			return oldunmount(...args);
+		};
+	}
+	componentWillUnmount() {}
+	updateArticle(article, change) {
+		const articleIndex = this.state.news.indexOf(article);
+		if (articleIndex === -1) return;
+		if (change === REMOVE_CHANGE) {
+			this.setState({
+				news: [
+					...this.state.news.slice(0, articleIndex),
+					...this.state.news.slice(articleIndex + 1),
+				],
+			});
+			return;
+		}
+		const storeArticle = this.state.news[articleIndex];
+		const updatedArticle = { ...storeArticle, ...change };
+		this.setState({
+			news: [
+				...this.state.news.slice(0, articleIndex),
+				updatedArticle,
+				...this.state.news.slice(articleIndex + 1),
+			],
+		});
+		return updatedArticle;
+	}
+	async onArticleChange(article, change, data = null) {
+		switch (change) {
+			case "make-first":
+				{
+					const max = Math.max(...this.state.news.map(x => x.position));
+					this.updateArticle(article, { position: max + 1 });
+					const updated = await en(
+						"делаю тему первой",
+						async () => await makeArticleFirst(article.id)
+					);
+					const updatedArticles = this.state.news.slice(0).map(a => {
+						if (!updated.hasOwnProperty(a.id)) return a;
+						const n = { ...a, position: updated[a.id] };
+						return n;
+					});
+					this.setState({ news: updatedArticles });
+				}
+				break;
+			case "make-current":
+				setState({ activeId: article.id });
+				await en(
+					"активирую",
+					async () => await activateArticle(article.id),
+					"active-article"
+				);
+				this.update && (await this.update());
+				break;
+			case "make-geek":
+				this.updateArticle(article, { geek: true });
+				await en(
+					"делаю тему гиковской",
+					async () => await makeArticleGeek(article.id)
+				);
+				break;
+			case "make-ungeek":
+				this.updateArticle(article, { geek: false });
+				await en(
+					"делаю тему негиковской",
+					async () => await makeArticleNotGeek(article.id)
+				);
+				break;
+			case "archive":
+				this.updateArticle(article, REMOVE_CHANGE);
+				await en(
+					"убираю в архив",
+					async () => await archiveArticle(article.id)
+				);
+				break;
+			case "remove":
+				this.updateArticle(article, REMOVE_CHANGE);
+				await en("удаляю", async () => await removeArticle(article.id));
+				break;
+			case "restore":
+				this.updateArticle(article, REMOVE_CHANGE);
+				await en(
+					"восстанавливаю",
+					async () => await restoreArticle(article.id)
+				);
+				break;
+			case "move":
+				const target = first(this.state.news, a => a.id === data.id);
+				const append = data.from < data.to ? 0.2 : -0.2;
+				this.updateArticle(target, { position: data.to + append });
+				const updated = await moveArticle(data.id, data.to - data.from);
+				const updatedArticles = this.state.news.slice(0).map(a => {
+					if (!updated.hasOwnProperty(a.id)) return a;
+					const n = { ...a, position: updated[a.id] };
+					return n;
+				});
+				this.setState({ news: updatedArticles });
+				break;
+			default:
+				console.error("unknown action");
+				break;
+		}
+	}
+}
+
+/**
+ * Listing for main "/" route
+ */
+export class Listing extends BaseListing {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -40,15 +229,24 @@ export class Listing extends React.Component {
 	}
 	render() {
 		if (!this.state.loaded) return <Loading />;
+
+		const sortIsDefault =
+			this.state.postRecentness === postRecentness[0] &&
+			this.state.postLevel === postLevels[0] &&
+			this.state.sort === sortings[0];
+
 		return (
 			<>
 				<ListingActions
 					includeFilters={true}
+					className={this.props.isAdmin ? "listing-actions-all" : ""}
+					//
 					postRecentness={this.state.postRecentness}
 					onRecentnessChange={postRecentness => {
 						this.setState({ postRecentness });
 						setRecentness(postRecentness);
 					}}
+					//
 					postLevel={this.state.postLevel}
 					onPostLevelChange={postLevel => {
 						const level = first(postLevels, x => x.title === postLevel);
@@ -57,12 +255,12 @@ export class Listing extends React.Component {
 						});
 						setPostLevel(level);
 					}}
+					//
 					sort={this.state.sort}
 					onSortingChange={sort => {
 						this.setState({ sort });
 						setSorting(sort);
 					}}
-					className={this.props.isAdmin ? "listing-actions-all" : ""}
 				/>
 				{this.props.isAdmin && (
 					<div
@@ -107,8 +305,8 @@ export class Listing extends React.Component {
 					</div>
 				)}
 				<div className="news page__news">
-					{[...this.state.news]
-						.sort((a, b) => this.state.sort.fn(a, b))
+					{this.state.news
+						.slice(0)
 						.filter(
 							(x, i) =>
 								this.state.postRecentness.fn(
@@ -117,12 +315,9 @@ export class Listing extends React.Component {
 									this.state.postLevel.hasOwnProperty("isgeek")
 								) && this.state.postLevel.fn(x, i)
 						)
+						.sort((a, b) => this.state.sort.fn(a, b))
 						.map((x, i) => {
 							const isCurrent = x.id === this.props.activeId;
-							const sortIsDefault =
-								this.state.postRecentness === postRecentness[0] &&
-								this.state.postLevel === postLevels[0] &&
-								this.state.sort === sortings[0];
 							const getControls = () => {
 								const isNotFirst = sortIsDefault && i !== 0;
 								return [
@@ -138,12 +333,10 @@ export class Listing extends React.Component {
 									key={x.id}
 									article={x}
 									archive={false}
-									isAdmin={this.props.isAdmin}
-									controls={this.props.isAdmin ? getControls() : []}
-									update={() => this.update()}
+									controls={this.props.isAdmin ? getControls() : null}
 									active={isCurrent}
 									draggable={this.props.isAdmin && sortIsDefault}
-									onMove={() => this.update()}
+									onChange={(id, data) => this.onArticleChange(x, id, data)}
 								/>
 							);
 						})}
@@ -160,7 +353,10 @@ export class Listing extends React.Component {
 	}
 }
 
-export class ArchiveListing extends React.Component {
+/**
+ * Listing for archive "/arhive/"
+ */
+export class ArchiveListing extends BaseListing {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -185,16 +381,16 @@ export class ArchiveListing extends React.Component {
 					}}
 				/>
 				<div className="news page__news">
-					{[...this.state.news]
+					{this.state.news
+						.slice(0)
 						.sort((a, b) => this.state.sort.fn(a, b))
 						.map(x => (
 							<ArticleBrief
 								key={x.id}
 								article={x}
 								archive={true}
-								isAdmin={this.props.isAdmin}
-								controls={this.props.isAdmin ? ["remove"] : []}
-								update={() => this.update()}
+								controls={this.props.isAdmin ? ["remove"] : null}
+								onChange={(id, data) => this.onArticleChange(x, id, data)}
 							/>
 						))}
 				</div>
@@ -210,7 +406,10 @@ export class ArchiveListing extends React.Component {
 	}
 }
 
-export class DeletedListing extends React.Component {
+/**
+ * Listing for deleted articles "/deleted/"
+ */
+export class DeletedListing extends BaseListing {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -226,25 +425,64 @@ export class DeletedListing extends React.Component {
 		if (!this.state.loaded) return <Loading />;
 		return (
 			<div className="news deleted-news page__news">
-				{[...this.state.news]
-					.sort((a, b) => Date.parse(a.ats) < Date.parse(b.ats))
-					.map(x => (
-						<ArticleBrief
-							key={x.id}
-							article={x}
-							isAdmin={this.props.isAdmin}
-							controls={this.props.isAdmin ? ["restore"] : []}
-							update={() => this.update()}
-						/>
-					))}
+				{this.state.news.map(x => (
+					<ArticleBrief
+						key={x.id}
+						article={x}
+						controls={this.props.isAdmin ? ["restore"] : []}
+						onChange={(id, data) => this.onArticleChange(x, id, data)}
+					/>
+				))}
 			</div>
 		);
 	}
 	async update() {
-		const news = await getDeletedNews();
+		const news = (await getDeletedNews()).sort(
+			(a, b) => Date.parse(a.ats) < Date.parse(b.ats)
+		);
 		this.setState({ news, loaded: true });
 	}
 	async componentWillMount() {
 		this.update();
+	}
+}
+
+/**
+ * Listing for sorting view "/sort/"
+ */
+export class Sorter extends BaseListing {
+	constructor(props) {
+		super(props);
+		this.state = {
+			news: [],
+			loaded: false,
+		};
+	}
+	update() {
+		getNews().then(news => {
+			this.setState({ news, loaded: true });
+		});
+	}
+	async componentWillMount() {
+		this.update();
+	}
+	render() {
+		if (!this.props.isAdmin) return <Redirect to="/login/" />;
+		if (!this.state.loaded) return <Loading />;
+		return (
+			<div className="sorter">
+				{this.state.news
+					.slice(0)
+					.sort((a, b) => a.position < b.position)
+					.map(article => (
+						<ArticleSort
+							article={article}
+							key={article.id}
+							current={this.props.activeId === article.id}
+							onChange={(id, data) => this.onArticleChange(article, id, data)}
+						/>
+					))}
+			</div>
+		);
 	}
 }

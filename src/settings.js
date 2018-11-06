@@ -3,6 +3,19 @@ export const apiRoot = APIROOT;
 
 export const postsPrefix = "/news";
 
+/**
+ * news update interval in minutes
+ *
+ * null if off
+ */
+export const newsAutoUpdateInterval = 10;
+
+/**
+ * needs for situation when dragging something
+ * near window border, so have add scroll manually
+ */
+export const isSafari = window.navigator.userAgent.indexOf("Safari") !== -1;
+
 export const sortings = [
 	{
 		title: "По приоритету",

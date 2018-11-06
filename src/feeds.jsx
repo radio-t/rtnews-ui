@@ -1,10 +1,12 @@
 import React from "react";
-import Loading from "./loading.jsx";
+
 import { getFeeds, addFeed, removeFeed } from "./api.js";
 import { formatDate, sleep } from "./utils.js";
 import { Redirect } from "react-router-dom";
 
-export default class LoginForm extends React.Component {
+import Loading from "./loading.jsx";
+
+export default class FeedsForm extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {

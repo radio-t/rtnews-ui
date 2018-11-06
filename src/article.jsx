@@ -1,10 +1,12 @@
 import React from "react";
+
 import { formatDate } from "./utils.js";
 import { getArticle } from "./api.js";
+
 import Remark from "./remark.jsx";
 import Loading from "./loading.jsx";
 
-export default class Article extends React.Component {
+export default class Article extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
