@@ -7,6 +7,7 @@ import {
 	removeArticle,
 	restoreArticle,
 } from "./api.js";
+import { setState } from "./store.jsx";
 
 import { addNotification, removeNotification } from "./store.jsx";
 
@@ -30,6 +31,7 @@ export default {
 		title: "Сделать текущей",
 		id: "make-current",
 		async fn(article, update) {
+			setState({ activeId: article.id });
 			await en("активирую", async () => await activateArticle(article.id));
 			await update();
 		},

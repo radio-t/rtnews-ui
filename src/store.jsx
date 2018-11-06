@@ -43,7 +43,7 @@ export function setState(state) {
 
 let notificationId = 0;
 
-export function addNotification(notification) {
+const createNotification = notification => {
 	if (typeof notification === "string") {
 		notification = {
 			data: <span dangerouslySetInnerHTML={{ __html: notification }} />,
@@ -65,16 +65,39 @@ export function addNotification(notification) {
 		},
 		notification
 	);
+	//inject key into react component to avoid misrendering
+	notification.data.key = notification.id;
+	return notification;
+};
+
+export function addNotification(notification) {
+	if (typeof notification === "function") {
+		// fuckery with indirection
+		const n = {};
+		const remover = () => {
+			console.log("hey!");
+			store.dispatch({
+				type: "removeNotification",
+				notification: n,
+			});
+		};
+		Object.assign(n, createNotification(notification(remover)));
+		notification = n;
+	} else {
+		notification = createNotification(notification);
+	}
 	store.dispatch({
 		type: "addNotification",
 		notification,
 	});
-	setTimeout(() => {
-		store.dispatch({
-			type: "removeNotification",
-			notification,
-		});
-	}, notification.time);
+	if (notification.time !== null) {
+		setTimeout(() => {
+			store.dispatch({
+				type: "removeNotification",
+				notification,
+			});
+		}, notification.time);
+	}
 	return notification;
 }
 
@@ -85,7 +108,27 @@ export function removeNotification(notification) {
 	});
 }
 
-export function setTheme(theme) {
+export function removeNotificationsWithContext(context) {
+	setState({
+		notifications: store
+			.getState()
+			.notifications.filter(n => n.context !== context),
+	});
+}
+
+export function setTheme(theme, immediate = false) {
 	setState({ theme });
-	document.documentElement.dataset.theme = theme;
+
+	if (immediate) {
+		document.documentElement.dataset.theme = theme;
+		return;
+	}
+
+	document.documentElement.classList.add("switch-transition");
+	setTimeout(() => {
+		document.documentElement.dataset.theme = theme;
+		setTimeout(() => {
+			document.documentElement.classList.remove("switch-transition");
+		}, 1500);
+	}, 10);
 }

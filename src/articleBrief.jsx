@@ -97,6 +97,7 @@ export default class ArticleBrief extends React.Component {
 		return (
 			<article
 				key={this.props.article.id}
+				id={this.props.active && "active-article"}
 				className={
 					"post " +
 					(this.props.active && this.props.active === true ? "post-active" : "")

@@ -82,8 +82,41 @@ export function getDeletedNews() {
 	return request("/news/del").then(processArticles);
 }
 
-export function getArticle(slug) {
-	return request("/news/slug/" + encodeURIComponent(slug)).then(processArticle);
+const articlesCache = new Map();
+const articlesIdSlugMap = new Map();
+
+export async function getArticle(slug) {
+	if (articlesCache.has(slug)) return Promise.resolve(articlesCache.get(slug));
+	const article = await request("/news/slug/" + encodeURIComponent(slug)).then(
+		processArticle
+	);
+	articlesCache.set(slug, article);
+	articlesIdSlugMap.set(article.id, article.slug);
+	return article;
+}
+
+export async function getArticleById(id) {
+	if (articlesIdSlugMap.has(id))
+		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(id)));
+	const article = await request("/news/id/" + encodeURIComponent(id)).then(
+		processArticle
+	);
+	articlesCache.set(article.slug, article);
+	articlesIdSlugMap.set(article.id, article.slug);
+	return article;
+}
+
+export function getActiveArticle() {
+	return request(`/news/active`)
+		.then(x => x.id)
+		.catch(() => null);
+}
+
+export async function pollActiveArticle(ms = 295) {
+	while (true) {
+		const req = await request(`/news/active/wait/${ms}`);
+		if (req != null && req.hasOwnProperty("id")) return req.id;
+	}
 }
 
 export function addArticle(link, title = "", snippet = "") {
@@ -106,19 +139,6 @@ export function addArticle(link, title = "", snippet = "") {
 export function moveArticle(from, to) {
 	const offset = to - from;
 	return request(`/news/move/${from}/${offset}`, { method: "PUT" });
-}
-
-export function getActiveArticle() {
-	return request(`/news/active`)
-		.then(x => x.id)
-		.catch(() => null);
-}
-
-export async function pollActiveArticle(ms = 295) {
-	while (true) {
-		const req = await request(`/news/active/wait/${ms}`);
-		if (req != null && req.hasOwnProperty("id")) return req.id;
-	}
 }
 
 export function archiveArticle(id) {

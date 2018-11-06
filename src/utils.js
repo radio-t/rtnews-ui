@@ -45,3 +45,10 @@ export async function animate(fn, interval = 1000, immediate = true) {
 	};
 	requestAnimationFrame(runner);
 }
+
+export async function waitDOMReady() {
+	while (true) {
+		if (document.readyState === "complete") return;
+		await sleep(200);
+	}
+}

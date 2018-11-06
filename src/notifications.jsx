@@ -5,7 +5,7 @@ export default function Notifications(props) {
 	return (
 		<div className="notifications">
 			{props.notifications &&
-				props.notifications.map(n => (
+				props.notifications.reverse().map(n => (
 					<div
 						className={
 							"notifications__item " +

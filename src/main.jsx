@@ -3,17 +3,25 @@ import "./style.css";
 import React from "react";
 import "./ganalitics.js";
 import { render } from "react-dom";
-import { store, setState, setTheme } from "./store.jsx";
+import {
+	store,
+	setState,
+	setTheme,
+	addNotification,
+	removeNotificationsWithContext,
+} from "./store.jsx";
 import { Provider, connect } from "react-redux";
 import Article from "./article.jsx";
 import Head from "./head.jsx";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 import {
 	getActiveArticle,
 	pollActiveArticle,
 	getAutoScroll,
 	loginViaCookies,
 	getTheme,
+	getArticleById,
 } from "./api.js";
 import AddArticle from "./add.jsx";
 import { Listing, ArchiveListing, DeletedListing } from "./articleListings.jsx";
@@ -22,6 +30,7 @@ import LoginForm from "./login.jsx";
 import NotFound from "./notFound.jsx";
 import Sorter from "./sorter.jsx";
 import Notifications from "./notifications.jsx";
+import { waitDOMReady } from "./utils.js";
 
 class App extends React.Component {
 	render() {
@@ -112,7 +121,7 @@ class App extends React.Component {
 async function main() {
 	const theme = getTheme();
 	document.documentElement.dataset.theme = theme;
-	setTheme(theme);
+	setTheme(theme, true);
 
 	const CApp = connect(state => {
 		return state;
@@ -120,21 +129,6 @@ async function main() {
 
 	await loginViaCookies().then(isAdmin => {
 		setState({ isAdmin });
-	});
-
-	getActiveArticle().then(async activeId => {
-		setState({ activeId });
-		setTimeout(async () => {
-			while (true) {
-				setState({ activeId: await pollActiveArticle() });
-				setTimeout(() => {
-					if (store.getState().autoScroll) {
-						const el = document.querySelector(".post-active");
-						if (el) el.scrollIntoView({ behavior: "smooth" });
-					}
-				}, 500);
-			}
-		}, 15000);
 	});
 
 	setState({ autoScroll: getAutoScroll() });
@@ -145,6 +139,61 @@ async function main() {
 		</Provider>,
 		document.querySelector(".app")
 	);
+
+	getActiveArticle().then(async activeId => {
+		setState({ activeId });
+		await waitDOMReady();
+		while (true) {
+			const activeId = await pollActiveArticle();
+			if (activeId === store.getState().activeId) {
+				addNotification({
+					data: <b>Тема активирована</b>,
+					time: 3000,
+				});
+				continue;
+			}
+			setState({ activeId });
+			if (store.getState().autoScroll) {
+				setTimeout(() => {
+					const el = document.querySelector(".post-active");
+					if (el) el.scrollIntoView({ behavior: "smooth" });
+				}, 500);
+			}
+			const article = await getArticleById(activeId);
+			setTimeout(() => {
+				document.title = "* Тема обновлена | Новости Радио-Т";
+			}, 300);
+			if (article && article.hasOwnProperty("title")) {
+				removeNotificationsWithContext("active-article");
+				addNotification(remove => ({
+					data: (
+						<span>
+							Тема обновлена "
+							<HashLink
+								to="/#active-article"
+								onClick={() => remove()}
+								scroll={el => {
+									if (!el) return;
+									if (location.pathname === "/") {
+										el.scrollIntoView({ behavior: "smooth" });
+										return;
+									}
+									setTimeout(() => {
+										el.scrollIntoView({ behavior: "smooth" });
+									}, 500);
+								}}
+							>
+								{article.title}
+							</HashLink>
+							"
+						</span>
+					),
+					time: null,
+					context: "active-article",
+				}));
+			}
+		}
+	});
 }
 
 main().catch(e => console.error(e));
