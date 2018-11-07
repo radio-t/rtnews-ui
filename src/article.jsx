@@ -5,6 +5,8 @@ import { getArticle } from "./api.js";
 
 import Remark from "./remark.jsx";
 import Loading from "./loading.jsx";
+import SVGInline from "react-svg-inline";
+import GearIcon from "./static/svg/gear.svg";
 
 export default class Article extends React.PureComponent {
 	constructor(props) {
@@ -24,9 +26,11 @@ export default class Article extends React.PureComponent {
 			<article className="full-post">
 				<h3 className="title full-post__title">
 					{this.state.article.geek && (
-						<span className="post__title-geek" title="Гиковская тема">
-							•
-						</span>
+						<SVGInline
+							className="icon post__title-geek-icon"
+							svg={GearIcon}
+							title="Гиковская тема"
+						/>
 					)}
 					<a className="post__title-link" href={this.state.article.origlink}>
 						{this.state.article.title}

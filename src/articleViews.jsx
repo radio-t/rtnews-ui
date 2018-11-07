@@ -10,6 +10,17 @@ import { HashLink } from "react-router-hash-link";
 import Loading from "./loading.jsx";
 import SVGInline from "react-svg-inline";
 import CommentsIcon from "./static/svg/i-comment.svg";
+import GearIcon from "./static/svg/gear.svg";
+
+/**
+ * touchmove targets used bt ArticleBase.onHandleTouchMove
+ */
+let moveTargets = [];
+
+/**
+ * Name of an event which occurs when touch-driven dragg occurs over element
+ */
+const eventIdentifier = "RTNEWSDATADRAG";
 
 /**
  * Base for article view
@@ -17,6 +28,58 @@ import CommentsIcon from "./static/svg/i-comment.svg";
  * Provides with basic drag'n'drop handlers
  */
 class ArticleBase extends React.PureComponent {
+	/**
+	 * Binds touch-driven drag over/leave/end events
+	 */
+	componentDidMount() {
+		this.onTouchDrag = (e => {
+			const rect = this.ref.getBoundingClientRect();
+			const ratio = (e.relativeCoords.y / rect.height) * 100;
+			if (ratio < 50) {
+				this.ref.classList.remove("touch-drag-target-bottom");
+				this.ref.classList.add("touch-drag-target-top");
+			} else {
+				this.ref.classList.remove("touch-drag-target-top");
+				this.ref.classList.add("touch-drag-target-bottom");
+			}
+		}).bind(this);
+		this.ref.addEventListener(eventIdentifier, this.onTouchDrag);
+
+		this.onTouchDragLeave = (e => {
+			this.ref.classList.remove("touch-drag-target-top");
+			this.ref.classList.remove("touch-drag-target-bottom");
+		}).bind(this);
+		this.ref.addEventListener(`${eventIdentifier}Leave`, this.onTouchDragLeave);
+
+		this.onTouchDragEnd = (e => {
+			this.ref.classList.remove("touch-drag-target-top");
+			this.ref.classList.remove("touch-drag-target-bottom");
+			if (e.data.position === this.props.article.position) return;
+			const append = (() => {
+				const rect = this.ref.getBoundingClientRect();
+				const ratio = (e.relativeCoords.y / rect.height) * 100;
+				let append = ratio < 60 ? 1 : 0;
+				if (e.data.position < this.props.article.position) append -= 1;
+				return append;
+			})();
+			if (e.data.position === this.props.article.position + append) return;
+			this.props.onChange &&
+				this.props.onChange("move", {
+					id: e.data.id,
+					from: e.data.position,
+					to: this.props.article.position + append,
+				});
+		}).bind(this);
+		this.ref.addEventListener(`${eventIdentifier}End`, this.onTouchDragEnd);
+	}
+	componentWillUnmount() {
+		this.ref.removeEventListener(eventIdentifier, this.onTouchDrag);
+		this.ref.removeEventListener(
+			`${eventIdentifier}Leave`,
+			this.onTouchDragLeave
+		);
+		this.ref.removeEventListener(`${eventIdentifier}End`, this.onTouchDragEnd);
+	}
 	onDragStart(e) {
 		this.ref.classList.add("drop-item");
 		this.setState({ detailedExpanded: false });
@@ -25,14 +88,21 @@ class ArticleBase extends React.PureComponent {
 			JSON.stringify(this.props.article)
 		);
 		e.dataTransfer.setData("rtnews/article-id", this.props.article.id);
+
+		if (isSafari) {
+			this.clientY = e.clientY;
+			this.dragInterval = setInterval(() => {
+				if (this.clientY <= 80) {
+					window.scrollBy(0, -((80 - this.clientY) / 2));
+				} else if (this.clientY >= window.innerHeight - 80) {
+					window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
+				}
+			}, 30);
+		}
 	}
 	onDrag(e) {
 		if (isSafari) {
-			if (e.clientY <= 70) {
-				window.scrollBy(0, -((70 - e.clientY) / 5));
-			} else if (e.clientY >= window.innerHeight - 70) {
-				window.scrollBy(0, (70 - (window.innerHeight - e.clientY)) / 5);
-			}
+			this.clientY = e.clientY;
 		}
 	}
 	onDragOver(e) {
@@ -62,11 +132,13 @@ class ArticleBase extends React.PureComponent {
 		this.ref.classList.remove("drop-bottom");
 	}
 	onDragEnd(e) {
+		clearInterval(this.dragInterval);
 		this.ref.classList.remove("drop-item");
 		this.ref.classList.remove("drop-top");
 		this.ref.classList.remove("drop-bottom");
 	}
 	async onDrop(e) {
+		clearInterval(this.dragInterval);
 		this.ref.classList.remove("drop-item");
 		this.ref.classList.remove("drop-top");
 		this.ref.classList.remove("drop-bottom");
@@ -88,6 +160,95 @@ class ArticleBase extends React.PureComponent {
 				from: data.position,
 				to: this.props.article.position + append,
 			});
+	}
+	onHandleTouchStart(e, article) {
+		if (e.touches.length > 1) return;
+		e.preventDefault();
+
+		this.ref.classList.add("touch-drag-item__start");
+		this.ref.classList.add("touch-drag-item");
+		this.ref.classList.remove("touch-drag-item__start");
+		this.initialTouch = e.touches[0];
+		this.initialTransform = this.ref.style.tranform;
+
+		// handle scroll over borders
+		this.clientY = e.touches[0].clientY;
+		this.dragInterval = setInterval(() => {
+			if (this.clientY <= 80) {
+				window.scrollBy(0, -((80 - this.clientY) / 2));
+			} else if (this.clientY >= window.innerHeight - 80) {
+				window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
+			}
+		}, 30);
+	}
+	onHandleTouchMove(e, article) {
+		this.clientY = e.touches[0].clientY;
+		const deltaY = e.touches[0].pageY - this.initialTouch.pageY;
+		this.ref.style.transform = `translate(0, ${deltaY}px)`;
+
+		const targets = document.elementsFromPoint(
+			e.touches[0].clientX,
+			e.touches[0].clientY
+		);
+
+		const left = moveTargets.filter(x => targets.indexOf(x) === -1);
+		const lEvent = new Event(`${eventIdentifier}Leave`, {
+			bubbles: false,
+			cancelable: false,
+		});
+		left.forEach(x => x.dispatchEvent(lEvent));
+
+		moveTargets = targets;
+
+		moveTargets.forEach(x => {
+			if (!x) return;
+			const event = new Event(eventIdentifier, {
+				bubbles: false,
+				cancelable: true,
+			});
+			const tRect = x.getBoundingClientRect();
+			event.absoluteCoords = {
+				x: e.touches[0].clientX,
+				y: e.touches[0].clientY,
+			};
+			event.relativeCoords = {
+				x: e.touches[0].clientX - tRect.x,
+				y: e.touches[0].clientY - tRect.y,
+			};
+			x.dispatchEvent(event);
+		});
+	}
+	onHandleTouchEnd(e, article) {
+		clearInterval(this.dragInterval);
+		this.ref.classList.remove("touch-drag-item");
+		if (this.initialTransform) {
+			this.ref.style.transform = this.initialTransform;
+		} else {
+			this.ref.style.transform = "";
+		}
+
+		const targets = document.elementsFromPoint(
+			e.changedTouches[0].clientX,
+			e.changedTouches[0].clientY
+		);
+		targets.forEach(x => {
+			if (!x) return;
+			const event = new Event(`${eventIdentifier}End`, {
+				bubbles: false,
+				cancelable: true,
+			});
+			event.data = article;
+			const rect = x.getBoundingClientRect();
+			event.absoluteCoords = {
+				x: e.changedTouches[0].clientX,
+				y: e.changedTouches[0].clientY,
+			};
+			event.relativeCoords = {
+				x: e.changedTouches[0].clientX - rect.x,
+				y: e.changedTouches[0].clientY - rect.y,
+			};
+			x.dispatchEvent(event);
+		});
 	}
 }
 
@@ -124,25 +285,30 @@ export class ArticleBrief extends ArticleBase {
 		return (
 			<article
 				key={this.props.article.id}
+				ref={ref => (this.ref = ref)}
 				id={this.props.active && "active-article"}
 				className={
 					"post " +
 					(this.props.active && this.props.active === true ? "post-active" : "")
 				}
 				draggable={this.state.draggable && this.props.draggable}
+				//
 				onDragStartCapture={e => this.onDragStart(e)}
 				onDrag={e => this.onDrag(e)}
 				onDragOver={e => this.onDragOver(e)}
 				onDragLeave={e => this.onDragLeave(e)}
 				onDragEnd={e => this.onDragEnd(e)}
 				onDrop={e => this.onDrop(e)}
-				ref={ref => (this.ref = ref)}
 			>
 				{this.props.draggable && (
 					<div
 						className="post__drag-handle"
+						ref={ref => (this.handle = ref)}
 						onMouseEnter={() => this.setState({ draggable: true })}
 						onMouseLeave={() => this.setState({ draggable: false })}
+						onTouchStart={e => this.onHandleTouchStart(e, this.props.article)}
+						onTouchEnd={e => this.onHandleTouchEnd(e, this.props.article)}
+						onTouchMove={e => this.onHandleTouchMove(e, this.props.article)}
 					/>
 				)}
 				{this.props.controls && (
@@ -170,9 +336,11 @@ export class ArticleBrief extends ArticleBase {
 					)}
 				<h3 className="title post__title">
 					{this.props.article.geek && (
-						<span className="post__title-geek" title="Гиковская тема">
-							•
-						</span>
+						<SVGInline
+							className="icon post__title-geek-icon"
+							svg={GearIcon}
+							title="Гиковская тема"
+						/>
 					)}
 					<Link
 						className="post__title-link"
@@ -287,13 +455,14 @@ export class ArticleSort extends ArticleBase {
 				className={
 					"sorter__item " + (this.props.current ? "sorter__item-current" : "")
 				}
+				ref={ref => (this.ref = ref)}
+				//
 				onDragStartCapture={e => this.onDragStart(e)}
 				onDrag={e => this.onDrag(e)}
 				onDragOver={e => this.onDragOver(e)}
 				onDragLeave={e => this.onDragLeave(e)}
 				onDragEnd={e => this.onDragEnd(e)}
 				onDrop={e => this.onDrop(e)}
-				ref={ref => (this.ref = ref)}
 			>
 				<div className="sorter__item-content">
 					<div className="post-controls sorter__item-controls">
@@ -312,9 +481,11 @@ export class ArticleSort extends ArticleBase {
 					</div>
 					<div className="sorter__item-header">
 						{this.props.article.geek && (
-							<span className="sorter__geek-indicator" title="Гиковская тема">
-								•
-							</span>
+							<SVGInline
+								className="icon sorter__geek-indicator"
+								svg={GearIcon}
+								title="Гиковская тема"
+							/>
 						)}
 						<Link
 							to={`${postsPrefix}/${this.props.article.slug}`}
@@ -352,9 +523,12 @@ export class ArticleSort extends ArticleBase {
 				</div>
 				<div
 					className="sorter__item-handle"
-					ref={this.handle}
+					ref={ref => (this.handle = ref)}
 					onMouseEnter={() => this.setState({ draggable: true })}
 					onMouseLeave={() => this.setState({ draggable: false })}
+					onTouchStart={e => this.onHandleTouchStart(e, this.props.article)}
+					onTouchEnd={e => this.onHandleTouchEnd(e, this.props.article)}
+					onTouchMove={e => this.onHandleTouchMove(e, this.props.article)}
 				>
 					☰
 				</div>

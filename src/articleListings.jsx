@@ -437,9 +437,10 @@ export class DeletedListing extends BaseListing {
 		);
 	}
 	async update() {
-		const news = (await getDeletedNews()).sort(
-			(a, b) => Date.parse(a.ats) < Date.parse(b.ats)
-		);
+		const news = (await getDeletedNews()).sort((a, b) => {
+			if (a.ats === b.ats) return 0;
+			return a.parsedats > b.parsedats ? -1 : 1;
+		});
 		this.setState({ news, loaded: true });
 	}
 	async componentWillMount() {
@@ -473,7 +474,10 @@ export class Sorter extends BaseListing {
 			<div className="sorter">
 				{this.state.news
 					.slice(0)
-					.sort((a, b) => a.position < b.position)
+					.sort((a, b) => {
+						if (a.position === b.position) return 0;
+						return a.position > b.position ? -1 : 1;
+					})
 					.map(article => (
 						<ArticleSort
 							article={article}

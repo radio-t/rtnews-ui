@@ -13,6 +13,8 @@ import {
 	addNotification,
 	setTheme as commitTheme,
 } from "./store.jsx";
+import SVGInline from "react-svg-inline";
+import FollowIcon from "./static/svg/follow.svg";
 
 import { NavLink, Route } from "react-router-dom";
 
@@ -146,13 +148,19 @@ export default class Head extends React.Component {
 									</span>
 									<span
 										role="button"
-										className="navigation__scroll-toggle"
+										className={
+											"navigation__scroll-toggle " +
+											(this.props.autoScroll && this.props.autoScroll === true
+												? "navigation__scroll-toggle-active"
+												: "")
+										}
 										onClick={() => this.toggleAutoScroll()}
 										title="Автоматически переходить к текущей теме"
 									>
-										{this.props.autoScroll && this.props.autoScroll === true
-											? "◉"
-											: "◎"}
+										<SVGInline
+											className="icon post__comments-icon"
+											svg={FollowIcon}
+										/>
 									</span>
 								</span>
 							</li>
@@ -172,6 +180,9 @@ export default class Head extends React.Component {
 											const el = document.getElementById("to-comments");
 											if (el) {
 												el.scrollIntoView({ behavior: "smooth" });
+												setTimeout(() => {
+													window.location.hash = "to-comments";
+												}, 500);
 											}
 										}, 200);
 									}}
@@ -239,6 +250,9 @@ export default class Head extends React.Component {
 			return;
 		}
 		el.scrollIntoView({ behavior: "smooth" });
+		setTimeout(() => {
+			window.location.hash = "active-article";
+		}, 500);
 	}
 	poehali() {
 		if (confirm("Таки поехали?")) {
