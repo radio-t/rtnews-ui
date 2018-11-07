@@ -17,6 +17,8 @@ npm install && ./node_modules/.bin/webpack --mode "development"
 ./node_modules/.bin/webpack-dev-server --mode "development"
 ```
 
+Tакже есть makefile
+
 ----
 ### Feeds API
 
