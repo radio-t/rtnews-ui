@@ -16,7 +16,7 @@ export default class ListingActions extends React.Component {
 										? "listing-actions__news-recent-button-active"
 										: "")
 								}
-								onClick={e => {
+								onMouseDown={e => {
 									const val =
 										this.props.postRecentness === postRecentness[0]
 											? postRecentness[1]
@@ -52,46 +52,44 @@ export default class ListingActions extends React.Component {
 				)}
 				<div className="listing-actions__sortings">
 					<ul className="sortings-list">
-						{(this.props.sortings || sortings).map(
-							x =>
-								x.title === this.props.sort.title ? (
-									<li
-										role="button"
-										className="sortings-list__item sortings-list__current-item"
-										key={x.title}
-									>
-										<label className="sortings-list__item-content sortings-list__current-item-content">
-											<input
-												type="radio"
-												className="sortings-list__item-input"
-												checked="true"
-												name="post-sortings"
-												value={x.title}
-											/>
-											{x.title}
-										</label>
-									</li>
-								) : (
-									<li
-										role="button"
-										className="sortings-list__item"
-										onClick={e =>
-											this.props.onSortingChange &&
-											this.props.onSortingChange(x)
-										}
-										key={x.title}
-									>
-										<label className="sortings-list__item-content">
-											<input
-												type="radio"
-												className="sortings-list__item-input"
-												name="post-sortings"
-												value={x.title}
-											/>
-											{x.title}
-										</label>
-									</li>
-								)
+						{(this.props.sortings || sortings).map(x =>
+							x.title === this.props.sort.title ? (
+								<li
+									role="button"
+									className="sortings-list__item sortings-list__current-item"
+									key={x.title}
+								>
+									<label className="sortings-list__item-content sortings-list__current-item-content">
+										<input
+											type="radio"
+											className="sortings-list__item-input"
+											checked="true"
+											name="post-sortings"
+											value={x.title}
+										/>
+										{x.title}
+									</label>
+								</li>
+							) : (
+								<li
+									role="button"
+									className="sortings-list__item"
+									onMouseDown={e =>
+										this.props.onSortingChange && this.props.onSortingChange(x)
+									}
+									key={x.title}
+								>
+									<label className="sortings-list__item-content">
+										<input
+											type="radio"
+											className="sortings-list__item-input"
+											name="post-sortings"
+											value={x.title}
+										/>
+										{x.title}
+									</label>
+								</li>
+							)
 						)}
 					</ul>
 				</div>

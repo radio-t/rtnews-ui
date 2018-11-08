@@ -268,6 +268,7 @@ p {
 /* loading */
 
 .loading {
+	margin-left: 1em;
 	font-size: 1.5em;
 	opacity: 0.4;
 	pointer-events: none;
@@ -397,7 +398,6 @@ p {
 }
 
 .navigation__scroll-toggle {
-	margin-left: 0.39em;
 	vertical-align: -0.02em;
 	color: hsla(200, 0%, 40%, 0.5);
 	fill: hsla(200, 0%, 40%, 0.5);
@@ -607,19 +607,21 @@ p {
 	outline: none;
 }
 
-.listing-actions__news-recent-button:hover,
-.listing-actions__news-recent-button:focus {
-	background: hsla(200, 60%, 60%, 0.1);
-}
-
 .listing-actions__news-recent-button-active {
 	background: hsla(200, 60%, 60%, 0.6);
 	color: #fff;
 }
 
-.listing-actions__news-recent-button-active:hover,
-.listing-actions__news-recent-button-active:focus {
-	background: hsla(200, 60%, 60%, 0.8);
+@media (hover: hover) {
+	.listing-actions__news-recent-button:hover,
+	.listing-actions__news-recent-button:focus {
+		background: hsla(200, 60%, 60%, 0.1);
+	}
+
+	.listing-actions__news-recent-button-active:hover,
+	.listing-actions__news-recent-button-active:focus {
+		background: hsla(200, 60%, 60%, 0.8);
+	}
 }
 
 .listing-actions__news-type-select {
@@ -807,8 +809,12 @@ p {
 }
 
 @media (hover: hover) {
-	.post:not(:hover) .post__controls {
+	.post .post__controls {
 		opacity: 0;
+	}
+
+	.post:hover .post__controls {
+		opacity: 1;
 		transition: opacity 0.3s;
 	}
 }
@@ -1104,14 +1110,21 @@ html[data-theme="night"] .add-form__submit {
 
 /* listing-actions */
 
-html[data-theme="night"] .listing-actions__news-recent-button:hover,
-html[data-theme="night"] .listing-actions__news-recent-button:focus {
-	background: hsla(200, 60%, 60%, 0.5);
-}
+@media (hover: hover) {
+	html[data-theme="night"] .listing-actions__news-recent-button:hover,
+	html[data-theme="night"] .listing-actions__news-recent-button:focus {
+		background: hsla(200, 60%, 60%, 0.2);
+	}
 
-html[data-theme="night"] .listing-actions__news-type-select:hover,
-html[data-theme="night"] .listing-actions__news-type-select:focus {
-	background: hsla(200, 60%, 60%, 0.5);
+	html[data-theme="night"] .listing-actions__news-recent-button-active:hover,
+	html[data-theme="night"] .listing-actions__news-recent-button-active:focus {
+		background: hsla(200, 60%, 60%, 0.7);
+	}
+
+	html[data-theme="night"] .listing-actions__news-type-select:hover,
+	html[data-theme="night"] .listing-actions__news-type-select:focus {
+		background: hsla(200, 60%, 60%, 0.5);
+	}
 }
 
 /* sortings-list */

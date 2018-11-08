@@ -34,11 +34,7 @@ import {
 } from "./api.js";
 import { setState, addNotification, removeNotification } from "./store.jsx";
 
-import {
-	ArticleBrief,
-	ArticleBriefRegular,
-	ArticleSort,
-} from "./articleViews.jsx";
+import { ArticleBrief, ArticleSort } from "./articleViews.jsx";
 import ListingActions from "./listingActions.jsx";
 import { Redirect } from "react-router-dom";
 import AddArticle from "./add.jsx";
@@ -103,8 +99,17 @@ class BaseListing extends React.Component {
 		const updateInterval = setInterval(() => {
 			let stamp = new Date().getTime();
 			if (stamp - this.updateTimestamp > newsAutoUpdateInterval * 60000) {
-				this.update();
-				this.updateTimestamp = stamp;
+				if (window.requestIdleCallback) {
+					requestIdleCallback(async () => {
+						await this.update();
+						this.updateTimestamp = stamp;
+					}, 10000);
+				} else {
+					async () => {
+						await this.update();
+						this.updateTimestamp = stamp;
+					};
+				}
 			}
 		}, 30000);
 
@@ -181,6 +186,7 @@ class BaseListing extends React.Component {
 				break;
 			case "archive":
 				this.updateArticle(article, REMOVE_CHANGE);
+				if (article.id === this.props.activeId) setState({ activeId: null });
 				await en(
 					"убираю в архив",
 					async () => await archiveArticle(article.id)
@@ -188,6 +194,7 @@ class BaseListing extends React.Component {
 				break;
 			case "remove":
 				this.updateArticle(article, REMOVE_CHANGE);
+				if (article.id === this.props.activeId) setState({ activeId: null });
 				await en("удаляю", async () => await removeArticle(article.id));
 				break;
 			case "restore":
@@ -311,14 +318,16 @@ export class Listing extends BaseListing {
 				<div className="news page__news">
 					{this.state.news
 						.slice(0)
-						.filter(
-							(x, i) =>
+						.filter((x, i) => {
+							if (this.props.activeId === x.id) return true;
+							return (
 								this.state.postRecentness.fn(
 									x,
 									i,
 									this.state.postLevel.hasOwnProperty("isgeek")
 								) && this.state.postLevel.fn(x, i)
-						)
+							);
+						})
 						.sort((a, b) => this.state.sort.fn(a, b))
 						.map((x, i) => {
 							const isCurrent = x.id === this.props.activeId;
@@ -332,7 +341,7 @@ export class Listing extends BaseListing {
 									"remove",
 								].filter(x => x !== null);
 							};
-							return this.props.isAdmin ? (
+							return (
 								<ArticleBrief
 									key={x.id}
 									article={x}
@@ -341,13 +350,6 @@ export class Listing extends BaseListing {
 									active={isCurrent}
 									draggable={this.props.isAdmin && sortIsDefault}
 									onChange={(id, data) => this.onArticleChange(x, id, data)}
-								/>
-							) : (
-								<ArticleBriefRegular
-									key={x.id}
-									article={x}
-									archive={false}
-									active={isCurrent}
 								/>
 							);
 						})}
@@ -395,20 +397,15 @@ export class ArchiveListing extends BaseListing {
 					{this.state.news
 						.slice(0)
 						.sort((a, b) => this.state.sort.fn(a, b))
-						.map(
-							x =>
-								this.props.isAdmin ? (
-									<ArticleBrief
-										key={x.id}
-										article={x}
-										archive={true}
-										controls={this.props.isAdmin ? ["remove"] : null}
-										onChange={(id, data) => this.onArticleChange(x, id, data)}
-									/>
-								) : (
-									<ArticleBriefRegular key={x.id} article={x} archive={true} />
-								)
-						)}
+						.map(x => (
+							<ArticleBrief
+								key={x.id}
+								article={x}
+								archive={true}
+								controls={this.props.isAdmin ? ["remove"] : null}
+								onChange={(id, data) => this.onArticleChange(x, id, data)}
+							/>
+						))}
 				</div>
 			</>
 		);

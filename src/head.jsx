@@ -17,6 +17,8 @@ import SVGInline from "react-svg-inline";
 import FollowIcon from "./static/svg/follow.svg";
 
 import { NavLink, Route } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
+import LinkToCurrent from "./linkToCurrent.jsx";
 
 const setTheme = v => {
 	commitTheme(v);
@@ -28,7 +30,11 @@ export default class Head extends React.Component {
 		return (
 			<div className="header wrapper page__header">
 				<h1 className="title header__title">Новости для Радио-Т</h1>
-				<ul className="navigation header__navigation">
+				<ul
+					className="navigation header__navigation"
+					role="navigation"
+					aria-label="Main navigation"
+				>
 					{this.props.isAdmin && (
 						<li className="navigation__item navigation__item_admin navigation__item_right navigation__item_logout">
 							<span
@@ -112,109 +118,72 @@ export default class Head extends React.Component {
 							</span>
 						</li>
 					)}
-					{this.props.isAdmin &&
-						this.props.theme === "day" && (
-							<button
-								onClick={() => setTheme("night")}
-								title="Поставить ночную тему"
-								className="inline-button navigation__item navigation__theme-switcher"
-							>
-								🌚
-							</button>
-						)}
-					{this.props.isAdmin &&
-						this.props.theme === "night" && (
-							<button
-								onClick={() => setTheme("day")}
-								title="Поставить дневную тему"
-								className="inline-button navigation__item navigation__theme-switcher"
-							>
-								🌞
-							</button>
-						)}
+					{this.props.isAdmin && this.props.theme === "day" && (
+						<button
+							onClick={() => setTheme("night")}
+							title="Поставить ночную тему"
+							className="inline-button navigation__item navigation__theme-switcher"
+						>
+							🌚
+						</button>
+					)}
+					{this.props.isAdmin && this.props.theme === "night" && (
+						<button
+							onClick={() => setTheme("day")}
+							title="Поставить дневную тему"
+							className="inline-button navigation__item navigation__theme-switcher"
+						>
+							🌞
+						</button>
+					)}
 					{this.props.isAdmin && <br />}
-					<Route
-						path="/"
-						exact={true}
-						render={() => (
-							<li className="navigation__item navigation__item_to-current">
-								<span>
-									<span
-										role="button"
-										className="pseudo navigation__item-link"
-										onClick={() => this.scrollToCurrent()}
-									>
-										К текущей теме
-									</span>
-									<span
-										role="button"
-										className={
-											"navigation__scroll-toggle " +
-											(this.props.autoScroll && this.props.autoScroll === true
-												? "navigation__scroll-toggle-active"
-												: "")
-										}
-										onClick={() => this.toggleAutoScroll()}
-										title="Автоматически переходить к текущей теме"
-									>
-										<SVGInline
-											className="icon post__comments-icon"
-											svg={FollowIcon}
-										/>
-									</span>
-								</span>
-							</li>
-						)}
-					/>
+					{this.props.activeId !== null && (
+						<li className="navigation__item navigation__item_to-current">
+							<span>
+								<LinkToCurrent
+									title="К текущей теме"
+									className="pseudo navigation__item-link"
+								/>
+							</span>
+						</li>
+					)}
 					<Route
 						path="/news/:slug"
 						render={() => (
 							<li className="navigation__item navigation__item_to-comments">
-								<a
-									role="button"
-									href="#to-comments"
+								<HashLink
+									to="#to-comments"
 									className="pseudo navigation__item-link"
-									onClick={e => {
-										e.preventDefault();
-										setTimeout(() => {
-											const el = document.getElementById("to-comments");
-											if (el) {
-												el.scrollIntoView({
-													behavior: "smooth",
-													block: "start",
-												});
-												setTimeout(() => {
-													window.location.hash = "to-comments";
-												}, 500);
-											}
-										}, 200);
+									scroll={el => {
+										el.scrollIntoView({
+											behavior: "smooth",
+											block: "start",
+										});
 									}}
 								>
 									К комментариям
-								</a>
+								</HashLink>
 							</li>
 						)}
 					/>
-					{!this.props.isAdmin &&
-						this.props.theme === "day" && (
-							<button
-								onClick={() => setTheme("night")}
-								title="Поставить ночную тему"
-								className="inline-button navigation__item navigation__theme-switcher"
-							>
-								🌚
-							</button>
-						)}
-					{!this.props.isAdmin &&
-						this.props.theme === "night" && (
-							<button
-								onClick={() => setTheme("day")}
-								title="Поставить дневную тему"
-								className="inline-button navigation__item navigation__theme-switcher"
-							>
-								🌞
-							</button>
-						)}
+					{!this.props.isAdmin && this.props.theme === "day" && (
+						<button
+							onClick={() => setTheme("night")}
+							title="Поставить ночную тему"
+							className="inline-button navigation__item navigation__theme-switcher"
+						>
+							🌚
+						</button>
+					)}
+					{!this.props.isAdmin && this.props.theme === "night" && (
+						<button
+							onClick={() => setTheme("day")}
+							title="Поставить дневную тему"
+							className="inline-button navigation__item navigation__theme-switcher"
+						>
+							🌞
+						</button>
+					)}
 				</ul>
 				<hr />
 			</div>
@@ -243,19 +212,6 @@ export default class Head extends React.Component {
 		const val = !store.getState().autoScroll;
 		setState({ autoScroll: val });
 		setAutoScroll(val);
-	}
-	scrollToCurrent() {
-		const el = document.querySelector(".post-active");
-		if (!el) {
-			addNotification({
-				data: <span>Текущей темы нет</span>,
-			});
-			return;
-		}
-		el.scrollIntoView({ behavior: "smooth", block: "start" });
-		setTimeout(() => {
-			window.location.hash = "active-article";
-		}, 500);
 	}
 	poehali() {
 		if (confirm("Таки поехали?")) {

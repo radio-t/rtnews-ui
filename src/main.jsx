@@ -1,4 +1,5 @@
 import "./style.css";
+import "intersection-observer";
 import "./ganalitics.js";
 
 import React from "react";
@@ -22,7 +23,6 @@ import {
 import { waitDOMReady, sleep } from "./utils.js";
 
 import Head from "./head.jsx";
-import { HashLink } from "react-router-hash-link";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Provider, connect } from "react-redux";
 import AddArticle from "./add.jsx";
@@ -37,8 +37,9 @@ import Feeds from "./feeds.jsx";
 import LoginForm from "./login.jsx";
 import NotFound from "./notFound.jsx";
 import Notifications from "./notifications.jsx";
+import LinkToCurrent from "./linkToCurrent.jsx";
 
-const listingSymbol = Symbol();
+import { listingRef } from "./symbols.js";
 
 class App extends React.Component {
 	render() {
@@ -55,7 +56,7 @@ class App extends React.Component {
 								return (
 									<Listing
 										{...this.props}
-										ref={ref => (window[listingSymbol] = ref)}
+										ref={ref => (window[listingRef] = ref)}
 									/>
 								);
 							}}
@@ -180,40 +181,6 @@ async function main() {
 					});
 					const article = await getArticleById(activeId);
 
-					const onMissingArticle = () => {
-						const el = document.getElementById("active-article");
-						if (!el) {
-							addNotification(r => ({
-								data: (
-									<b>
-										Не могу найти тему,{" "}
-										<span
-											class="pseudo"
-											onClick={async e => {
-												window[listingSymbol] &&
-													(await window[listingSymbol].update());
-												r();
-												const el = document.getElementById("active-article");
-												if (el) {
-													el.scrollIntoView({
-														behavior: "smooth",
-														block: "start",
-													});
-												} else {
-													await sleep(1500);
-													onMissingArticle();
-												}
-											}}
-										>
-											обновить список?
-										</span>
-									</b>
-								),
-								time: 30000,
-							}));
-						}
-					};
-
 					if (article && article.hasOwnProperty("title")) {
 						removeNotificationsWithContext("active-article");
 						addNotification(remove => ({
@@ -221,30 +188,10 @@ async function main() {
 								<span>
 									Тема обновлена:
 									<br />
-									<HashLink
-										to="/#active-article"
-										onClick={() => {
-											remove();
-											setTimeout(onMissingArticle, 1500);
-										}}
-										scroll={el => {
-											if (location.pathname === "/") {
-												el.scrollIntoView({
-													behavior: "smooth",
-													block: "start",
-												});
-												return;
-											}
-											setTimeout(() => {
-												el.scrollIntoView({
-													behavior: "smooth",
-													block: "start",
-												});
-											}, 500);
-										}}
-									>
-										“{article.title}”
-									</HashLink>
+									<LinkToCurrent
+										title={`“${article.title}”`}
+										onClick={() => remove()}
+									/>
 								</span>
 							),
 							time: null,

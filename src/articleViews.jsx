@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatDate } from "./utils.js";
+import { formatDate, first } from "./utils.js";
 import { postsPrefix, isSafari } from "./settings.js";
 import ArticleButtons from "./articleButtons.js";
 import { getArticle } from "./api.js";
@@ -23,15 +23,49 @@ let moveTargets = [];
 const eventIdentifier = "RTNEWSDATADRAG";
 
 /**
+ * Map which connect HTMLElement with React.Component
+ *
+ * used on intersection observer
+ */
+const refToComponentMap = new WeakMap();
+
+/**
+ * Intersection observer which used to improve
+ * performance of Article Component
+ *
+ * Basically, if an Article is not in screen then
+ * component should not update
+ */
+const observer = new IntersectionObserver(entries => {
+	entries.forEach(e => {
+		if (refToComponentMap.has(e.target)) {
+			const component = refToComponentMap.get(e.target);
+			component.setState({ visible: e.isIntersecting });
+		}
+	});
+});
+
+/**
  * Base for article view
  *
  * Provides with basic drag'n'drop handlers
+ * Provides intersection observing to discard renders while not in view
  */
 class ArticleBase extends React.PureComponent {
+	shouldComponentUpdate(nextProps, nextState) {
+		if (!nextState.visible) return false;
+		return super.shouldComponentUpdate(nextProps, nextState);
+	}
+	componentWillMount() {
+		this.setState({ visible: true });
+	}
 	/**
-	 * Binds touch-driven drag over/leave/end events
+	 * Binds touch-driven drag over/leave/end events and intersection observer
 	 */
 	componentDidMount() {
+		refToComponentMap.set(this.ref, this);
+		observer.observe(this.ref);
+
 		this.onTouchDrag = (e => {
 			const rect = this.ref.getBoundingClientRect();
 			const ratio = (e.relativeCoords.y / rect.height) * 100;
@@ -73,6 +107,8 @@ class ArticleBase extends React.PureComponent {
 		this.ref.addEventListener(`${eventIdentifier}End`, this.onTouchDragEnd);
 	}
 	componentWillUnmount() {
+		observer.unobserve(this.ref);
+
 		this.ref.removeEventListener(eventIdentifier, this.onTouchDrag);
 		this.ref.removeEventListener(
 			`${eventIdentifier}Leave`,
@@ -253,151 +289,6 @@ class ArticleBase extends React.PureComponent {
 }
 
 /**
- * Light version of ArticleBrief for regular users
- * which don't need admin's functionality
- */
-export class ArticleBriefRegular extends ArticleBase {
-	constructor(props) {
-		super(props);
-		this.state = {
-			articleText: null,
-			detailedExpanded: false,
-			fetchLock: false,
-		};
-	}
-	fetchArticle() {
-		if (this.state.fetchLock) return;
-		if (this.state.articleText !== null) return;
-		this.setState({ fetchLock: true });
-		getArticle(this.props.article.slug)
-			.then(article => {
-				this.setState({ articleText: article.content });
-			})
-			.catch(e => {
-				this.setState({
-					articleText: "Не смог загрузить новость",
-					fetchLock: false,
-				});
-				console.error(e);
-			});
-	}
-	render() {
-		return (
-			<article
-				key={this.props.article.id}
-				ref={ref => (this.ref = ref)}
-				id={this.props.active && "active-article"}
-				className={
-					"post " +
-					(this.props.active && this.props.active === true ? "post-active" : "")
-				}
-			>
-				{this.props.article.pic &&
-					!this.props.archive && (
-						<div
-							className="post__image-container"
-							style={{ backgroundImage: `url(${this.props.article.pic})` }}
-						/>
-					)}
-				<h3 className="title post__title">
-					{this.props.article.geek && (
-						<SVGInline
-							className="icon post__title-geek-icon"
-							svg={GearIcon}
-							title="Гиковская тема"
-						/>
-					)}
-					<Link
-						className="post__title-link"
-						to={`${postsPrefix}/${this.props.article.slug}`}
-					>
-						{this.props.article.title || (
-							<span className="post__empty-title">No Title</span>
-						)}
-					</Link>
-				</h3>
-				<div className="post__meta">
-					<a
-						className="post__original-link"
-						href={this.props.article.origlink}
-						title={this.props.article.origlink}
-					>
-						{this.props.article.domain}
-					</a>
-					<span
-						className="post__timestamp"
-						title={this.props.article.ats}
-						dangerouslySetInnerHTML={{
-							__html: formatDate(new Date(Date.parse(this.props.article.ats))),
-						}}
-					/>
-					<HashLink
-						className="post__comments-link"
-						to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
-						scroll={el => {
-							setTimeout(() => {
-								el.scrollIntoView({ behavior: "smooth", block: "start" });
-							}, 500);
-						}}
-					>
-						<SVGInline
-							className="icon post__comments-icon"
-							svg={CommentsIcon}
-						/>
-						{this.props.article.comments}
-					</HashLink>
-				</div>
-				{!this.props.archive && [
-					<div key="paragraph" className="post__snippet">
-						<p
-							dangerouslySetInnerHTML={{ __html: this.props.article.snippet }}
-						/>
-					</div>,
-					<span
-						key="detailed"
-						className="pseudo post__detailed-link"
-						to={`${postsPrefix}/${this.props.article.slug}`}
-						ref={ref => (this.detailedRef = ref)}
-						onClick={e => {
-							this.setState({ detailedExpanded: !this.state.detailedExpanded });
-							this.fetchArticle();
-						}}
-					>
-						{this.state.detailedExpanded ? "Скрыть" : "Подробнее"}
-					</span>,
-					this.state.detailedExpanded &&
-						(this.state.articleText === null ? (
-							<div className="post__full-content" key="fulltext">
-								<Loading />
-							</div>
-						) : (
-							<div
-								className="article-content post__full-content"
-								key="fulltext"
-							>
-								<div
-									class="article-content post__full-content-content"
-									dangerouslySetInnerHTML={{ __html: this.state.articleText }}
-								/>
-								<div
-									className="post__full-content-hide"
-									onClick={() => {
-										if (this.detailedRef)
-											this.detailedRef.scrollIntoView({ block: "start" });
-										this.setState({ detailedExpanded: false });
-									}}
-								>
-									×
-								</div>
-							</div>
-						)),
-				]}
-			</article>
-		);
-	}
-}
-
-/**
  * Views which used in main, archive and deleted listings
  */
 export class ArticleBrief extends ArticleBase {
@@ -406,14 +297,15 @@ export class ArticleBrief extends ArticleBase {
 		this.state = {
 			articleText: null,
 			detailedExpanded: false,
-			fetchLock: false,
 			draggable: false,
+			visible: true,
 		};
+		this.fetchLock = false;
 	}
 	fetchArticle() {
-		if (this.state.fetchLock) return;
+		if (this.fetchLock) return;
 		if (this.state.articleText !== null) return;
-		this.setState({ fetchLock: true });
+		this.fetchLock = true;
 		getArticle(this.props.article.slug)
 			.then(article => {
 				this.setState({ articleText: article.content });
@@ -421,8 +313,8 @@ export class ArticleBrief extends ArticleBase {
 			.catch(e => {
 				this.setState({
 					articleText: "Не смог загрузить новость",
-					fetchLock: false,
 				});
+				this.fetchLock = false;
 				console.error(e);
 			});
 	}
@@ -472,13 +364,12 @@ export class ArticleBrief extends ArticleBase {
 						))}
 					</div>
 				)}
-				{this.props.article.pic &&
-					!this.props.archive && (
-						<div
-							className="post__image-container"
-							style={{ backgroundImage: `url(${this.props.article.pic})` }}
-						/>
-					)}
+				{this.props.article.pic && !this.props.archive && (
+					<div
+						className="post__image-container"
+						style={{ backgroundImage: `url(${this.props.article.pic})` }}
+					/>
+				)}
 				<h3 className="title post__title">
 					{this.props.article.geek && (
 						<SVGInline
