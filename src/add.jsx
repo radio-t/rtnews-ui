@@ -122,7 +122,10 @@ export default class AddArticleForm extends React.Component {
 			return (
 				<form
 					className="add-form"
-					onSubmit={e => this.onSubmit(e)}
+					onSubmit={e => {
+						e.preventDefault();
+						this.onSubmit();
+					}}
 					style={this.props.style}
 				>
 					<p className="add-form__manual-switch">
@@ -175,7 +178,10 @@ export default class AddArticleForm extends React.Component {
 		return (
 			<form
 				className="add-form"
-				onSubmit={e => this.onSubmit(e)}
+				onSubmit={e => {
+					e.preventDefault();
+					this.onSubmit();
+				}}
 				style={this.props.style}
 			>
 				<p className="add-form__manual-switch">
@@ -207,6 +213,18 @@ export default class AddArticleForm extends React.Component {
 					onChange={e => this.setState({ manualText: e.target.value })}
 					placeholder="Описание новости"
 					className="add-form__article-description"
+					onKeyDown={e => {
+						if (
+							this.state.manualLink.length === 0 ||
+							this.state.manualTitle.length === 0 ||
+							this.state.manualText.length === 0
+						)
+							return;
+						if (e.which === 13 && (e.metaKey || e.ctrlKey)) {
+							e.preventDefault();
+							this.onSubmit();
+						}
+					}}
 				/>
 				<input
 					className="add-form__submit add-form__submit-manual"
@@ -280,8 +298,7 @@ export default class AddArticleForm extends React.Component {
 		document.body.removeEventListener("dragover", this.onDragover, false);
 		document.body.removeEventListener("drop", this.onDrop, false);
 	}
-	async onSubmit(e) {
-		e.preventDefault();
+	async onSubmit() {
 		this.setState({ posting: true });
 		try {
 			if (!this.state.manual) {

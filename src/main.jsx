@@ -38,6 +38,8 @@ import LoginForm from "./login.jsx";
 import NotFound from "./notFound.jsx";
 import Notifications from "./notifications.jsx";
 
+const listingSymbol = Symbol();
+
 class App extends React.Component {
 	render() {
 		return (
@@ -50,7 +52,12 @@ class App extends React.Component {
 							exact={true}
 							render={() => {
 								document.title = "Новости для Радио-Т";
-								return <Listing {...this.props} />;
+								return (
+									<Listing
+										{...this.props}
+										ref={ref => (window[listingSymbol] = ref)}
+									/>
+								);
 							}}
 						/>
 						<Route
@@ -150,67 +157,104 @@ async function main() {
 		setState({ activeId });
 		await waitDOMReady();
 		while (true) {
-			const activeId = await pollActiveArticle();
-			if (activeId === store.getState().activeId) {
-				removeNotificationsWithContext("active-article");
-				addNotification({
-					data: <b>Тема активирована</b>,
-					time: 3000,
-				});
-				continue;
-			}
-			setState({ activeId });
-			setImmediate(async () => {
-				if (store.getState().autoScroll) {
-					setTimeout(() => {
-						const el = document.querySelector(".post-active");
-						if (el) el.scrollIntoView({ behavior: "smooth" });
-					}, 500);
-				}
-				sleep(700).then(() => {
-					document.title = "* Тема обновлена | Новости Радио-Т";
-				});
-				const article = await getArticleById(activeId);
-				if (article && article.hasOwnProperty("title")) {
+			try {
+				const activeId = await pollActiveArticle();
+				if (activeId === store.getState().activeId) {
 					removeNotificationsWithContext("active-article");
-					addNotification(remove => ({
-						data: (
-							<span>
-								Тема обновлена:
-								<br />
-								<HashLink
-									to="/#active-article"
-									onClick={() => {
-										remove();
-										setTimeout(() => {
-											const el = document.getElementById("active-article");
-											if (!el) {
-												addNotification({
-													data: <b>Не могу найти тему, надо обновить список</b>,
-													time: 5000,
-												});
-											}
-										}, 500);
-									}}
-									scroll={el => {
-										if (location.pathname === "/") {
-											el.scrollIntoView({ behavior: "smooth" });
-											return;
-										}
-										setTimeout(() => {
-											el.scrollIntoView({ behavior: "smooth" });
-										}, 500);
-									}}
-								>
-									“{article.title}”
-								</HashLink>
-							</span>
-						),
-						time: null,
-						context: "active-article",
-					}));
+					addNotification({
+						data: <b>Тема активирована</b>,
+						time: 3000,
+					});
+					continue;
 				}
-			});
+				setState({ activeId });
+				setImmediate(async () => {
+					if (store.getState().autoScroll) {
+						setTimeout(() => {
+							const el = document.querySelector(".post-active");
+							if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+						}, 500);
+					}
+					sleep(700).then(() => {
+						document.title = "* Тема обновлена | Новости Радио-Т";
+					});
+					const article = await getArticleById(activeId);
+
+					const onMissingArticle = () => {
+						const el = document.getElementById("active-article");
+						if (!el) {
+							addNotification(r => ({
+								data: (
+									<b>
+										Не могу найти тему,{" "}
+										<span
+											class="pseudo"
+											onClick={async e => {
+												window[listingSymbol] &&
+													(await window[listingSymbol].update());
+												r();
+												const el = document.getElementById("active-article");
+												if (el) {
+													el.scrollIntoView({
+														behavior: "smooth",
+														block: "start",
+													});
+												} else {
+													await sleep(1500);
+													onMissingArticle();
+												}
+											}}
+										>
+											обновить список?
+										</span>
+									</b>
+								),
+								time: 30000,
+							}));
+						}
+					};
+
+					if (article && article.hasOwnProperty("title")) {
+						removeNotificationsWithContext("active-article");
+						addNotification(remove => ({
+							data: (
+								<span>
+									Тема обновлена:
+									<br />
+									<HashLink
+										to="/#active-article"
+										onClick={() => {
+											remove();
+											setTimeout(onMissingArticle, 1500);
+										}}
+										scroll={el => {
+											if (location.pathname === "/") {
+												el.scrollIntoView({
+													behavior: "smooth",
+													block: "start",
+												});
+												return;
+											}
+											setTimeout(() => {
+												el.scrollIntoView({
+													behavior: "smooth",
+													block: "start",
+												});
+											}, 500);
+										}}
+									>
+										“{article.title}”
+									</HashLink>
+								</span>
+							),
+							time: null,
+							context: "active-article",
+						}));
+					}
+				});
+			} catch (e) {
+				await sleep(60000);
+			}
 		}
 	});
 }

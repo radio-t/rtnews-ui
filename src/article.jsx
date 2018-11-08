@@ -7,20 +7,27 @@ import Remark from "./remark.jsx";
 import Loading from "./loading.jsx";
 import SVGInline from "react-svg-inline";
 import GearIcon from "./static/svg/gear.svg";
+import NotFound from "./notFound.jsx";
 
 export default class Article extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
 			article: null,
+			error: false,
 		};
-		getArticle(props.slug).then(article => {
-			document.title = article.title + "| Новости Радио-Т";
-			this.setState({ ...this.state, article });
-		});
+		getArticle(props.slug)
+			.then(article => {
+				document.title = article.title + "| Новости Радио-Т";
+				this.setState({ ...this.state, article });
+			})
+			.catch(e => {
+				this.setState({ error: true });
+			});
 	}
 
 	render() {
+		if (this.state.error) return <NotFound />;
 		if (this.state.article === null) return <Loading />;
 		return (
 			<article className="full-post">

@@ -336,7 +336,7 @@ export class ArticleBriefRegular extends ArticleBase {
 						to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
 						scroll={el => {
 							setTimeout(() => {
-								el.scrollIntoView({ behavior: "smooth" });
+								el.scrollIntoView({ behavior: "smooth", block: "start" });
 							}, 500);
 						}}
 					>
@@ -382,7 +382,8 @@ export class ArticleBriefRegular extends ArticleBase {
 								<div
 									className="post__full-content-hide"
 									onClick={() => {
-										if (this.detailedRef) this.detailedRef.scrollIntoView();
+										if (this.detailedRef)
+											this.detailedRef.scrollIntoView({ block: "start" });
 										this.setState({ detailedExpanded: false });
 									}}
 								>
@@ -515,7 +516,7 @@ export class ArticleBrief extends ArticleBase {
 						to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
 						scroll={el => {
 							setTimeout(() => {
-								el.scrollIntoView({ behavior: "smooth" });
+								el.scrollIntoView({ behavior: "smooth", block: "start" });
 							}, 500);
 						}}
 					>
@@ -561,7 +562,8 @@ export class ArticleBrief extends ArticleBase {
 								<div
 									className="post__full-content-hide"
 									onClick={() => {
-										if (this.detailedRef) this.detailedRef.scrollIntoView();
+										if (this.detailedRef)
+											this.detailedRef.scrollIntoView({ block: "start" });
 										this.setState({ detailedExpanded: false });
 									}}
 								>

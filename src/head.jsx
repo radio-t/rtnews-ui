@@ -179,7 +179,10 @@ export default class Head extends React.Component {
 										setTimeout(() => {
 											const el = document.getElementById("to-comments");
 											if (el) {
-												el.scrollIntoView({ behavior: "smooth" });
+												el.scrollIntoView({
+													behavior: "smooth",
+													block: "start",
+												});
 												setTimeout(() => {
 													window.location.hash = "to-comments";
 												}, 500);
@@ -249,7 +252,7 @@ export default class Head extends React.Component {
 			});
 			return;
 		}
-		el.scrollIntoView({ behavior: "smooth" });
+		el.scrollIntoView({ behavior: "smooth", block: "start" });
 		setTimeout(() => {
 			window.location.hash = "active-article";
 		}, 500);

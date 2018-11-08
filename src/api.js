@@ -26,6 +26,12 @@ function processArticle(article) {
 	if (article.hasOwnProperty("activets")) {
 		article.parsedactivets = Date.parse(article.activets);
 	}
+	if (article.domain === "") {
+		try {
+			const url = new URL(article.origlink);
+			article.domain = url.hostname;
+		} catch (e) {}
+	}
 	return article;
 }
 
