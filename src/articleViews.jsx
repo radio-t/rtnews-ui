@@ -253,6 +253,150 @@ class ArticleBase extends React.PureComponent {
 }
 
 /**
+ * Light version of ArticleBrief for regular users
+ * which don't need admin's functionality
+ */
+export class ArticleBriefRegular extends ArticleBase {
+	constructor(props) {
+		super(props);
+		this.state = {
+			articleText: null,
+			detailedExpanded: false,
+			fetchLock: false,
+		};
+	}
+	fetchArticle() {
+		if (this.state.fetchLock) return;
+		if (this.state.articleText !== null) return;
+		this.setState({ fetchLock: true });
+		getArticle(this.props.article.slug)
+			.then(article => {
+				this.setState({ articleText: article.content });
+			})
+			.catch(e => {
+				this.setState({
+					articleText: "Не смог загрузить новость",
+					fetchLock: false,
+				});
+				console.error(e);
+			});
+	}
+	render() {
+		return (
+			<article
+				key={this.props.article.id}
+				ref={ref => (this.ref = ref)}
+				id={this.props.active && "active-article"}
+				className={
+					"post " +
+					(this.props.active && this.props.active === true ? "post-active" : "")
+				}
+			>
+				{this.props.article.pic &&
+					!this.props.archive && (
+						<div
+							className="post__image-container"
+							style={{ backgroundImage: `url(${this.props.article.pic})` }}
+						/>
+					)}
+				<h3 className="title post__title">
+					{this.props.article.geek && (
+						<SVGInline
+							className="icon post__title-geek-icon"
+							svg={GearIcon}
+							title="Гиковская тема"
+						/>
+					)}
+					<Link
+						className="post__title-link"
+						to={`${postsPrefix}/${this.props.article.slug}`}
+					>
+						{this.props.article.title || (
+							<span className="post__empty-title">No Title</span>
+						)}
+					</Link>
+				</h3>
+				<div className="post__meta">
+					<a
+						className="post__original-link"
+						href={this.props.article.origlink}
+						title={this.props.article.origlink}
+					>
+						{this.props.article.domain}
+					</a>
+					<span
+						className="post__timestamp"
+						title={this.props.article.ats}
+						dangerouslySetInnerHTML={{
+							__html: formatDate(new Date(Date.parse(this.props.article.ats))),
+						}}
+					/>
+					<HashLink
+						className="post__comments-link"
+						to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
+						scroll={el => {
+							setTimeout(() => {
+								el.scrollIntoView({ behavior: "smooth" });
+							}, 500);
+						}}
+					>
+						<SVGInline
+							className="icon post__comments-icon"
+							svg={CommentsIcon}
+						/>
+						{this.props.article.comments}
+					</HashLink>
+				</div>
+				{!this.props.archive && [
+					<div key="paragraph" className="post__snippet">
+						<p
+							dangerouslySetInnerHTML={{ __html: this.props.article.snippet }}
+						/>
+					</div>,
+					<span
+						key="detailed"
+						className="pseudo post__detailed-link"
+						to={`${postsPrefix}/${this.props.article.slug}`}
+						ref={ref => (this.detailedRef = ref)}
+						onClick={e => {
+							this.setState({ detailedExpanded: !this.state.detailedExpanded });
+							this.fetchArticle();
+						}}
+					>
+						{this.state.detailedExpanded ? "Скрыть" : "Подробнее"}
+					</span>,
+					this.state.detailedExpanded &&
+						(this.state.articleText === null ? (
+							<div className="post__full-content" key="fulltext">
+								<Loading />
+							</div>
+						) : (
+							<div
+								className="article-content post__full-content"
+								key="fulltext"
+							>
+								<div
+									class="article-content post__full-content-content"
+									dangerouslySetInnerHTML={{ __html: this.state.articleText }}
+								/>
+								<div
+									className="post__full-content-hide"
+									onClick={() => {
+										if (this.detailedRef) this.detailedRef.scrollIntoView();
+										this.setState({ detailedExpanded: false });
+									}}
+								>
+									×
+								</div>
+							</div>
+						)),
+				]}
+			</article>
+		);
+	}
+}
+
+/**
  * Views which used in main, archive and deleted listings
  */
 export class ArticleBrief extends ArticleBase {

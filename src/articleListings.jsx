@@ -34,7 +34,11 @@ import {
 } from "./api.js";
 import { setState, addNotification, removeNotification } from "./store.jsx";
 
-import { ArticleBrief, ArticleSort } from "./articleViews.jsx";
+import {
+	ArticleBrief,
+	ArticleBriefRegular,
+	ArticleSort,
+} from "./articleViews.jsx";
 import ListingActions from "./listingActions.jsx";
 import { Redirect } from "react-router-dom";
 import AddArticle from "./add.jsx";
@@ -328,7 +332,7 @@ export class Listing extends BaseListing {
 									"remove",
 								].filter(x => x !== null);
 							};
-							return (
+							return this.props.isAdmin ? (
 								<ArticleBrief
 									key={x.id}
 									article={x}
@@ -337,6 +341,13 @@ export class Listing extends BaseListing {
 									active={isCurrent}
 									draggable={this.props.isAdmin && sortIsDefault}
 									onChange={(id, data) => this.onArticleChange(x, id, data)}
+								/>
+							) : (
+								<ArticleBriefRegular
+									key={x.id}
+									article={x}
+									archive={false}
+									active={isCurrent}
 								/>
 							);
 						})}
@@ -384,15 +395,20 @@ export class ArchiveListing extends BaseListing {
 					{this.state.news
 						.slice(0)
 						.sort((a, b) => this.state.sort.fn(a, b))
-						.map(x => (
-							<ArticleBrief
-								key={x.id}
-								article={x}
-								archive={true}
-								controls={this.props.isAdmin ? ["remove"] : null}
-								onChange={(id, data) => this.onArticleChange(x, id, data)}
-							/>
-						))}
+						.map(
+							x =>
+								this.props.isAddmin ? (
+									<ArticleBrief
+										key={x.id}
+										article={x}
+										archive={true}
+										controls={this.props.isAdmin ? ["remove"] : null}
+										onChange={(id, data) => this.onArticleChange(x, id, data)}
+									/>
+								) : (
+									<ArticleBriefRegular key={x.id} article={x} archive={true} />
+								)
+						)}
 				</div>
 			</>
 		);
