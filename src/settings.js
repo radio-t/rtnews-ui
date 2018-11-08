@@ -65,7 +65,7 @@ export const postRecentness = [
 	{
 		title: "Свежие",
 		fn(x, i, isgeek = true) {
-			const interval = now - Date.parse(x.ats);
+			const interval = now - x.parsedats;
 			if (isgeek && x.geek && interval < 3 * month) {
 				return true;
 			} else if (interval < 21 * day) {

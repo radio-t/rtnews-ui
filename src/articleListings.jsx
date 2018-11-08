@@ -397,7 +397,7 @@ export class ArchiveListing extends BaseListing {
 						.sort((a, b) => this.state.sort.fn(a, b))
 						.map(
 							x =>
-								this.props.isAddmin ? (
+								this.props.isAdmin ? (
 									<ArticleBrief
 										key={x.id}
 										article={x}
