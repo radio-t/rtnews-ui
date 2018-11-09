@@ -28,7 +28,9 @@ export default class Head extends React.Component {
 	render() {
 		return (
 			<div className="header wrapper page__header">
-				<h1 className="title header__title">Новости для Радио-Т</h1>
+				<h1 className="title header__title">
+					Новости для <span class="no-break">Радио-Т</span>
+				</h1>
 				<ul
 					className="navigation header__navigation"
 					role="navigation"

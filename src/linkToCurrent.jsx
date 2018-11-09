@@ -43,21 +43,21 @@ export default function LinkToCurrent(props) {
 	return (
 		<Link
 			to="/"
-			onClick={e => {
+			onClick={async e => {
 				if (window.location.pathname === "/") e.preventDefault();
-				setTimeout(() => {
-					props.onClick && props.onClick(e);
-					waitFor(() => {
-						return !!document.getElementById("active-article");
-					}, 6000)
-						.then(() => {
-							const el = document.getElementById("active-article");
-							el.scrollIntoView({ behavior: "smooth", block: "start" });
-						})
-						.catch(() => {
-							onMissingArticle();
-						});
-				}, 100);
+				props.onClick && props.onClick(e);
+				await sleep(100);
+				await waitFor(
+					() => window[listingRef] && window[listingRef].state.loaded
+				);
+				await waitFor(() => !!document.getElementById("active-article"), 2000)
+					.then(() => {
+						const el = document.getElementById("active-article");
+						el.scrollIntoView({ behavior: "smooth", block: "start" });
+					})
+					.catch(() => {
+						onMissingArticle();
+					});
 			}}
 			className={props.className}
 		>

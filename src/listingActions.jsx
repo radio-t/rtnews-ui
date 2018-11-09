@@ -1,6 +1,7 @@
 import React from "react";
 
 import { postRecentness, postLevels, sortings } from "./settings.js";
+import Select from "./select.jsx";
 
 export default class ListingActions extends React.Component {
 	render() {
@@ -28,24 +29,18 @@ export default class ListingActions extends React.Component {
 								<span style={{ borderBottom: "1px dashed" }}>Свежие</span>
 							</button>
 						)}
-						<select
+						<Select
+							items={postLevels.map(x => x.title)}
+							value={this.props.postLevel.title}
+							onChange={e =>
+								this.props.onPostLevelChange && this.props.onPostLevelChange(e)
+							}
 							className={`listing-actions__news-type-select ${
 								this.props.postLevel.title !== postLevels[0].title
 									? "listing-actions__news-type-select-selected"
 									: ""
 							}`}
-							value={this.props.postLevel.title}
-							onChange={e =>
-								this.props.onPostLevelChange &&
-								this.props.onPostLevelChange(e.target.value)
-							}
-						>
-							{postLevels.map(x => (
-								<option value={x.title} key={x.title}>
-									{x.title}
-								</option>
-							))}
-						</select>
+						/>
 					</div>
 				) : (
 					<div />
@@ -59,7 +54,10 @@ export default class ListingActions extends React.Component {
 									className="sortings-list__item sortings-list__current-item"
 									key={x.title}
 								>
-									<label className="sortings-list__item-content sortings-list__current-item-content">
+									<label
+										className="sortings-list__item-content sortings-list__current-item-content"
+										tabIndex="0"
+									>
 										<input
 											type="radio"
 											className="sortings-list__item-input"
@@ -79,7 +77,17 @@ export default class ListingActions extends React.Component {
 									}
 									key={x.title}
 								>
-									<label className="sortings-list__item-content">
+									<label
+										className="sortings-list__item-content"
+										tabIndex="0"
+										onKeyPress={e => {
+											if (e.keyCode === 13) {
+												e.preventDefault();
+												this.props.onSortingChange &&
+													this.props.onSortingChange(x);
+											}
+										}}
+									>
 										<input
 											type="radio"
 											className="sortings-list__item-input"
