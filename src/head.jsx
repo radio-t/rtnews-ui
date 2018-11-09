@@ -15,9 +15,12 @@ import {
 } from "./store.jsx";
 
 import { Link, NavLink, Route } from "react-router-dom";
-import { HashLink } from "react-router-hash-link";
 import LinkToCurrent from "./linkToCurrent.jsx";
-import { waitFor, sleep } from "./utils.js";
+import { sleep } from "./utils.js";
+
+import SVGInline from "react-svg-inline";
+import MoonIcon from "./static/svg/moon.svg";
+import SunIcon from "./static/svg/sun.svg";
 
 const setTheme = v => {
 	commitTheme(v);
@@ -120,24 +123,30 @@ export default class Head extends React.Component {
 						</li>
 					)}
 					{this.props.isAdmin && this.props.theme === "day" && (
-						<button
+						<span
 							onClick={() => setTheme("night")}
 							title="Поставить ночную тему"
 							className="inline-button navigation__item navigation__theme-switcher"
 						>
-							🌚
-						</button>
+							<SVGInline
+								svg={MoonIcon}
+								className="icon navigation__theme-switcher-icon"
+							/>
+						</span>
 					)}
 					{this.props.isAdmin && this.props.theme === "night" && (
-						<button
+						<span
 							onClick={() => setTheme("day")}
 							title="Поставить дневную тему"
 							className="inline-button navigation__item navigation__theme-switcher"
 						>
-							🌞
-						</button>
+							<SVGInline
+								svg={SunIcon}
+								className="icon navigation__theme-switcher-icon"
+							/>
+						</span>
 					)}
-					{this.props.isAdmin && <br />}
+					{this.props.isAdmin && <div className="navigation__separator" />}
 					{this.props.activeId !== null && (
 						<li className="navigation__item navigation__item_to-current">
 							<span>
@@ -175,7 +184,10 @@ export default class Head extends React.Component {
 							title="Поставить ночную тему"
 							className="inline-button navigation__item navigation__theme-switcher"
 						>
-							🌚
+							<SVGInline
+								svg={MoonIcon}
+								className="icon navigation__theme-switcher-icon"
+							/>
 						</button>
 					)}
 					{!this.props.isAdmin && this.props.theme === "night" && (
@@ -184,7 +196,10 @@ export default class Head extends React.Component {
 							title="Поставить дневную тему"
 							className="inline-button navigation__item navigation__theme-switcher"
 						>
-							🌞
+							<SVGInline
+								svg={SunIcon}
+								className="icon navigation__theme-switcher-icon"
+							/>
 						</button>
 					)}
 				</ul>
