@@ -52,3 +52,17 @@ export async function waitDOMReady() {
 		await sleep(200);
 	}
 }
+
+export async function waitFor(fn, max = null) {
+	const timestamp = new Date().getTime();
+	while (true) {
+		if (fn()) return;
+		await sleep(100);
+		if (max !== null) {
+			const delta = new Date().getTime();
+			if (delta - timestamp > max) {
+				throw new Error("Time passed");
+			}
+		}
+	}
+}

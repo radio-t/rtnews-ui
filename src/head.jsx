@@ -13,12 +13,11 @@ import {
 	addNotification,
 	setTheme as commitTheme,
 } from "./store.jsx";
-import SVGInline from "react-svg-inline";
-import FollowIcon from "./static/svg/follow.svg";
 
-import { NavLink, Route } from "react-router-dom";
+import { Link, NavLink, Route } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import LinkToCurrent from "./linkToCurrent.jsx";
+import { waitFor, sleep } from "./utils.js";
 
 const setTheme = v => {
 	commitTheme(v);
@@ -151,18 +150,20 @@ export default class Head extends React.Component {
 						path="/news/:slug"
 						render={() => (
 							<li className="navigation__item navigation__item_to-comments">
-								<HashLink
+								<Link
 									to="#to-comments"
-									className="pseudo navigation__item-link"
-									scroll={el => {
-										el.scrollIntoView({
-											behavior: "smooth",
-											block: "start",
+									onClick={e => {
+										e.preventDefault();
+										const el = document.getElementById("to-comments");
+										el.scrollIntoView({ behavior: "smooth", block: "start" });
+										sleep(500).then(() => {
+											window.location.hash = "to-comments";
 										});
 									}}
+									className="pseudo navigation__item-link"
 								>
 									К комментариям
-								</HashLink>
+								</Link>
 							</li>
 						)}
 					/>

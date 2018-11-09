@@ -2,9 +2,9 @@ import React from "react";
 
 import { addNotification } from "./store.jsx";
 import { listingRef } from "./symbols.js";
-import { sleep } from "./utils.js";
+import { sleep, waitFor } from "./utils.js";
 
-import { HashLink } from "react-router-hash-link";
+import { Link } from "react-router-dom";
 
 const onMissingArticle = () => {
 	const el = document.getElementById("active-article");
@@ -41,30 +41,27 @@ const onMissingArticle = () => {
 
 export default function LinkToCurrent(props) {
 	return (
-		<HashLink
-			to="/#active-article"
+		<Link
+			to="/"
 			onClick={e => {
-				props.onClick && props.onClick(e);
-				setTimeout(onMissingArticle, 1500);
+				if (window.location.pathname === "/") e.preventDefault();
+				setTimeout(() => {
+					props.onClick && props.onClick(e);
+					waitFor(() => {
+						return !!document.getElementById("active-article");
+					}, 6000)
+						.then(() => {
+							const el = document.getElementById("active-article");
+							el.scrollIntoView({ behavior: "smooth", block: "start" });
+						})
+						.catch(() => {
+							onMissingArticle();
+						});
+				}, 100);
 			}}
 			className={props.className}
-			scroll={el => {
-				if (location.pathname === "/") {
-					el.scrollIntoView({
-						behavior: "smooth",
-						block: "start",
-					});
-					return;
-				}
-				setTimeout(() => {
-					el.scrollIntoView({
-						behavior: "smooth",
-						block: "start",
-					});
-				}, 500);
-			}}
 		>
 			{props.title}
-		</HashLink>
+		</Link>
 	);
 }

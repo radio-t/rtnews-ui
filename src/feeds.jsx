@@ -19,6 +19,9 @@ export default class FeedsForm extends React.PureComponent {
 			this.setState({ feeds, loaded: true });
 		});
 	}
+	componentWillMount() {
+		document.title = "Управление фидами | Новости Радио-Т";
+	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (!this.state.loaded) return <Loading />;

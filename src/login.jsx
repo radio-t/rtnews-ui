@@ -14,9 +14,16 @@ export default class LoginForm extends React.Component {
 			denied: 0,
 			loggedIn: false,
 		};
+	}
+	componentDidMount() {
 		loginViaCookies().then(loggedIn => {
 			this.setState({ loggedIn });
 		});
+		document.title = "Вход | Новости Радио-Т";
+		setTimeout(() => {
+			const el = document.querySelector("input.login-form__user");
+			if (el) el.focus();
+		}, 500);
 	}
 	render() {
 		if (this.state.loggedIn) return <Redirect to="/" />;
@@ -55,12 +62,6 @@ export default class LoginForm extends React.Component {
 				)}
 			</form>
 		);
-	}
-	componentDidMount() {
-		setTimeout(() => {
-			const el = document.querySelector("input.login-form__user");
-			if (el) el.focus();
-		}, 500);
 	}
 	async onSubmit(e) {
 		e.preventDefault();

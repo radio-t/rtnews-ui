@@ -1,4 +1,4 @@
-import "./style.css";
+import "./style.scss";
 import "intersection-observer";
 import "./ganalitics.js";
 
@@ -51,31 +51,22 @@ class App extends React.Component {
 						<Route
 							path="/"
 							exact={true}
-							render={() => {
-								document.title = "Новости для Радио-Т";
-								return (
-									<Listing
-										{...this.props}
-										ref={ref => (window[listingRef] = ref)}
-									/>
-								);
-							}}
+							render={() => (
+								<Listing
+									{...this.props}
+									ref={ref => (window[listingRef] = ref)}
+								/>
+							)}
 						/>
 						<Route
 							path="/deleted/"
 							exact={true}
-							render={() => {
-								document.title = "Удаленные темы | Новости Радио-Т";
-								return <DeletedListing {...this.props} />;
-							}}
+							render={() => <DeletedListing {...this.props} />}
 						/>
 						<Route
 							path="/archive/"
 							exact={true}
-							render={() => {
-								document.title = "Архив | Новости Радио-Т";
-								return <ArchiveListing {...this.props} />;
-							}}
+							render={() => <ArchiveListing {...this.props} />}
 						/>
 						<Route
 							path="/add/"
@@ -88,33 +79,14 @@ class App extends React.Component {
 						<Route
 							path="/feeds/"
 							exact={true}
-							render={() => {
-								document.title = "Управление фидами | Новости Радио-Т";
-								return <Feeds {...this.props} />;
-							}}
+							render={() => <Feeds {...this.props} />}
 						/>
-						<Route
-							path="/sort/"
-							render={() => {
-								document.title = "Сортировка тем | Новости Радио-Т";
-								return <Sorter {...this.props} />;
-							}}
-						/>
+						<Route path="/sort/" render={() => <Sorter {...this.props} />} />
 						<Route
 							path="/news/:slug"
-							render={props => {
-								document.title = `${props.match.params.slug} | Новости Радио-Т`;
-								return <Article slug={props.match.params.slug} />;
-							}}
+							render={props => <Article slug={props.match.params.slug} />}
 						/>
-						<Route
-							path="/login/"
-							exact={true}
-							render={() => {
-								document.title = "Вход | Новости Радио-Т";
-								return <LoginForm />;
-							}}
-						/>
+						<Route path="/login/" exact={true} render={() => <LoginForm />} />
 						<Route component={NotFound} />
 					</Switch>
 					<div className="footer page__footer">

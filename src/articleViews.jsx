@@ -1,10 +1,10 @@
 import React from "react";
 
-import { formatDate, first } from "./utils.js";
+import { formatDate } from "./utils.js";
 import { postsPrefix, isSafari } from "./settings.js";
-import ArticleButtons from "./articleButtons.js";
 import { getArticle } from "./api.js";
 
+import ArticleControls from "./articleControls.jsx";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import Loading from "./loading.jsx";
@@ -40,7 +40,8 @@ const observer = new IntersectionObserver(entries => {
 	entries.forEach(e => {
 		if (refToComponentMap.has(e.target)) {
 			const component = refToComponentMap.get(e.target);
-			component.setState({ visible: e.isIntersecting });
+			component.visible = e.isIntersecting;
+			component.setState({});
 		}
 	});
 });
@@ -51,13 +52,16 @@ const observer = new IntersectionObserver(entries => {
  * Provides with basic drag'n'drop handlers
  * Provides intersection observing to discard renders while not in view
  */
-class ArticleBase extends React.PureComponent {
+class ArticleBase extends React.Component {
 	shouldComponentUpdate(nextProps, nextState) {
-		if (!nextState.visible) return false;
-		return super.shouldComponentUpdate(nextProps, nextState);
+		if (nextProps.active !== this.props.active) {
+			return true;
+		}
+		if (!this.visible) return false;
+		return true;
 	}
 	componentWillMount() {
-		this.setState({ visible: true });
+		this.visible = true;
 	}
 	/**
 	 * Binds touch-driven drag over/leave/end events and intersection observer
@@ -349,20 +353,13 @@ export class ArticleBrief extends ArticleBase {
 					/>
 				)}
 				{this.props.controls && (
-					<div className="post-controls post__controls">
-						{this.props.controls.map(c => (
-							<span
-								role="button"
-								className={
-									"post-controls__control " + `post-controls__control-${c}`
-								}
-								key={c}
-								onClick={() => this.props.onChange && this.props.onChange(c)}
-							>
-								{ArticleButtons[c].title}
-							</span>
-						))}
-					</div>
+					<ArticleControls
+						className="post__controls"
+						controls={this.props.controls}
+						onChange={change =>
+							this.props.onChange && this.props.onChange(change)
+						}
+					/>
 				)}
 				{this.props.article.pic && !this.props.archive && (
 					<div
@@ -479,7 +476,7 @@ export class ArticleSort extends ArticleBase {
 		};
 		this.controls = () =>
 			[
-				!this.props.current ? "make-current" : null,
+				!this.props.active ? "make-current" : null,
 				this.props.article.geek ? "make-ungeek" : "make-geek",
 				"archive",
 				"remove",
@@ -490,7 +487,7 @@ export class ArticleSort extends ArticleBase {
 			<div
 				draggable={this.state.draggable}
 				className={
-					"sorter__item " + (this.props.current ? "sorter__item-current" : "")
+					"sorter__item " + (this.props.active ? "sorter__item-current" : "")
 				}
 				ref={ref => (this.ref = ref)}
 				//
@@ -502,20 +499,13 @@ export class ArticleSort extends ArticleBase {
 				onDrop={e => this.onDrop(e)}
 			>
 				<div className="sorter__item-content">
-					<div className="post-controls sorter__item-controls">
-						{this.controls().map(c => (
-							<span
-								role="button"
-								className={
-									"post-controls__control " + `post-controls__control-${c}`
-								}
-								key={c}
-								onClick={() => this.props.onChange && this.props.onChange(c)}
-							>
-								{ArticleButtons[c].title}
-							</span>
-						))}
-					</div>
+					<ArticleControls
+						className="sorter__item-controls"
+						controls={this.controls()}
+						onChange={change =>
+							this.props.onChange && this.props.onChange(change)
+						}
+					/>
 					<div className="sorter__item-header">
 						{this.props.article.geek && (
 							<SVGInline

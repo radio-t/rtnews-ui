@@ -16,16 +16,26 @@ export default class Article extends React.PureComponent {
 			article: null,
 			error: false,
 		};
-		getArticle(props.slug)
+	}
+	componentDidMount() {
+		getArticle(this.props.slug)
 			.then(article => {
 				document.title = article.title + "| Новости Радио-Т";
-				this.setState({ ...this.state, article });
+				this.setState({ article });
 			})
 			.catch(e => {
 				this.setState({ error: true });
 			});
-	}
 
+		setTimeout(() => {
+			const hash = window.location.hash;
+			if (hash === "") return;
+			const el = document.getElementById(hash.substr(1));
+			if (el) {
+				el.scrollIntoView({ behavior: "smooth", block: "start" });
+			}
+		}, 200);
+	}
 	render() {
 		if (this.state.error) return <NotFound />;
 		if (this.state.article === null) return <Loading />;
@@ -75,15 +85,5 @@ export default class Article extends React.PureComponent {
 				/>
 			</article>
 		);
-	}
-	componentDidMount() {
-		setTimeout(() => {
-			const hash = window.location.hash;
-			if (hash === "") return;
-			const el = document.getElementById(hash.substr(1));
-			if (el) {
-				el.scrollIntoView({ behavior: "smooth", block: "start" });
-			}
-		}, 200);
 	}
 }

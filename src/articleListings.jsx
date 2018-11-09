@@ -238,6 +238,16 @@ export class Listing extends BaseListing {
 			addFormExpanded: false,
 		};
 	}
+	componentDidMount() {
+		document.title = "Новости для Радио-Т";
+	}
+	async componentWillMount() {
+		this.update();
+	}
+	async update() {
+		const news = await getNews();
+		this.setState({ news, loaded: true });
+	}
 	render() {
 		if (!this.state.loaded) return <Loading />;
 
@@ -357,13 +367,6 @@ export class Listing extends BaseListing {
 			</>
 		);
 	}
-	async update() {
-		const news = await getNews();
-		this.setState({ news, loaded: true });
-	}
-	async componentWillMount() {
-		this.update();
-	}
 }
 
 /**
@@ -379,6 +382,16 @@ export class ArchiveListing extends BaseListing {
 			news: [],
 			loaded: false,
 		};
+	}
+	componentDidMount() {
+		document.title = "Архив | Новости Радио-Т";
+	}
+	async componentWillMount() {
+		this.update();
+	}
+	async update() {
+		const news = await getArchiveNews();
+		this.setState({ news, loaded: true });
 	}
 	render() {
 		if (!this.state.loaded) return <Loading />;
@@ -410,13 +423,6 @@ export class ArchiveListing extends BaseListing {
 			</>
 		);
 	}
-	async update() {
-		const news = await getArchiveNews();
-		this.setState({ news, loaded: true });
-	}
-	async componentWillMount() {
-		this.update();
-	}
 }
 
 /**
@@ -432,6 +438,19 @@ export class DeletedListing extends BaseListing {
 			news: [],
 			loaded: false,
 		};
+	}
+	componentDidMount() {
+		document.title = "Удаленные темы | Новости Радио-Т";
+	}
+	componentWillMount() {
+		this.update();
+	}
+	async update() {
+		const news = (await getDeletedNews()).sort((a, b) => {
+			if (a.ats === b.ats) return 0;
+			return a.parsedats > b.parsedats ? -1 : 1;
+		});
+		this.setState({ news, loaded: true });
 	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
@@ -449,16 +468,6 @@ export class DeletedListing extends BaseListing {
 			</div>
 		);
 	}
-	async update() {
-		const news = (await getDeletedNews()).sort((a, b) => {
-			if (a.ats === b.ats) return 0;
-			return a.parsedats > b.parsedats ? -1 : 1;
-		});
-		this.setState({ news, loaded: true });
-	}
-	async componentWillMount() {
-		this.update();
-	}
 }
 
 /**
@@ -472,13 +481,16 @@ export class Sorter extends BaseListing {
 			loaded: false,
 		};
 	}
+	componentDidMount() {
+		document.title = "Сортировка тем | Новости Радио-Т";
+	}
+	componentWillMount() {
+		this.update();
+	}
 	update() {
 		getNews().then(news => {
 			this.setState({ news, loaded: true });
 		});
-	}
-	async componentWillMount() {
-		this.update();
 	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
@@ -495,7 +507,7 @@ export class Sorter extends BaseListing {
 						<ArticleSort
 							article={article}
 							key={article.id}
-							current={this.props.activeId === article.id}
+							active={this.props.activeId === article.id}
 							onChange={(id, data) => this.onArticleChange(article, id, data)}
 						/>
 					))}

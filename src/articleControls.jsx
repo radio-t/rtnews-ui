@@ -1,4 +1,6 @@
-export default {
+import React from "react";
+
+const controls = {
 	"make-current": {
 		title: "Сделать текущей",
 		id: "make-current",
@@ -27,3 +29,20 @@ export default {
 		title: "Восстановить",
 	},
 };
+
+export default function ArticleControls(props) {
+	return (
+		<div className={"post-controls " + props.className ? props.className : ""}>
+			{props.controls.map(c => (
+				<span
+					role="button"
+					className={"post-controls__control " + `post-controls__control-${c}`}
+					key={c}
+					onClick={() => props.onChange && props.onChange(c)}
+				>
+					{controls[c].title}
+				</span>
+			))}
+		</div>
+	);
+}
