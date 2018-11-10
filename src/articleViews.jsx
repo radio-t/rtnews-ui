@@ -13,64 +13,130 @@ import CommentsIcon from "./static/svg/i-comment.svg";
 import GearIcon from "./static/svg/gear.svg";
 
 /**
- * touchmove targets used bt ArticleBase.onHandleTouchMove
+ * Applies "should update only if visible" logic to component
  */
-let moveTargets = [];
+function UpdateOnlyIfVisible(Component) {
+	/**
+	 * Map which connects HTMLElement with React.Component
+	 */
+	const refToComponentMap = new WeakMap();
 
-/**
- * Name of an event which occurs when touch-driven dragg occurs over element
- */
-const eventIdentifier = "RTNEWSDATADRAG";
-
-/**
- * Map which connect HTMLElement with React.Component
- *
- * used on intersection observer
- */
-const refToComponentMap = new WeakMap();
-
-/**
- * Intersection observer which used to improve
- * performance of Article Component
- *
- * Basically, if an Article is not in screen then
- * component should not update
- */
-const observer = new IntersectionObserver(entries => {
-	entries.forEach(e => {
-		if (refToComponentMap.has(e.target)) {
-			const component = refToComponentMap.get(e.target);
-			component.visible = e.isIntersecting;
-			component.setState({});
-		}
+	const observer = new IntersectionObserver(entries => {
+		entries.forEach(e => {
+			if (refToComponentMap.has(e.target)) {
+				const component = refToComponentMap.get(e.target);
+				component.visible = e.isIntersecting;
+				component.setState({});
+			}
+		});
 	});
-});
 
-/**
- * Base for article view
- *
- * Provides with basic drag'n'drop handlers
- * Provides intersection observing to discard renders while not in view
- */
-class ArticleBase extends React.Component {
-	shouldComponentUpdate(nextProps, nextState) {
-		if (nextProps.active !== this.props.active) {
+	return class extends Component {
+		shouldComponentUpdate(nextProps, nextState) {
+			if (nextProps.active !== this.props.active) return true;
+			if (!this.visible) return false;
 			return true;
 		}
-		if (!this.visible) return false;
-		return true;
-	}
-	componentWillMount() {
-		this.visible = true;
-	}
-	/**
-	 * Binds touch-driven drag over/leave/end events and intersection observer
-	 */
-	componentDidMount() {
-		refToComponentMap.set(this.ref, this);
-		observer.observe(this.ref);
+		componentWillMount() {
+			super.componentWillMount && super.componentWillMount();
+			this.visible = true;
+		}
+		componentDidMount() {
+			super.componentDidMount && super.componentDidMount();
+			refToComponentMap.set(this.ref, this);
+			observer.observe(this.ref);
+		}
+		componentWillUnmount() {
+			super.componentDidUnmount && super.componentWillUnmount();
+			observer.unobserve(this.ref);
+		}
+		render() {
+			return super.render();
+		}
+	};
+}
 
-		this.onTouchDrag = (e => {
+/**
+ * Applies drag'n'drop logic to component
+ */
+function Draggable(Component) {
+	/**
+	 * touchmove targets used by ArticleBase.onHandleTouchMove
+	 */
+	let moveTargets = [];
+
+	/**
+	 * Name of an event which occurs when touch-driven dragg occurs over element
+	 */
+	const eventIdentifier = "RTNEWSDATADRAG";
+
+	return class extends Component {
+		componentDidMount() {
+			super.componentDidMount && super.componentDidMount();
+			if (!(this.handle && this.ref)) return;
+
+			this.handle.addEventListener("mouseenter", () => {
+				this.ref.draggable = this.props.draggable;
+			});
+			this.handle.addEventListener("mouseleave", () => {
+				this.ref.draggable = this.props.draggable;
+			});
+
+			this.onHandleTouchStart = this.onHandleTouchStart.bind(this);
+			this.handle.addEventListener("touchstart", this.onHandleTouchStart);
+			this.onHandleTouchMove = this.onHandleTouchMove.bind(this);
+			this.handle.addEventListener("touchmove", this.onHandleTouchMove);
+			this.onHandleTouchEnd = this.onHandleTouchEnd.bind(this);
+			this.handle.addEventListener("touchend", this.onHandleTouchEnd);
+
+			this.onTouchDrag = this.onTouchDrag.bind(this);
+			this.ref.addEventListener(eventIdentifier, this.onTouchDrag);
+			this.onTouchDragLeave = this.onTouchDragLeave.bind(this);
+			this.ref.addEventListener(
+				`${eventIdentifier}Leave`,
+				this.onTouchDragLeave
+			);
+			this.onTouchDragEnd = this.onTouchDragEnd.bind(this);
+			this.ref.addEventListener(`${eventIdentifier}End`, this.onTouchDragEnd);
+
+			this.onDrop = this.onDrop.bind(this);
+			this.ref.addEventListener("drop", this.onDrop);
+			this.onDrag = this.onDrag.bind(this);
+			this.ref.addEventListener("drag", this.onDrag);
+			this.onDragStart = this.onDragStart.bind(this);
+			this.ref.addEventListener("dragstart", this.onDragStart);
+			this.onDragOver = this.onDragOver.bind(this);
+			this.ref.addEventListener("dragover", this.onDragOver);
+			this.onDragLeave = this.onDragLeave.bind(this);
+			this.ref.addEventListener("dragleave", this.onDragLeave);
+			this.onDragEnd = this.onDragEnd.bind(this);
+			this.ref.addEventListener("dragend", this.onDragEnd);
+		}
+		componentWillUnmount() {
+			super.componentWillUnmount && super.componentWillUnmount();
+			if (!this.props.isAdmin) return;
+
+			this.ref.removeEventListener(eventIdentifier, this.onTouchDrag);
+			this.ref.removeEventListener(
+				`${eventIdentifier}Leave`,
+				this.onTouchDragLeave
+			);
+			this.ref.removeEventListener(
+				`${eventIdentifier}End`,
+				this.onTouchDragEnd
+			);
+
+			this.handle.removeEventListener("touchend", this.onHandleTouchEnd);
+			this.handle.removeEventListener("touchmove", this.onHandleTouchMove);
+			this.handle.removeEventListener("touchstart", this.onHandleTouchStart);
+
+			this.ref.removeEventListener("drag", this.onDrag);
+			this.ref.removeEventListener("dragstart", this.onDragStart);
+			this.ref.removeEventListener("dragover", this.onDragOver);
+			this.ref.removeEventListener("dragleave", this.onDragLeave);
+			this.ref.removeEventListener("dragend", this.onDragEnd);
+		}
+		onTouchDrag(e) {
 			const rect = this.ref.getBoundingClientRect();
 			const ratio = (e.relativeCoords.y / rect.height) * 100;
 			if (ratio < 50) {
@@ -80,16 +146,12 @@ class ArticleBase extends React.Component {
 				this.ref.classList.remove("touch-drag-target-top");
 				this.ref.classList.add("touch-drag-target-bottom");
 			}
-		}).bind(this);
-		this.ref.addEventListener(eventIdentifier, this.onTouchDrag);
-
-		this.onTouchDragLeave = (e => {
+		}
+		onTouchDragLeave(e) {
 			this.ref.classList.remove("touch-drag-target-top");
 			this.ref.classList.remove("touch-drag-target-bottom");
-		}).bind(this);
-		this.ref.addEventListener(`${eventIdentifier}Leave`, this.onTouchDragLeave);
-
-		this.onTouchDragEnd = (e => {
+		}
+		onTouchDragEnd(e) {
 			this.ref.classList.remove("touch-drag-target-top");
 			this.ref.classList.remove("touch-drag-target-bottom");
 			if (e.data.position === this.props.article.position) return;
@@ -107,30 +169,20 @@ class ArticleBase extends React.Component {
 					from: e.data.position,
 					to: this.props.article.position + append,
 				});
-		}).bind(this);
-		this.ref.addEventListener(`${eventIdentifier}End`, this.onTouchDragEnd);
-	}
-	componentWillUnmount() {
-		observer.unobserve(this.ref);
+		}
 
-		this.ref.removeEventListener(eventIdentifier, this.onTouchDrag);
-		this.ref.removeEventListener(
-			`${eventIdentifier}Leave`,
-			this.onTouchDragLeave
-		);
-		this.ref.removeEventListener(`${eventIdentifier}End`, this.onTouchDragEnd);
-	}
-	onDragStart(e) {
-		this.ref.classList.add("drop-item");
-		this.setState({ detailedExpanded: false });
-		e.dataTransfer.setData(
-			"rtnews/article",
-			JSON.stringify(this.props.article)
-		);
-		e.dataTransfer.setData("rtnews/article-id", this.props.article.id);
+		onHandleTouchStart(e) {
+			if (e.touches.length > 1) return;
+			e.preventDefault();
 
-		if (isSafari) {
-			this.clientY = e.clientY;
+			this.ref.classList.add("touch-drag-item__start");
+			this.ref.classList.add("touch-drag-item");
+			this.ref.classList.remove("touch-drag-item__start");
+			this.initialTouch = e.touches[0];
+			this.initialTransform = this.ref.style.tranform;
+
+			// handle scroll over borders
+			this.clientY = e.touches[0].clientY;
 			this.dragInterval = setInterval(() => {
 				if (this.clientY <= 80) {
 					window.scrollBy(0, -((80 - this.clientY) / 2));
@@ -139,163 +191,170 @@ class ArticleBase extends React.Component {
 				}
 			}, 30);
 		}
-	}
-	onDrag(e) {
-		if (isSafari) {
-			this.clientY = e.clientY;
-		}
-	}
-	onDragOver(e) {
-		if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
-		e.preventDefault();
-		if (e.dataTransfer.getData("rtnews/article-id") === this.props.article.id) {
-			this.ref.classList.remove("drop-top");
-			this.ref.classList.remove("drop-bottom");
-			return;
-		}
-		let append = (() => {
-			const rect = e.currentTarget.getBoundingClientRect();
-			const y = e.clientY - rect.y;
-			const proportion = (y / rect.height) * 100;
-			return proportion < 60 ? 1 : 0;
-		})();
-		if (append === 1) {
-			this.ref.classList.remove("drop-bottom");
-			this.ref.classList.add("drop-top");
-		} else {
-			this.ref.classList.remove("drop-top");
-			this.ref.classList.add("drop-bottom");
-		}
-	}
-	onDragLeave(e) {
-		this.ref.classList.remove("drop-top");
-		this.ref.classList.remove("drop-bottom");
-	}
-	onDragEnd(e) {
-		clearInterval(this.dragInterval);
-		this.ref.classList.remove("drop-item");
-		this.ref.classList.remove("drop-top");
-		this.ref.classList.remove("drop-bottom");
-	}
-	async onDrop(e) {
-		clearInterval(this.dragInterval);
-		this.ref.classList.remove("drop-item");
-		this.ref.classList.remove("drop-top");
-		this.ref.classList.remove("drop-bottom");
-		if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
-		e.preventDefault();
-		const data = JSON.parse(e.dataTransfer.getData("rtnews/article"));
-		if (data.position === this.props.article.position) return;
-		let append = (() => {
-			const rect = e.currentTarget.getBoundingClientRect();
-			const y = e.clientY - rect.y;
-			const proportion = (y / rect.height) * 100;
-			return proportion < 60 ? 1 : 0;
-		})();
-		if (data.position < this.props.article.position) append -= 1;
-		if (data.position === this.props.article.position + append) return;
-		this.props.onChange &&
-			this.props.onChange("move", {
-				id: data.id,
-				from: data.position,
-				to: this.props.article.position + append,
+		onHandleTouchMove(e) {
+			this.clientY = e.touches[0].clientY;
+			const deltaY = e.touches[0].pageY - this.initialTouch.pageY;
+			this.ref.style.transform = `translate(0, ${deltaY}px)`;
+
+			const targets = document.elementsFromPoint(
+				e.touches[0].clientX,
+				e.touches[0].clientY
+			);
+
+			const left = moveTargets.filter(x => targets.indexOf(x) === -1);
+			const lEvent = new Event(`${eventIdentifier}Leave`, {
+				bubbles: false,
+				cancelable: false,
 			});
-	}
-	onHandleTouchStart(e, article) {
-		if (e.touches.length > 1) return;
-		e.preventDefault();
+			left.forEach(x => x.dispatchEvent(lEvent));
 
-		this.ref.classList.add("touch-drag-item__start");
-		this.ref.classList.add("touch-drag-item");
-		this.ref.classList.remove("touch-drag-item__start");
-		this.initialTouch = e.touches[0];
-		this.initialTransform = this.ref.style.tranform;
+			moveTargets = targets;
 
-		// handle scroll over borders
-		this.clientY = e.touches[0].clientY;
-		this.dragInterval = setInterval(() => {
-			if (this.clientY <= 80) {
-				window.scrollBy(0, -((80 - this.clientY) / 2));
-			} else if (this.clientY >= window.innerHeight - 80) {
-				window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
+			moveTargets.forEach(x => {
+				if (!x) return;
+				const event = new Event(eventIdentifier, {
+					bubbles: false,
+					cancelable: true,
+				});
+				const tRect = x.getBoundingClientRect();
+				event.absoluteCoords = {
+					x: e.touches[0].clientX,
+					y: e.touches[0].clientY,
+				};
+				event.relativeCoords = {
+					x: e.touches[0].clientX - tRect.x,
+					y: e.touches[0].clientY - tRect.y,
+				};
+				x.dispatchEvent(event);
+			});
+		}
+		onHandleTouchEnd(e) {
+			const article = this.props.article;
+			clearInterval(this.dragInterval);
+			this.ref.classList.remove("touch-drag-item");
+			if (this.initialTransform) {
+				this.ref.style.transform = this.initialTransform;
+			} else {
+				this.ref.style.transform = "";
 			}
-		}, 30);
-	}
-	onHandleTouchMove(e, article) {
-		this.clientY = e.touches[0].clientY;
-		const deltaY = e.touches[0].pageY - this.initialTouch.pageY;
-		this.ref.style.transform = `translate(0, ${deltaY}px)`;
 
-		const targets = document.elementsFromPoint(
-			e.touches[0].clientX,
-			e.touches[0].clientY
-		);
-
-		const left = moveTargets.filter(x => targets.indexOf(x) === -1);
-		const lEvent = new Event(`${eventIdentifier}Leave`, {
-			bubbles: false,
-			cancelable: false,
-		});
-		left.forEach(x => x.dispatchEvent(lEvent));
-
-		moveTargets = targets;
-
-		moveTargets.forEach(x => {
-			if (!x) return;
-			const event = new Event(eventIdentifier, {
-				bubbles: false,
-				cancelable: true,
+			const targets = document.elementsFromPoint(
+				e.changedTouches[0].clientX,
+				e.changedTouches[0].clientY
+			);
+			targets.forEach(x => {
+				if (!x) return;
+				const event = new Event(`${eventIdentifier}End`, {
+					bubbles: false,
+					cancelable: true,
+				});
+				event.data = article;
+				const rect = x.getBoundingClientRect();
+				event.absoluteCoords = {
+					x: e.changedTouches[0].clientX,
+					y: e.changedTouches[0].clientY,
+				};
+				event.relativeCoords = {
+					x: e.changedTouches[0].clientX - rect.x,
+					y: e.changedTouches[0].clientY - rect.y,
+				};
+				x.dispatchEvent(event);
 			});
-			const tRect = x.getBoundingClientRect();
-			event.absoluteCoords = {
-				x: e.touches[0].clientX,
-				y: e.touches[0].clientY,
-			};
-			event.relativeCoords = {
-				x: e.touches[0].clientX - tRect.x,
-				y: e.touches[0].clientY - tRect.y,
-			};
-			x.dispatchEvent(event);
-		});
-	}
-	onHandleTouchEnd(e, article) {
-		clearInterval(this.dragInterval);
-		this.ref.classList.remove("touch-drag-item");
-		if (this.initialTransform) {
-			this.ref.style.transform = this.initialTransform;
-		} else {
-			this.ref.style.transform = "";
 		}
 
-		const targets = document.elementsFromPoint(
-			e.changedTouches[0].clientX,
-			e.changedTouches[0].clientY
-		);
-		targets.forEach(x => {
-			if (!x) return;
-			const event = new Event(`${eventIdentifier}End`, {
-				bubbles: false,
-				cancelable: true,
-			});
-			event.data = article;
-			const rect = x.getBoundingClientRect();
-			event.absoluteCoords = {
-				x: e.changedTouches[0].clientX,
-				y: e.changedTouches[0].clientY,
-			};
-			event.relativeCoords = {
-				x: e.changedTouches[0].clientX - rect.x,
-				y: e.changedTouches[0].clientY - rect.y,
-			};
-			x.dispatchEvent(event);
-		});
-	}
+		onDragStart(e) {
+			this.ref.classList.add("drop-item");
+			this.setState({ detailedExpanded: false });
+			e.dataTransfer.setData(
+				"rtnews/article",
+				JSON.stringify(this.props.article)
+			);
+			e.dataTransfer.setData("rtnews/article-id", this.props.article.id);
+
+			if (isSafari) {
+				this.clientY = e.clientY;
+				this.dragInterval = setInterval(() => {
+					if (this.clientY <= 80) {
+						window.scrollBy(0, -((80 - this.clientY) / 2));
+					} else if (this.clientY >= window.innerHeight - 80) {
+						window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
+					}
+				}, 30);
+			}
+		}
+		onDrag(e) {
+			if (isSafari) {
+				this.clientY = e.clientY;
+			}
+		}
+		onDragOver(e) {
+			if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
+			e.preventDefault();
+			if (
+				e.dataTransfer.getData("rtnews/article-id") === this.props.article.id
+			) {
+				this.ref.classList.remove("drop-top");
+				this.ref.classList.remove("drop-bottom");
+				return;
+			}
+			let append = (() => {
+				const rect = e.currentTarget.getBoundingClientRect();
+				const y = e.clientY - rect.y;
+				const proportion = (y / rect.height) * 100;
+				return proportion < 60 ? 1 : 0;
+			})();
+			if (append === 1) {
+				this.ref.classList.remove("drop-bottom");
+				this.ref.classList.add("drop-top");
+			} else {
+				this.ref.classList.remove("drop-top");
+				this.ref.classList.add("drop-bottom");
+			}
+		}
+		onDragLeave(e) {
+			this.ref.classList.remove("drop-top");
+			this.ref.classList.remove("drop-bottom");
+		}
+		onDragEnd(e) {
+			clearInterval(this.dragInterval);
+			this.ref.classList.remove("drop-item");
+			this.ref.classList.remove("drop-top");
+			this.ref.classList.remove("drop-bottom");
+		}
+		async onDrop(e) {
+			clearInterval(this.dragInterval);
+			this.ref.classList.remove("drop-item");
+			this.ref.classList.remove("drop-top");
+			this.ref.classList.remove("drop-bottom");
+			if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
+			e.preventDefault();
+			const data = JSON.parse(e.dataTransfer.getData("rtnews/article"));
+			if (data.position === this.props.article.position) return;
+			let append = (() => {
+				const rect = e.currentTarget.getBoundingClientRect();
+				const y = e.clientY - rect.y;
+				const proportion = (y / rect.height) * 100;
+				return proportion < 60 ? 1 : 0;
+			})();
+			if (data.position < this.props.article.position) append -= 1;
+			if (data.position === this.props.article.position + append) return;
+			this.props.onChange &&
+				this.props.onChange("move", {
+					id: data.id,
+					from: data.position,
+					to: this.props.article.position + append,
+				});
+		}
+		render() {
+			return super.render();
+		}
+	};
 }
 
 /**
  * Views which used in main, archive and deleted listings
  */
-export class ArticleBrief extends ArticleBase {
+class ArticleBriefBasic extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -332,26 +391,12 @@ export class ArticleBrief extends ArticleBase {
 					"post " +
 					(this.props.active && this.props.active === true ? "post-active" : "")
 				}
-				draggable={this.state.draggable && this.props.draggable}
-				//
-				onDragStartCapture={e => this.onDragStart(e)}
-				onDrag={e => this.onDrag(e)}
-				onDragOver={e => this.onDragOver(e)}
-				onDragLeave={e => this.onDragLeave(e)}
-				onDragEnd={e => this.onDragEnd(e)}
-				onDrop={e => this.onDrop(e)}
 			>
-				{this.props.draggable && (
-					<div
-						className="post__drag-handle"
-						ref={ref => (this.handle = ref)}
-						onMouseEnter={() => this.setState({ draggable: true })}
-						onMouseLeave={() => this.setState({ draggable: false })}
-						onTouchStart={e => this.onHandleTouchStart(e, this.props.article)}
-						onTouchEnd={e => this.onHandleTouchEnd(e, this.props.article)}
-						onTouchMove={e => this.onHandleTouchMove(e, this.props.article)}
-					/>
-				)}
+				<div
+					className="post__drag-handle"
+					ref={ref => (this.handle = ref)}
+					style={{ display: this.props.draggable ? null : "none" }}
+				/>
 				{this.props.controls && (
 					<ArticleControls
 						className="post__controls"
@@ -465,10 +510,15 @@ export class ArticleBrief extends ArticleBase {
 	}
 }
 
+export const ArticleBrief = UpdateOnlyIfVisible(ArticleBriefBasic);
+export const DraggableArticleBrief = UpdateOnlyIfVisible(
+	Draggable(ArticleBriefBasic)
+);
+
 /**
  * View which used in sorting listing "/sort/"
  */
-export class ArticleSort extends ArticleBase {
+export class ArticleSortBasic extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -490,13 +540,6 @@ export class ArticleSort extends ArticleBase {
 					"sorter__item " + (this.props.active ? "sorter__item-current" : "")
 				}
 				ref={ref => (this.ref = ref)}
-				//
-				onDragStartCapture={e => this.onDragStart(e)}
-				onDrag={e => this.onDrag(e)}
-				onDragOver={e => this.onDragOver(e)}
-				onDragLeave={e => this.onDragLeave(e)}
-				onDragEnd={e => this.onDragEnd(e)}
-				onDrop={e => this.onDrop(e)}
 			>
 				<div className="sorter__item-content">
 					<ArticleControls
@@ -548,18 +591,12 @@ export class ArticleSort extends ArticleBase {
 						</span>
 					</div>
 				</div>
-				<div
-					className="sorter__item-handle"
-					ref={ref => (this.handle = ref)}
-					onMouseEnter={() => this.setState({ draggable: true })}
-					onMouseLeave={() => this.setState({ draggable: false })}
-					onTouchStart={e => this.onHandleTouchStart(e, this.props.article)}
-					onTouchEnd={e => this.onHandleTouchEnd(e, this.props.article)}
-					onTouchMove={e => this.onHandleTouchMove(e, this.props.article)}
-				>
+				<div className="sorter__item-handle" ref={ref => (this.handle = ref)}>
 					☰
 				</div>
 			</div>
 		);
 	}
 }
+
+export const ArticleSort = UpdateOnlyIfVisible(Draggable(ArticleSortBasic));

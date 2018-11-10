@@ -274,7 +274,7 @@ p {
 	&__item-handle {
 		cursor: grab;
 		font-size: 1.5em;
-		padding: 0.2em 0.2em 0.2em 0;
+		padding: 0.2em 0 0.2em 0.2em;
 	}
 
 	&__item-handle:not(:hover) {

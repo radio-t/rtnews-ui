@@ -32,7 +32,11 @@ import {
 import { setState, addNotification, removeNotification } from "./store.jsx";
 import articleCache from "./articleCache.js";
 
-import { ArticleBrief, ArticleSort } from "./articleViews.jsx";
+import {
+	ArticleBrief,
+	DraggableArticleBrief,
+	ArticleSort,
+} from "./articleViews.jsx";
 import ListingActions from "./listingActions.jsx";
 import { Redirect } from "react-router-dom";
 import AddArticle from "./add.jsx";
@@ -65,6 +69,49 @@ async function en(message, fn, context = null) {
 	}
 }
 
+function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
+	if (updateInterval === null) return Component;
+
+	return class extends Component {
+		componentDidMount() {
+			super.componentDidMount && super.componentDidMount();
+
+			this.updateTimestamp = new Date().getTime();
+
+			this.updateInterval = setInterval(async () => {
+				let stamp = new Date().getTime();
+				if (stamp - this.updateTimestamp > updateInterval * 60000) {
+					if (window.requestIdleCallback) {
+						await new Promise(resolve => {
+							requestIdleCallback(
+								() => {
+									this.update(true)
+										.then(resolve)
+										.catch(resolve);
+								},
+								{
+									timeout: 30000,
+								}
+							);
+						});
+					} else {
+						await this.update();
+					}
+				}
+			}, 30000);
+		}
+		componentWillUnmount() {
+			super.componentWillUnmount && super.componentWillUnmount();
+			clearInterval(this.updateInterval);
+		}
+		async update(...args) {
+			const o = await super.update(...args);
+			this.updateTimestamp = new Date().getTime();
+			return o;
+		}
+	};
+}
+
 /**
  * Base for listing components
  *
@@ -81,43 +128,9 @@ class BaseListing extends React.Component {
 	constructor(props) {
 		super(props);
 
-		if (newsAutoUpdateInterval === null) return;
-
 		this.updateArticle = this.updateArticle.bind(this);
 		this.onArticleChange = this.onArticleChange.bind(this);
-
-		//auto update functionality
-		this.updateTimestamp = new Date().getTime();
-		const oldupdate = this.update.bind(this);
-		this.update = (...args) => {
-			this.updateTimestamp = new Date().getTime();
-			return oldupdate(...args);
-		};
-
-		const updateInterval = setInterval(() => {
-			let stamp = new Date().getTime();
-			if (stamp - this.updateTimestamp > newsAutoUpdateInterval * 60000) {
-				if (window.requestIdleCallback) {
-					requestIdleCallback(async () => {
-						await this.update();
-						this.updateTimestamp = stamp;
-					}, 10000);
-				} else {
-					async () => {
-						await this.update();
-						this.updateTimestamp = stamp;
-					};
-				}
-			}
-		}, 30000);
-
-		const oldunmount = this.componentWillUnmount.bind(this);
-		this.componentWillUnmount = (...args) => {
-			clearInterval(updateInterval);
-			return oldunmount(...args);
-		};
 	}
-	componentWillUnmount() {}
 	updateArticle(article, change) {
 		const articleIndex = this.state.news.indexOf(article);
 		if (articleIndex === -1) return;
@@ -232,10 +245,12 @@ class BaseListing extends React.Component {
 	}
 }
 
+const BaseListingWithAutoUpdate = withAutoUpdate(BaseListing);
+
 /**
  * Listing for main "/" route
  */
-export class Listing extends BaseListing {
+export class Listing extends BaseListingWithAutoUpdate {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -248,9 +263,11 @@ export class Listing extends BaseListing {
 		};
 	}
 	componentDidMount() {
+		super.componentDidMount && super.componentDidMount();
 		document.title = "Новости для Радио-Т";
 	}
 	async componentWillMount() {
+		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
 	async update(force = false) {
@@ -360,14 +377,23 @@ export class Listing extends BaseListing {
 									"remove",
 								].filter(x => x !== null);
 							};
-							return (
+							return this.props.isAdmin ? (
+								<DraggableArticleBrief
+									key={x.id}
+									article={x}
+									archive={false}
+									controls={this.props.isAdmin ? getControls() : null}
+									active={isCurrent}
+									draggable={sortIsDefault}
+									onChange={(id, data) => this.onArticleChange(x, id, data)}
+								/>
+							) : (
 								<ArticleBrief
 									key={x.id}
 									article={x}
 									archive={false}
 									controls={this.props.isAdmin ? getControls() : null}
 									active={isCurrent}
-									draggable={this.props.isAdmin && sortIsDefault}
 									onChange={(id, data) => this.onArticleChange(x, id, data)}
 								/>
 							);
@@ -381,7 +407,7 @@ export class Listing extends BaseListing {
 /**
  * Listing for archive "/arhive/"
  */
-export class ArchiveListing extends BaseListing {
+export class ArchiveListing extends BaseListingWithAutoUpdate {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -393,9 +419,11 @@ export class ArchiveListing extends BaseListing {
 		};
 	}
 	componentDidMount() {
+		super.componentDidMount && super.componentDidMount();
 		document.title = "Архив | Новости Радио-Т";
 	}
 	async componentWillMount() {
+		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
 	async update(force = false) {
@@ -437,7 +465,7 @@ export class ArchiveListing extends BaseListing {
 /**
  * Listing for deleted articles "/deleted/"
  */
-export class DeletedListing extends BaseListing {
+export class DeletedListing extends BaseListingWithAutoUpdate {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -449,9 +477,11 @@ export class DeletedListing extends BaseListing {
 		};
 	}
 	componentDidMount() {
+		super.componentDidMount && super.componentDidMount();
 		document.title = "Удаленные темы | Новости Радио-Т";
 	}
 	componentWillMount() {
+		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
 	async update(force = false) {
@@ -482,7 +512,7 @@ export class DeletedListing extends BaseListing {
 /**
  * Listing for sorting view "/sort/"
  */
-export class Sorter extends BaseListing {
+export class Sorter extends BaseListingWithAutoUpdate {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -491,9 +521,11 @@ export class Sorter extends BaseListing {
 		};
 	}
 	componentDidMount() {
+		super.componentDidMount && super.componentDidMount();
 		document.title = "Сортировка тем | Новости Радио-Т";
 	}
 	componentWillMount() {
+		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
 	update(force = false) {
@@ -518,6 +550,7 @@ export class Sorter extends BaseListing {
 							key={article.id}
 							active={this.props.activeId === article.id}
 							onChange={(id, data) => this.onArticleChange(article, id, data)}
+							draggable={true}
 						/>
 					))}
 			</div>

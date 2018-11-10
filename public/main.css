@@ -199,7 +199,7 @@ p {
   .sorter__item-handle {
     cursor: grab;
     font-size: 1.5em;
-    padding: 0.2em 0.2em 0.2em 0; }
+    padding: 0.2em 0 0.2em 0.2em; }
   .sorter__item-handle:not(:hover) {
     opacity: 0.4; }
   .sorter__item-feed {
