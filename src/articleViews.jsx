@@ -487,10 +487,7 @@ class ArticleBriefBasic extends React.Component {
 								<Loading />
 							</div>
 						) : (
-							<div
-								className="article-content post__full-content"
-								key="fulltext"
-							>
+							<div className="post__full-content" key="fulltext">
 								<div
 									class="article-content post__full-content-content"
 									dangerouslySetInnerHTML={{ __html: this.state.articleText }}
@@ -505,8 +502,9 @@ class ArticleBriefBasic extends React.Component {
 											});
 										this.setState({ detailedExpanded: false });
 									}}
+									title="К заголовку"
 								>
-									^
+									<span className="post__full-content-hide-button">^</span>
 								</div>
 							</div>
 						)),

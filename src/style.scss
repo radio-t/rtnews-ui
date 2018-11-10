@@ -1040,13 +1040,19 @@ p {
 		font-size: 2rem;
 		padding: 0.5rem;
 		color: rgba(0, 0, 0, 0.2);
-		background: rgba(0, 0, 0, 0.03);
+		background: rgba(0, 0, 0, 0.08);
 		cursor: default;
 		flex: 0;
 
 		&:hover {
 			background: rgba(0, 0, 0, 0.06);
 		}
+	}
+
+	&__full-content-hide-button {
+		position: -webkit-sticky;
+		position: sticky;
+		top: 0.3em;
 	}
 }
 
@@ -1077,7 +1083,7 @@ p {
 	position: relative;
 	box-sizing: border-box;
 	max-width: 100%;
-	overflow: scroll;
+	overflow-y: scroll;
 
 	img {
 		max-width: 100%;
