@@ -20,7 +20,7 @@ import {
 	getTheme,
 	getArticleById,
 } from "./api.js";
-import { waitDOMReady, sleep } from "./utils.js";
+import { waitDOMReady, sleep, scrollIntoView } from "./utils.js";
 
 import Head from "./head.jsx";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -145,7 +145,7 @@ async function main() {
 					if (store.getState().autoScroll) {
 						setTimeout(() => {
 							const el = document.querySelector(".post-active");
-							if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+							if (el) scrollIntoView(el);
 						}, 500);
 					}
 					sleep(700).then(() => {

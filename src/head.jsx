@@ -16,7 +16,7 @@ import {
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent.jsx";
-import { sleep } from "./utils.js";
+import { sleep, scrollIntoView } from "./utils.js";
 
 import SVGInline from "react-svg-inline";
 import MoonIcon from "./static/svg/moon.svg";
@@ -166,7 +166,7 @@ export default class Head extends React.Component {
 									onClick={e => {
 										e.preventDefault();
 										const el = document.getElementById("to-comments");
-										el.scrollIntoView({ behavior: "smooth", block: "start" });
+										scrollIntoView(el);
 										sleep(500).then(() => {
 											window.location.hash = "to-comments";
 										});

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatDate } from "./utils.js";
+import { formatDate, scrollIntoView } from "./utils.js";
 import { postsPrefix, isSafari } from "./settings.js";
 import { getArticle } from "./api.js";
 
@@ -452,7 +452,7 @@ class ArticleBriefBasic extends React.Component {
 						to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
 						scroll={el => {
 							setTimeout(() => {
-								el.scrollIntoView({ behavior: "smooth", block: "start" });
+								scrollIntoView(el);
 							}, 500);
 						}}
 					>
@@ -496,10 +496,7 @@ class ArticleBriefBasic extends React.Component {
 									className="post__full-content-hide"
 									onClick={() => {
 										if (this.ref)
-											this.ref.scrollIntoView({
-												block: "start",
-												behavior: "smooth",
-											});
+											scrollIntoView(this.ref);
 										this.setState({ detailedExpanded: false });
 									}}
 									title="К заголовку"

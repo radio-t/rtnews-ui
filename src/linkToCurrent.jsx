@@ -2,7 +2,7 @@ import React from "react";
 
 import { addNotification } from "./store.jsx";
 import { listingRef } from "./symbols.js";
-import { sleep, waitFor } from "./utils.js";
+import { sleep, waitFor, scrollIntoView } from "./utils.js";
 
 import { Link } from "react-router-dom";
 
@@ -20,10 +20,7 @@ const onMissingArticle = () => {
 							r();
 							const el = document.getElementById("active-article");
 							if (el) {
-								el.scrollIntoView({
-									behavior: "smooth",
-									block: "start",
-								});
+								scrollIntoView(el);
 							} else {
 								await sleep(1500);
 								onMissingArticle();
@@ -54,7 +51,7 @@ export default function LinkToCurrent(props) {
 					.then(() => {
 						document.title = "Новости для Радио-Т";
 						const el = document.getElementById("active-article");
-						el.scrollIntoView({ behavior: "smooth", block: "start" });
+						scrollIntoView(el);
 					})
 					.catch(() => {
 						onMissingArticle();

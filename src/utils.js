@@ -66,3 +66,47 @@ export async function waitFor(fn, max = null) {
 		}
 	}
 }
+
+export const scrollIntoView = (() => {
+	if ("scrollBehavior" in document.documentElement.style) {
+		return (el, behavior = "smooth") =>
+			el.scrollIntoView({ behavior, block: "start" });
+	} else {
+		// easeOutQuart
+		const timingfn = t => -(Math.pow(t - 1, 4) - 1);
+
+		const easing = (time, duration, from, to) => {
+			if (time >= duration) return to;
+			const percentage = timingfn(time / duration);
+			const delta = to - from;
+			return from + percentage * delta;
+		};
+
+		const requestAnimationFrame =
+			window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
+		return (el, behavior = "smooth") => {
+			if (behavior !== "smooth")
+				return el.scrollIntoView({ behavior, block: "start" });
+			else {
+				const startPosition = window.scrollY || window.pageYOffset;
+				const targetPosition = startPosition + el.getBoundingClientRect().y;
+				const timeStart = performance.now();
+				const duration = 500;
+
+				function loop(timeCurrent) {
+					const elapsed = timeCurrent - timeStart;
+					const next = easing(elapsed, duration, startPosition, targetPosition);
+					window.scrollTo(0, next);
+					if (elapsed <= duration) {
+						requestAnimationFrame(loop);
+					} else {
+						window.scrollTo(0, targetPosition);
+					}
+				}
+
+				requestAnimationFrame(loop);
+			}
+		};
+	}
+})();

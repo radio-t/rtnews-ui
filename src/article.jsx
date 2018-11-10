@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatDate } from "./utils.js";
+import { formatDate, scrollIntoView } from "./utils.js";
 import { getArticle } from "./api.js";
 
 import Remark from "./remark.jsx";
@@ -32,7 +32,7 @@ export default class Article extends React.PureComponent {
 			if (hash === "") return;
 			const el = document.getElementById(hash.substr(1));
 			if (el) {
-				el.scrollIntoView({ behavior: "smooth", block: "start" });
+				scrollIntoView(el);
 			}
 		}, 200);
 	}
