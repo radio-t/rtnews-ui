@@ -52,6 +52,7 @@ export default function LinkToCurrent(props) {
 				);
 				await waitFor(() => !!document.getElementById("active-article"), 2000)
 					.then(() => {
+						document.title = "Новости для Радио-Т";
 						const el = document.getElementById("active-article");
 						el.scrollIntoView({ behavior: "smooth", block: "start" });
 					})

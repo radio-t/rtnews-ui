@@ -248,7 +248,15 @@ export function setArchiveSorting(value) {
 
 export function getTheme() {
 	const s = localStorage.getItem("theme");
-	return s === null ? "day" : s;
+	if (s !== null) return s;
+
+	//check system night mode
+	const mode = (() => {
+		const query = window.matchMedia("(prefers-color-scheme: dark)");
+		return query.matches ? "night" : "day";
+	})();
+
+	return mode || "day";
 }
 
 export function setTheme(value) {
