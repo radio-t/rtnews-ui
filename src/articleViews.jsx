@@ -79,7 +79,7 @@ function Draggable(Component) {
 				this.ref.draggable = this.props.draggable;
 			});
 			this.handle.addEventListener("mouseleave", () => {
-				this.ref.draggable = this.props.draggable;
+				this.ref.draggable = false;
 			});
 
 			this.onHandleTouchStart = this.onHandleTouchStart.bind(this);

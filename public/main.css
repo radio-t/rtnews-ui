@@ -691,11 +691,15 @@ p {
     font-size: 2rem;
     padding: 0.5rem;
     color: rgba(0, 0, 0, 0.2);
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(0, 0, 0, 0.08);
     cursor: default;
     flex: 0; }
     .post__full-content-hide:hover {
       background: rgba(0, 0, 0, 0.06); }
+  .post__full-content-hide-button {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0.3em; }
 
 /* full-post */
 .full-post__title {
@@ -716,7 +720,7 @@ p {
   position: relative;
   box-sizing: border-box;
   max-width: 100%;
-  overflow: scroll; }
+  overflow-y: scroll; }
   .article-content img {
     max-width: 100%;
     object-fit: scale-down; }
