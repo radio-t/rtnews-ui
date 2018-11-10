@@ -296,6 +296,10 @@ export function loginViaCookies() {
 		.then(x => {
 			if (!x) logout();
 			return x;
+		})
+		.catch(e => {
+			logout();
+			return false;
 		});
 }
 
