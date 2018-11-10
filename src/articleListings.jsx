@@ -85,9 +85,12 @@ function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
 						await new Promise(resolve => {
 							requestIdleCallback(
 								() => {
-									this.update(true)
+									this.update()
 										.then(resolve)
-										.catch(resolve);
+										.catch(e => {
+											console.error(e);
+											resolve();
+										});
 								},
 								{
 									timeout: 30000,
@@ -95,7 +98,11 @@ function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
 							);
 						});
 					} else {
-						await this.update();
+						try {
+							await this.update();
+						} catch (e) {
+							console.error(e);
+						}
 					}
 				}
 			}, 30000);
@@ -345,7 +352,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 							style={{ display: this.state.addFormExpanded ? null : "none" }}
 							onAdd={() => {
 								sleep(1000).then(() => {
-									this.update();
+									this.update(true);
 								});
 							}}
 						/>
