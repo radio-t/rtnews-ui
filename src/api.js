@@ -298,6 +298,8 @@ export function loginViaCookies() {
 			return x;
 		})
 		.catch(e => {
+			if (e instanceof TypeError && e.message === "cancelled") return false;
+
 			logout();
 			return false;
 		});
