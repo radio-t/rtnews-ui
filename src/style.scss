@@ -246,6 +246,11 @@ p {
 
 	&__item-link {
 		color: #000;
+
+		&--geek {
+			color: hsla(200, 60%, 50%, 1);
+			border-bottom-color: hsla(200, 40%, 50%, 0.4);
+		}
 	}
 
 	&__item-current {
@@ -302,6 +307,7 @@ p {
 	&__geek-indicator-svg {
 		vertical-align: -0.05em;
 		margin-left: -0.15em;
+		margin-right: 0.1em;
 		color: hsla(200, 60%, 60%, 1);
 		fill: hsla(200, 60%, 60%, 1);
 		stroke: hsla(200, 60%, 60%, 1);
@@ -943,11 +949,17 @@ p {
 	&__title-link {
 		color: #000;
 		border-bottom-color: rgba(0, 0, 0, 0.1);
+
+		&--geek {
+			color: hsla(200, 60%, 50%, 1);
+			border-bottom-color: hsla(200, 40%, 50%, 0.4);
+		}
 	}
 
 	&__title-geek-icon-svg {
 		vertical-align: -0.05em;
 		margin-left: -0.15em;
+		margin-right: 0.1em;
 		width: 1em;
 		height: 1em;
 		color: hsla(200, 60%, 60%, 1);
@@ -1153,6 +1165,11 @@ html[data-theme="night"] {
 
 	.sorter__item-link {
 		color: #ddd;
+
+		&--geek {
+			color: hsla(200, 60%, 60%, 1);
+			border-bottom-color: hsla(200, 60%, 60%, 0.5);
+		}
 	}
 
 	.sorter__comments-link {
@@ -1250,6 +1267,11 @@ html[data-theme="night"] {
 	.post__title-link {
 		color: #ddd;
 		border-bottom-color: rgba(255, 255, 255, 0.4);
+
+		&--geek {
+			color: hsla(200, 60%, 60%, 1);
+			border-bottom-color: hsla(200, 60%, 60%, 0.4);
+		}
 	}
 
 	.post__full-content {

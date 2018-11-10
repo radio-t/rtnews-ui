@@ -412,7 +412,7 @@ class ArticleBriefBasic extends React.Component {
 						style={{ backgroundImage: `url(${this.props.article.pic})` }}
 					/>
 				)}
-				<h3 className="title post__title">
+				<h3 className="title post__title ">
 					{this.props.article.geek && (
 						<SVGInline
 							className="icon post__title-geek-icon"
@@ -421,7 +421,10 @@ class ArticleBriefBasic extends React.Component {
 						/>
 					)}
 					<Link
-						className="post__title-link"
+						className={
+							"post__title-link " +
+							(this.props.article.geek ? "post__title-link--geek" : "")
+						}
 						to={`${postsPrefix}/${this.props.article.slug}`}
 					>
 						{this.props.article.title || (
@@ -495,12 +498,15 @@ class ArticleBriefBasic extends React.Component {
 								<div
 									className="post__full-content-hide"
 									onClick={() => {
-										if (this.detailedRef)
-											this.detailedRef.scrollIntoView({ block: "start" });
+										if (this.ref)
+											this.ref.scrollIntoView({
+												block: "start",
+												behavior: "smooth",
+											});
 										this.setState({ detailedExpanded: false });
 									}}
 								>
-									×
+									^
 								</div>
 							</div>
 						)),
@@ -559,7 +565,10 @@ export class ArticleSortBasic extends React.Component {
 						)}
 						<Link
 							to={`${postsPrefix}/${this.props.article.slug}`}
-							className="sorter__item-link"
+							className={
+								"sorter__item-link " +
+								(this.props.article.geek ? "sorter__item-link--geek" : "")
+							}
 						>
 							{this.props.article.title.trim()}
 						</Link>

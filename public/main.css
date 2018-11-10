@@ -183,6 +183,9 @@ p {
       margin-left: -0.5rem; } }
   .sorter__item-link {
     color: #000; }
+    .sorter__item-link--geek {
+      color: #3399cc;
+      border-bottom-color: rgba(77, 145, 179, 0.4); }
   .sorter__item-current {
     background-color: rgba(252, 237, 207, 0.7); }
   .sorter__item-controls {
@@ -214,6 +217,7 @@ p {
   .sorter__geek-indicator-svg {
     vertical-align: -0.05em;
     margin-left: -0.15em;
+    margin-right: 0.1em;
     color: #5cadd6;
     fill: #5cadd6;
     stroke: #5cadd6;
@@ -625,9 +629,13 @@ p {
   .post__title-link {
     color: #000;
     border-bottom-color: rgba(0, 0, 0, 0.1); }
+    .post__title-link--geek {
+      color: #3399cc;
+      border-bottom-color: rgba(77, 145, 179, 0.4); }
   .post__title-geek-icon-svg {
     vertical-align: -0.05em;
     margin-left: -0.15em;
+    margin-right: 0.1em;
     width: 1em;
     height: 1em;
     color: #5cadd6;
@@ -781,6 +789,9 @@ html[data-theme="night"] {
     border-bottom: 1px solid rgba(255, 255, 255, 0.27); }
   html[data-theme="night"] .sorter__item-link {
     color: #ddd; }
+    html[data-theme="night"] .sorter__item-link--geek {
+      color: #5cadd6;
+      border-bottom-color: rgba(92, 173, 214, 0.5); }
   html[data-theme="night"] .sorter__comments-link {
     opacity: 0.7;
     fill: rgba(255, 255, 255, 0.8); }
@@ -829,6 +840,9 @@ html[data-theme="night"] {
   html[data-theme="night"] .post__title-link {
     color: #ddd;
     border-bottom-color: rgba(255, 255, 255, 0.4); }
+    html[data-theme="night"] .post__title-link--geek {
+      color: #5cadd6;
+      border-bottom-color: rgba(92, 173, 214, 0.4); }
   html[data-theme="night"] .post__full-content {
     background: rgba(255, 255, 255, 0.23); }
   html[data-theme="night"] .post__full-content-hide {
