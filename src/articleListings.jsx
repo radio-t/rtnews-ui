@@ -12,9 +12,6 @@ import {
 	newsAutoUpdateInterval,
 } from "./settings.js";
 import {
-	getNews,
-	getArchiveNews,
-	getDeletedNews,
 	getRecentness,
 	setRecentness,
 	getPostLevel,
@@ -33,6 +30,7 @@ import {
 	moveArticle,
 } from "./api.js";
 import { setState, addNotification, removeNotification } from "./store.jsx";
+import articleCache from "./articleCache.js";
 
 import { ArticleBrief, ArticleSort } from "./articleViews.jsx";
 import ListingActions from "./listingActions.jsx";
@@ -159,6 +157,7 @@ class BaseListing extends React.Component {
 						return n;
 					});
 					this.setState({ news: updatedArticles });
+					articleCache.invalidate("common");
 				}
 				break;
 			case "make-current":
@@ -168,7 +167,8 @@ class BaseListing extends React.Component {
 					async () => await activateArticle(article.id),
 					"active-article"
 				);
-				this.update && (await this.update());
+				this.update && (await this.update(true));
+				articleCache.invalidate("common");
 				break;
 			case "make-geek":
 				this.updateArticle(article, { geek: true });
@@ -176,6 +176,7 @@ class BaseListing extends React.Component {
 					"делаю тему гиковской",
 					async () => await makeArticleGeek(article.id)
 				);
+				articleCache.invalidate("common");
 				break;
 			case "make-ungeek":
 				this.updateArticle(article, { geek: false });
@@ -183,6 +184,7 @@ class BaseListing extends React.Component {
 					"делаю тему негиковской",
 					async () => await makeArticleNotGeek(article.id)
 				);
+				articleCache.invalidate("common");
 				break;
 			case "archive":
 				this.updateArticle(article, REMOVE_CHANGE);
@@ -191,11 +193,15 @@ class BaseListing extends React.Component {
 					"убираю в архив",
 					async () => await archiveArticle(article.id)
 				);
+				articleCache.invalidate("common");
+				articleCache.invalidate("archive");
 				break;
 			case "remove":
 				this.updateArticle(article, REMOVE_CHANGE);
 				if (article.id === this.props.activeId) setState({ activeId: null });
 				await en("удаляю", async () => await removeArticle(article.id));
+				articleCache.invalidate("common");
+				articleCache.invalidate("deleted");
 				break;
 			case "restore":
 				this.updateArticle(article, REMOVE_CHANGE);
@@ -203,6 +209,8 @@ class BaseListing extends React.Component {
 					"восстанавливаю",
 					async () => await restoreArticle(article.id)
 				);
+				articleCache.invalidate("deleted");
+				articleCache.invalidate("common");
 				break;
 			case "move":
 				const target = first(this.state.news, a => a.id === data.id);
@@ -215,6 +223,7 @@ class BaseListing extends React.Component {
 					return n;
 				});
 				this.setState({ news: updatedArticles });
+				articleCache.invalidate("common");
 				break;
 			default:
 				console.error("unknown action");
@@ -244,8 +253,8 @@ export class Listing extends BaseListing {
 	async componentWillMount() {
 		this.update();
 	}
-	async update() {
-		const news = await getNews();
+	async update(force = false) {
+		const news = await articleCache.get("common", force);
 		this.setState({ news, loaded: true });
 	}
 	render() {
@@ -389,8 +398,8 @@ export class ArchiveListing extends BaseListing {
 	async componentWillMount() {
 		this.update();
 	}
-	async update() {
-		const news = await getArchiveNews();
+	async update(force = false) {
+		const news = await articleCache.get("archive", force);
 		this.setState({ news, loaded: true });
 	}
 	render() {
@@ -445,8 +454,8 @@ export class DeletedListing extends BaseListing {
 	componentWillMount() {
 		this.update();
 	}
-	async update() {
-		const news = (await getDeletedNews()).sort((a, b) => {
+	async update(force = false) {
+		const news = (await articleCache.get("deleted", force)).sort((a, b) => {
 			if (a.ats === b.ats) return 0;
 			return a.parsedats > b.parsedats ? -1 : 1;
 		});
@@ -487,8 +496,8 @@ export class Sorter extends BaseListing {
 	componentWillMount() {
 		this.update();
 	}
-	update() {
-		getNews().then(news => {
+	update(force = false) {
+		articleCache.get("common", force).then(news => {
 			this.setState({ news, loaded: true });
 		});
 	}

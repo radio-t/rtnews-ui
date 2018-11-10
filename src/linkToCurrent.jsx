@@ -16,7 +16,7 @@ const onMissingArticle = () => {
 					<span
 						class="pseudo"
 						onClick={async e => {
-							window[listingRef] && (await window[listingRef].update());
+							window[listingRef] && (await window[listingRef].update(true));
 							r();
 							const el = document.getElementById("active-article");
 							if (el) {

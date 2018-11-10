@@ -11,6 +11,14 @@ export const postsPrefix = "/news";
 export const newsAutoUpdateInterval = 10;
 
 /**
+ * news cache interval in minutes. Used between
+ * history transition (back/forward in browser)
+ *
+ * null if off
+ */
+export const newsCacheValidInterval = 5;
+
+/**
  * needs for situation when dragging something
  * near window border, so have add scroll manually
  */
