@@ -13,6 +13,7 @@ import {
 	addNotification,
 	setTheme as commitTheme,
 } from "./store.jsx";
+import { postsPrefix } from "./settings.js";
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent.jsx";
@@ -158,7 +159,7 @@ export default class Head extends React.Component {
 						</li>
 					)}
 					<Route
-						path="/news/:slug"
+						path={`${postsPrefix}/:slug`}
 						render={() => (
 							<li className="navigation__item navigation__item_to-comments">
 								<Link

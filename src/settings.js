@@ -1,7 +1,7 @@
 // via webpack define plugin
 export const apiRoot = APIROOT;
 
-export const postsPrefix = "/news";
+export const postsPrefix = "/post";
 
 export const remark = {
 	baseurl: "https://remark42.radio-t.com",

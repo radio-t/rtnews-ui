@@ -4,6 +4,7 @@ import "./ganalitics.js";
 
 import React from "react";
 
+import { postsPrefix } from "./settings.js";
 import { render } from "react-dom";
 import {
 	store,
@@ -84,7 +85,7 @@ class App extends React.Component {
 							/>
 							<Route path="/sort/" render={() => <Sorter {...this.props} />} />
 							<Route
-								path="/news/:slug"
+								path={`${postsPrefix}/:slug`}
 								render={props => <Article slug={props.match.params.slug} />}
 							/>
 							<Route path="/login/" exact={true} render={() => <LoginForm />} />
