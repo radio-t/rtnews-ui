@@ -47,48 +47,50 @@ class App extends React.Component {
 			<Router>
 				<div className="page">
 					<Head {...this.props} />
-					<Switch>
-						<Route
-							path="/"
-							exact={true}
-							render={() => (
-								<Listing
-									{...this.props}
-									ref={ref => (window[listingRef] = ref)}
-								/>
-							)}
-						/>
-						<Route
-							path="/deleted/"
-							exact={true}
-							render={() => <DeletedListing {...this.props} />}
-						/>
-						<Route
-							path="/archive/"
-							exact={true}
-							render={() => <ArchiveListing {...this.props} />}
-						/>
-						<Route
-							path="/add/"
-							exact={true}
-							render={() => {
-								document.title = "Добавить новость | Новости Радио-Т";
-								return <AddArticle {...this.props} />;
-							}}
-						/>
-						<Route
-							path="/feeds/"
-							exact={true}
-							render={() => <Feeds {...this.props} />}
-						/>
-						<Route path="/sort/" render={() => <Sorter {...this.props} />} />
-						<Route
-							path="/news/:slug"
-							render={props => <Article slug={props.match.params.slug} />}
-						/>
-						<Route path="/login/" exact={true} render={() => <LoginForm />} />
-						<Route component={NotFound} />
-					</Switch>
+					<div class="content page__content">
+						<Switch>
+							<Route
+								path="/"
+								exact={true}
+								render={() => (
+									<Listing
+										{...this.props}
+										ref={ref => (window[listingRef] = ref)}
+									/>
+								)}
+							/>
+							<Route
+								path="/deleted/"
+								exact={true}
+								render={() => <DeletedListing {...this.props} />}
+							/>
+							<Route
+								path="/archive/"
+								exact={true}
+								render={() => <ArchiveListing {...this.props} />}
+							/>
+							<Route
+								path="/add/"
+								exact={true}
+								render={() => {
+									document.title = "Добавить новость | Новости Радио-Т";
+									return <AddArticle {...this.props} />;
+								}}
+							/>
+							<Route
+								path="/feeds/"
+								exact={true}
+								render={() => <Feeds {...this.props} />}
+							/>
+							<Route path="/sort/" render={() => <Sorter {...this.props} />} />
+							<Route
+								path="/news/:slug"
+								render={props => <Article slug={props.match.params.slug} />}
+							/>
+							<Route path="/login/" exact={true} render={() => <LoginForm />} />
+							<Route component={NotFound} />
+						</Switch>
+					</div>
 					<div className="footer page__footer">
 						<hr />
 						<a href="http://radio-t.com/">Radio-T</a>,{" "}

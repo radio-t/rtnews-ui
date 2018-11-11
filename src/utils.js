@@ -53,6 +53,15 @@ export async function waitDOMReady() {
 	}
 }
 
+export async function retry(fn, retries = 3) {
+	for (let i = 0; i < retries; i++) {
+		try {
+			return await fn();
+		} catch (e) {}
+	}
+	throw new Error("Retry failed");
+}
+
 export async function waitFor(fn, max = null) {
 	const timestamp = new Date().getTime();
 	while (true) {
@@ -109,4 +118,26 @@ export const scrollIntoView = (() => {
 			}
 		};
 	}
+})();
+
+export function debounce(fn, wait = 100, immediate = false) {
+	let timeout;
+	return function(...args) {
+		const later = () => {
+			timeout = null;
+			if (!immediate) fn.apply(this, args);
+		};
+		const callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) fn.apply(this, args);
+	};
+}
+
+export const requestIdleCallback = (() => {
+	if ("requestIdleCallback" in window) return window.requestIdleCallback;
+	return fn => {
+		fn();
+		return 0;
+	};
 })();

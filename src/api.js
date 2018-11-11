@@ -4,8 +4,9 @@ import {
 	archiveSortings,
 	postRecentness,
 	postLevels,
+	remark as RemarkConfig,
 } from "./settings.js";
-import { first } from "./utils.js";
+import { first, retry, debounce } from "./utils.js";
 
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;
@@ -294,21 +295,16 @@ export function loginViaCookies() {
 	const headers = new Headers();
 	const auth = cookies.auth;
 	headers.append("Authorization", "Basic " + auth);
-	return fetch(apiRoot + "/news/reload", {
-		method: "PUT",
-		headers: headers,
-		credentials: "omit",
-		mode: "cors",
-	})
-		.then(response => response.status === 200)
-		.then(x => {
-			if (!x) logout();
-			return x;
+	return retry(() =>
+		fetch(apiRoot + "/news/reload", {
+			method: "PUT",
+			headers: headers,
+			credentials: "omit",
+			mode: "cors",
 		})
+	)
+		.then(response => response.status === 200)
 		.catch(e => {
-			if (e instanceof TypeError && e.message === "cancelled") return false;
-
-			logout();
 			return false;
 		});
 }
@@ -316,3 +312,64 @@ export function loginViaCookies() {
 export function logout() {
 	document.cookie = "auth=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/";
 }
+
+/**
+ * Performs cumulative get of comment counts
+ * by debouncing execution by 100ms
+ *
+ * @param {String} url
+ * @returns {Promise} promise with response object
+ */
+export const getRemarkCommentsCount = (() => {
+	let tasksMap = new Map();
+	const worker = debounce(async () => {
+		const urls = Array.from(tasksMap.keys());
+		if (urls.length === 0) return;
+		const tasksMapSlice = tasksMap;
+		tasksMap = new Map();
+		try {
+			const data = await fetch(
+				`${RemarkConfig.baseurl}/api/v1/counts?site=${encodeURIComponent(
+					RemarkConfig.site_id
+				)}`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(urls),
+				}
+			).then(resp => resp.json());
+			for (let item of data) {
+				const task = tasksMapSlice.get(item.url);
+				if (!task) continue;
+				tasksMapSlice.delete(item.url);
+				task.onGet(item);
+			}
+			for (let orphan of tasksMapSlice.keys()) {
+				const task = tasksMapSlice.get(orphan);
+				if (!task) continue;
+				task.onReject(new Error("URL wasn't found in response"));
+			}
+		} catch (e) {
+			for (let item of tasksMapSlice.keys()) {
+				const task = tasksMapSlice.get(item);
+				task.onReject(e);
+			}
+		}
+	}, 100);
+	return url => {
+		return new Promise((resolve, reject) => {
+			const task = {
+				onGet: data => {
+					resolve(data);
+				},
+				onReject: e => {
+					reject(e);
+				},
+			};
+			tasksMap.set(url, task);
+			worker();
+		});
+	};
+})();

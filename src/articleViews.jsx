@@ -495,8 +495,10 @@ class ArticleBriefBasic extends React.Component {
 								<div
 									className="post__full-content-hide"
 									onClick={() => {
-										if (this.ref)
-											scrollIntoView(this.ref);
+										if (this.ref) {
+											const rect = this.ref.getBoundingClientRect();
+											if (rect.y < 0) scrollIntoView(this.ref);
+										}
 										this.setState({ detailedExpanded: false });
 									}}
 									title="К заголовку"

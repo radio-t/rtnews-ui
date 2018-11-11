@@ -3,6 +3,11 @@ export const apiRoot = APIROOT;
 
 export const postsPrefix = "/news";
 
+export const remark = {
+	baseurl: "https://remark42.radio-t.com",
+	site_id: "rtnews",
+};
+
 /**
  * news update interval in minutes
  *

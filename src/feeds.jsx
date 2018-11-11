@@ -14,16 +14,32 @@ export default class FeedsForm extends React.PureComponent {
 			loaded: false,
 			posting: false,
 			feedurl: "",
+			error: null,
 		};
-		getFeeds().then(feeds => {
-			this.setState({ feeds, loaded: true });
-		});
+		getFeeds()
+			.then(feeds => {
+				this.setState({ feeds, loaded: true });
+			})
+			.catch(error => {
+				this.setState({ error });
+			});
 	}
 	componentWillMount() {
 		document.title = "Управление фидами | Новости Радио-Т";
 	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
+		if (this.state.error)
+			return (
+				<Error
+					code={this.state.error.status || 500}
+					message={
+						this.state.error.statusText ||
+						this.state.error.message ||
+						"Произошла ошибка"
+					}
+				/>
+			);
 		if (!this.state.loaded) return <Loading />;
 		return (
 			<div className="feeds">

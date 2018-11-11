@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import { sleep, first } from "./utils.js";
+import { sleep, first, requestIdleCallback } from "./utils.js";
 import {
 	archiveSortings,
 	postRecentness,
@@ -31,6 +31,7 @@ import {
 } from "./api.js";
 import { setState, addNotification, removeNotification } from "./store.jsx";
 import articleCache from "./articleCache.js";
+import Error from "./error.jsx";
 
 import {
 	ArticleBrief,
@@ -81,29 +82,21 @@ function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
 			this.updateInterval = setInterval(async () => {
 				let stamp = new Date().getTime();
 				if (stamp - this.updateTimestamp > updateInterval * 60000) {
-					if (window.requestIdleCallback) {
-						await new Promise(resolve => {
-							requestIdleCallback(
-								() => {
-									this.update()
-										.then(resolve)
-										.catch(e => {
-											console.error(e);
-											resolve();
-										});
-								},
-								{
-									timeout: 30000,
-								}
-							);
-						});
-					} else {
-						try {
-							await this.update();
-						} catch (e) {
-							console.error(e);
-						}
-					}
+					await new Promise(resolve => {
+						requestIdleCallback(
+							() => {
+								this.update()
+									.then(resolve)
+									.catch(e => {
+										console.error(e);
+										resolve();
+									});
+							},
+							{
+								timeout: 30000,
+							}
+						);
+					});
 				}
 			}, 30000);
 		}
@@ -137,6 +130,22 @@ class BaseListing extends React.Component {
 
 		this.updateArticle = this.updateArticle.bind(this);
 		this.onArticleChange = this.onArticleChange.bind(this);
+		this.dataProvider = () => [];
+	}
+	async update(force = false) {
+		try {
+			const news = await this.dataProvider(force);
+			this.setState({ news, loaded: true });
+		} catch (e) {
+			if (force || !this.state.loaded) {
+				this.setState({ error: e });
+			} else {
+				addNotification({
+					data: "Произошла ошибка при обновлении новостей",
+					time: 10000,
+				});
+			}
+		}
 	}
 	updateArticle(article, change) {
 		const articleIndex = this.state.news.indexOf(article);
@@ -265,9 +274,11 @@ export class Listing extends BaseListingWithAutoUpdate {
 			postLevel: getPostLevel(),
 			sort: getSorting(),
 			loaded: false,
+			error: null,
 			news: [],
 			addFormExpanded: false,
 		};
+		this.dataProvider = force => articleCache.get("common", force);
 	}
 	componentDidMount() {
 		super.componentDidMount && super.componentDidMount();
@@ -277,11 +288,19 @@ export class Listing extends BaseListingWithAutoUpdate {
 		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
-	async update(force = false) {
-		const news = await articleCache.get("common", force);
-		this.setState({ news, loaded: true });
-	}
 	render() {
+		if (this.state.error)
+			return (
+				<Error
+					code={this.state.error.status || 500}
+					message={
+						this.state.error.statusText ||
+						this.state.error.message ||
+						"Произошла ошибка"
+					}
+				/>
+			);
+
 		if (!this.state.loaded) return <Loading />;
 
 		const sortIsDefault =
@@ -423,7 +442,9 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 			sort: getArchiveSorting(),
 			news: [],
 			loaded: false,
+			error: null,
 		};
+		this.dataProvider = force => articleCache.get("archive", force);
 	}
 	componentDidMount() {
 		super.componentDidMount && super.componentDidMount();
@@ -433,11 +454,18 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
-	async update(force = false) {
-		const news = await articleCache.get("archive", force);
-		this.setState({ news, loaded: true });
-	}
 	render() {
+		if (this.state.error)
+			return (
+				<Error
+					code={this.state.error.status || 500}
+					message={
+						this.state.error.statusText ||
+						this.state.error.message ||
+						"Произошла ошибка"
+					}
+				/>
+			);
 		if (!this.state.loaded) return <Loading />;
 		return (
 			<>
@@ -481,7 +509,13 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 			sort: getArchiveSorting(),
 			news: [],
 			loaded: false,
+			error: null,
 		};
+		this.dataProvider = async force =>
+			(await articleCache.get("deleted", force)).sort((a, b) => {
+				if (a.ats === b.ats) return 0;
+				return a.parsedats > b.parsedats ? -1 : 1;
+			});
 	}
 	componentDidMount() {
 		super.componentDidMount && super.componentDidMount();
@@ -491,15 +525,19 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
-	async update(force = false) {
-		const news = (await articleCache.get("deleted", force)).sort((a, b) => {
-			if (a.ats === b.ats) return 0;
-			return a.parsedats > b.parsedats ? -1 : 1;
-		});
-		this.setState({ news, loaded: true });
-	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
+		if (this.state.error)
+			return (
+				<Error
+					code={this.state.error.status || 500}
+					message={
+						this.state.error.statusText ||
+						this.state.error.message ||
+						"Произошла ошибка"
+					}
+				/>
+			);
 		if (!this.state.loaded) return <Loading />;
 		return (
 			<div className="news deleted-news page__news">
@@ -525,7 +563,9 @@ export class Sorter extends BaseListingWithAutoUpdate {
 		this.state = {
 			news: [],
 			loaded: false,
+			error: null,
 		};
+		this.dataProvider = force => articleCache.get("common", force);
 	}
 	componentDidMount() {
 		super.componentDidMount && super.componentDidMount();
@@ -535,13 +575,19 @@ export class Sorter extends BaseListingWithAutoUpdate {
 		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
-	update(force = false) {
-		articleCache.get("common", force).then(news => {
-			this.setState({ news, loaded: true });
-		});
-	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
+		if (this.state.error)
+			return (
+				<Error
+					code={this.state.error.status || 500}
+					message={
+						this.state.error.statusText ||
+						this.state.error.message ||
+						"Произошла ошибка"
+					}
+				/>
+			);
 		if (!this.state.loaded) return <Loading />;
 		return (
 			<div className="sorter">

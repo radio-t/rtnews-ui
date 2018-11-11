@@ -2,6 +2,7 @@ import React from "react";
 
 import { formatDate, scrollIntoView } from "./utils.js";
 import { getArticle } from "./api.js";
+import { remark } from "./settings.js";
 
 import Remark from "./remark.jsx";
 import Loading from "./loading.jsx";
@@ -79,9 +80,7 @@ export default class Article extends React.PureComponent {
 				<Remark
 					className="full-post__comments"
 					id="to-comments"
-					config={{
-						site_id: "rtnews",
-					}}
+					config={remark}
 				/>
 			</article>
 		);

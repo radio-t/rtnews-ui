@@ -4,11 +4,14 @@ export default class Loading extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			numberOfDots: 4,
+			numberOfDots: (props.numberOfDots || 3) - 1,
 		};
 		this.interval = setInterval(() => {
 			this.setState(state => {
-				return { numberOfDots: (state.numberOfDots + 1) % 7 };
+				return {
+					numberOfDots:
+						(state.numberOfDots + 1) % (this.props.numberOfDots || 3),
+				};
 			});
 		}, 500);
 	}

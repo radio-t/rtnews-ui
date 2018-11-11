@@ -12,7 +12,7 @@ export default class Remark extends React.Component {
 
 		const BASE_URL = this.props.baseurl || "https://remark42.radio-t.com";
 
-		const remark_config = this.props.config;
+		const remark_config = { ...this.props.config };
 
 		if (!remark_config.site_id) {
 			console.error("Remark42: Site ID is undefined.");
@@ -221,8 +221,8 @@ export default class Remark extends React.Component {
 				document.removeEventListener("keydown", this.onKeyDown);
 			},
 			delay: null,
-			events: ["", "webkit", "moz", "MS", "o"].map(
-				prefix => (prefix ? `${prefix}TransitionEnd` : "transitionend")
+			events: ["", "webkit", "moz", "MS", "o"].map(prefix =>
+				prefix ? `${prefix}TransitionEnd` : "transitionend"
 			),
 			onAnimationClose() {
 				const el = this.node;
