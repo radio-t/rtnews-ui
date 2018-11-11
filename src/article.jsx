@@ -9,13 +9,14 @@ import Loading from "./loading.jsx";
 import SVGInline from "react-svg-inline";
 import GearIcon from "./static/svg/gear.svg";
 import NotFound from "./notFound.jsx";
+import Error from "./error.jsx";
 
 export default class Article extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
 			article: null,
-			error: false,
+			error: null,
 		};
 	}
 	componentDidMount() {
@@ -24,8 +25,8 @@ export default class Article extends React.PureComponent {
 				document.title = article.title + "| Новости Радио-Т";
 				this.setState({ article });
 			})
-			.catch(e => {
-				this.setState({ error: true });
+			.catch(error => {
+				this.setState({ error });
 			});
 
 		setTimeout(() => {
@@ -38,7 +39,23 @@ export default class Article extends React.PureComponent {
 		}, 200);
 	}
 	render() {
-		if (this.state.error) return <NotFound />;
+		if (
+			this.state.error &&
+			this.state.error.status &&
+			this.state.error.status === 404
+		)
+			return <NotFound />;
+		if (this.state.error)
+			return (
+				<Error
+					code={this.state.error.status || 500}
+					message={
+						this.state.error.statusText ||
+						this.state.error.message ||
+						"Произошла ошибка"
+					}
+				/>
+			);
 		if (this.state.article === null) return <Loading />;
 		return (
 			<article className="full-post">

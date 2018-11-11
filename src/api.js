@@ -66,9 +66,7 @@ function request(endpoint, options = {}) {
 			options
 		)
 	).then(req => {
-		if (req.status >= 400) {
-			throw req.statusText;
-		}
+		if (req.status >= 400) throw req;
 		return req.json().catch(e => null);
 	});
 }

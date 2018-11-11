@@ -5,6 +5,7 @@ import { formatDate, sleep } from "./utils.js";
 import { Redirect } from "react-router-dom";
 
 import Loading from "./loading.jsx";
+import Error from "./error.jsx";
 
 export default class FeedsForm extends React.PureComponent {
 	constructor(props) {
