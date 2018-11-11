@@ -4,7 +4,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-addr = "127.0.0.1"
+addr = "0.0.0.0"
 port = 9000
 
 os.chdir(os.path.join(dir_path, "public"))

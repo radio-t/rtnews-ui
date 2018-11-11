@@ -4,6 +4,8 @@
 
 ----
 ### Разработка
+Таски описаны в `makefile`
+
 #### Build
 ```
 # modes are: production|development
@@ -17,7 +19,11 @@ npm install && ./node_modules/.bin/webpack --mode "development"
 ./node_modules/.bin/webpack-dev-server --mode "development"
 ```
 
-Tакже есть makefile
+#### С помощью Docker
+В makefile продублированы команды для docker
+
+#### ENVIRONMENT
+**RTHOST**: Ссылка на api. По умолчанию используется `https://news.radio-t.com/api/v1` для продакшна и `http://jess.umputun.com:8780/api/v1` для дева
 
 ----
 ### Feeds API

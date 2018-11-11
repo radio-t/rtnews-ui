@@ -1,18 +1,22 @@
-FROM node:4.2.3
+FROM node:10-alpine AS rtnews_deps
 
-ADD . /srv/rtnews-ui
+COPY ./package.json ./package-lock.json /app/
 
 RUN \
-	cd /srv/rtnews-ui && \
-	npm i && \
-	make build && \
-	mkdir -p /var/www && \
-	mv ./public /var/www/webapp && \
-	mv /srv/rtnews-ui/dockerinit.sh /init.sh && \
-	chmod +x /init.sh
+	cd /app && \
+	npm i --loglevel error
 
-VOLUME ["/var/www/webapp"]
 
-ENTRYPOINT ["/init.sh"]
+FROM node:10-alpine
 
-CMD ["sleep", "100"]
+COPY --from=rtnews_deps /app /app
+
+RUN \
+	cd /app && \
+	apk add --update make && \
+	npm i --loglevel error
+
+EXPOSE 9000
+
+WORKDIR /app
+ENTRYPOINT ["/bin/ash"]

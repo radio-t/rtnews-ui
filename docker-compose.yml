@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+    builder:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: "rtnews/builder"
+        container_name: "rtnews_builder"
+        environment:
+            # target of build, if not specified will be
+            # "https://news.radio-t.com/api/v1" for production
+            # and "http://jess.umputun.com:8780/api/v1"
+            # for development
+            - RTHOST
+        ports:
+            - "9000:9000"
+        volumes:
+            - ./src:/app/src:ro
+            - ./makefile:/app/makefile:ro
+            - ./webpack.config.js:/app/webpack.config.js:ro
+            - ./package.json:/app/package.json
+            - ./package-lock.json:/app/package-lock.json
+            - ./public:/app/public
