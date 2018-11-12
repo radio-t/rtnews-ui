@@ -47,7 +47,7 @@ function UpdateOnlyIfVisible(Component) {
 			observer.observe(this.ref);
 		}
 		componentWillUnmount() {
-			super.componentDidUnmount && super.componentWillUnmount();
+			super.componentWillUnmount && super.componentWillUnmount();
 			observer.unobserve(this.ref);
 		}
 		render() {
@@ -75,12 +75,10 @@ function Draggable(Component) {
 			super.componentDidMount && super.componentDidMount();
 			if (!(this.handle && this.ref)) return;
 
-			this.handle.addEventListener("mouseenter", () => {
-				this.ref.draggable = this.props.draggable;
-			});
-			this.handle.addEventListener("mouseleave", () => {
-				this.ref.draggable = false;
-			});
+			this.onHandleMouseEnter = this.onHandleMouseEnter.bind(this);
+			this.handle.addEventListener("mouseenter", this.onHandleMouseEnter);
+			this.onHandleMouseLeave = this.onHandleMouseLeave.bind(this);
+			this.handle.addEventListener("mouseleave", this.onHandleMouseLeave);
 
 			this.onHandleTouchStart = this.onHandleTouchStart.bind(this);
 			this.handle.addEventListener("touchstart", this.onHandleTouchStart);
@@ -114,27 +112,39 @@ function Draggable(Component) {
 		}
 		componentWillUnmount() {
 			super.componentWillUnmount && super.componentWillUnmount();
-			if (!this.props.isAdmin) return;
+			if (this.ref) {
+				this.ref.removeEventListener(eventIdentifier, this.onTouchDrag);
+				this.ref.removeEventListener(
+					`${eventIdentifier}Leave`,
+					this.onTouchDragLeave
+				);
+				this.ref.removeEventListener(
+					`${eventIdentifier}End`,
+					this.onTouchDragEnd
+				);
 
-			this.ref.removeEventListener(eventIdentifier, this.onTouchDrag);
-			this.ref.removeEventListener(
-				`${eventIdentifier}Leave`,
-				this.onTouchDragLeave
-			);
-			this.ref.removeEventListener(
-				`${eventIdentifier}End`,
-				this.onTouchDragEnd
-			);
+				this.ref.removeEventListener("drop", this.onDrop);
+				this.ref.removeEventListener("drag", this.onDrag);
+				this.ref.removeEventListener("dragstart", this.onDragStart);
+				this.ref.removeEventListener("dragover", this.onDragOver);
+				this.ref.removeEventListener("dragleave", this.onDragLeave);
+				this.ref.removeEventListener("dragend", this.onDragEnd);
+			}
 
-			this.handle.removeEventListener("touchend", this.onHandleTouchEnd);
-			this.handle.removeEventListener("touchmove", this.onHandleTouchMove);
-			this.handle.removeEventListener("touchstart", this.onHandleTouchStart);
+			if (this.handle) {
+				this.handle.removeEventListener("touchend", this.onHandleTouchEnd);
+				this.handle.removeEventListener("touchmove", this.onHandleTouchMove);
+				this.handle.removeEventListener("touchstart", this.onHandleTouchStart);
 
-			this.ref.removeEventListener("drag", this.onDrag);
-			this.ref.removeEventListener("dragstart", this.onDragStart);
-			this.ref.removeEventListener("dragover", this.onDragOver);
-			this.ref.removeEventListener("dragleave", this.onDragLeave);
-			this.ref.removeEventListener("dragend", this.onDragEnd);
+				this.handle.removeEventListener("mouseenter", this.onHandleMouseEnter);
+				this.handle.removeEventListener("mouseleave", this.onHandleMouseLeave);
+			}
+		}
+		onHandleMouseEnter(e) {
+			this.ref.draggable = this.props.draggable;
+		}
+		onHandleMouseLeave(e) {
+			this.ref.draggable = false;
 		}
 		onTouchDrag(e) {
 			const rect = this.ref.getBoundingClientRect();
