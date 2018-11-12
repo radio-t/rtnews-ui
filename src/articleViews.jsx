@@ -273,6 +273,7 @@ function Draggable(Component) {
 		}
 
 		onDragStart(e) {
+			if (!this.ref.draggable) return;
 			this.ref.classList.add("drop-item");
 			this.setState({ detailedExpanded: false });
 			e.dataTransfer.setData(
