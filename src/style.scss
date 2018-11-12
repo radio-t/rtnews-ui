@@ -95,7 +95,7 @@ p {
 	}
 
 	&__item {
-		padding: 0.2em 0.4em;
+		padding: 0.2em 0.5em;
 
 		&:hover,
 		&--selected {
@@ -718,7 +718,7 @@ p {
 		padding: 0.2rem 0.4rem;
 		border-radius: 0.2em;
 		text-transform: lowercase;
-		margin-right: 0.4em;
+		margin: 0 0.4rem 0 0;
 
 		&:focus,
 		&::-moz-focus-inner {
@@ -746,7 +746,7 @@ p {
 
 	&__news-type-select {
 		.select__current {
-			padding: 0.2em 0.4em;
+			padding: 0.2rem 0.4rem;
 			border-radius: 0.2em;
 		}
 
