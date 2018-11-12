@@ -40,7 +40,7 @@ dockerClear:
 # usefull when want to test/add/remove new dependencies
 .PHONY: dockerShell
 dockerShell:
-	docker-compose run --rm builder
+	docker-compose run --rm -p "127.0.0.1:9000:9000" builder
 
 # builds "public" directory
 .PHONY: dockerBuildPublic
