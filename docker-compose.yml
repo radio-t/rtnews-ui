@@ -19,6 +19,7 @@ services:
             - ./src:/app/src:ro
             - ./makefile:/app/makefile:ro
             - ./webpack.config.js:/app/webpack.config.js:ro
-            - ./package.json:/app/package.json
-            - ./package-lock.json:/app/package-lock.json
+            - ./sync-packages.sh:/app/sync-packages.sh:ro
+            - ./package.json:/app/package.json.host
+            - ./package-lock.json:/app/package-lock.json.host
             - ./public:/app/public
