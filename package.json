@@ -7,10 +7,6 @@
     "type": "git",
     "url": "git+https://github.com/igoradamenko/rtnews-ui.git"
   },
-  "scripts": {
-    "build": "./node_modules/.bin/gulp4 build --type=production",
-    "dev": "./node_modules/.bin/gulp4"
-  },
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/polyfill": "^7.0.0",
@@ -18,7 +14,6 @@
     "@babel/preset-react": "^7.0.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "^7.1.5",
-    "concurrently": "^4.0.1",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^1.0.1",
     "file-loader": "^2.0.0",
