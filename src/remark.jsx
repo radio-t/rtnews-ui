@@ -19,9 +19,7 @@ export default class Remark extends React.Component {
 			return;
 		}
 
-		remark_config.url = (remark_config.url || window.location.href).split(
-			"#"
-		)[0];
+		remark_config.url = (this.props.url || window.location.href).split("#")[0];
 
 		const node = this.ref;
 

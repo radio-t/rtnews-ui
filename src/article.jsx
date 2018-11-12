@@ -98,6 +98,7 @@ export default class Article extends React.PureComponent {
 					className="full-post__comments"
 					id="to-comments"
 					config={remark}
+					url={`https://news.radio-t.com/post/${this.state.article.slug}`}
 				/>
 			</article>
 		);
