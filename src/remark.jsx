@@ -12,7 +12,10 @@ export default class Remark extends React.Component {
 
 		const BASE_URL = this.props.baseurl || "https://remark42.radio-t.com";
 
-		const remark_config = { ...this.props.config };
+		const remark_config = {
+			baseurl: this.props.baseurl,
+			site_id: this.props.site_id,
+		};
 
 		if (!remark_config.site_id) {
 			console.error("Remark42: Site ID is undefined.");

@@ -97,7 +97,8 @@ export default class Article extends React.PureComponent {
 				<Remark
 					className="full-post__comments"
 					id="to-comments"
-					config={remark}
+					baseurl={remark.baseurl}
+					site_id={remark.site_id}
 					url={`https://news.radio-t.com/post/${this.state.article.slug}`}
 				/>
 			</article>
