@@ -1,6 +1,6 @@
-import React from "react";
+import { createElement, Component } from "react";
 
-export default class Remark extends React.Component {
+export default class Remark extends Component {
 	constructor(props) {
 		super(props);
 	}

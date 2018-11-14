@@ -2,7 +2,7 @@ import "./style.scss";
 import "intersection-observer";
 import "./ganalitics.js";
 
-import React from "react";
+import { createElement, Component } from "react";
 
 import { postsPrefix } from "./settings.js";
 import { render } from "react-dom";
@@ -42,7 +42,7 @@ import LinkToCurrent from "./linkToCurrent.jsx";
 
 import { listingRef } from "./symbols.js";
 
-class App extends React.Component {
+class App extends Component {
 	render() {
 		return (
 			<Router>

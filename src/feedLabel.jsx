@@ -1,4 +1,4 @@
-import React from "react";
+import { createElement } from "react";
 
 export default function FeedLabel(props) {
 	if (props.feed.length === 0) return null;

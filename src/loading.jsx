@@ -1,6 +1,6 @@
-import React from "react";
+import { createElement, Component } from "react";
 
-export default class Loading extends React.Component {
+export default class Loading extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {

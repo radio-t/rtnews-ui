@@ -1,8 +1,8 @@
-import React from "react";
+import { createElement, Component } from "react";
 
 import { getRemarkCommentsCount } from "./api.js";
 
-export default class RemarkCounter extends React.Component {
+export default class RemarkCounter extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {

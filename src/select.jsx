@@ -1,7 +1,6 @@
-import React from "react";
-import { throws } from "assert";
+import { createElement, PureComponent } from "react";
 
-export default class Select extends React.PureComponent {
+export default class Select extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {

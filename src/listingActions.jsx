@@ -1,9 +1,9 @@
-import React from "react";
+import { createElement, Component } from "react";
 
 import { postRecentness, postLevels, sortings } from "./settings.js";
 import Select from "./select.jsx";
 
-export default class ListingActions extends React.Component {
+export default class ListingActions extends Component {
 	render() {
 		return (
 			<div className={"listing-actions " + (this.props.className || "")}>

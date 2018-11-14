@@ -1,4 +1,4 @@
-import React from "react";
+import { createElement, PureComponent } from "react";
 
 import { getFeeds, addFeed, removeFeed } from "./api.js";
 import { formatDate, sleep } from "./utils.js";
@@ -7,7 +7,7 @@ import { Redirect } from "react-router-dom";
 import Loading from "./loading.jsx";
 import Error from "./error.jsx";
 
-export default class FeedsForm extends React.PureComponent {
+export default class FeedsForm extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {

@@ -28,6 +28,7 @@ module.exports = (a, args) => {
 									"@babel/preset-env",
 									{
 										useBuiltIns: "usage",
+										modules: false,
 									},
 								],
 							],
@@ -45,9 +46,16 @@ module.exports = (a, args) => {
 									"@babel/preset-env",
 									{
 										useBuiltIns: "usage",
+										modules: false,
 									},
 								],
-								"@babel/preset-react",
+								[
+									"@babel/preset-react",
+									{
+										pragma: "createElement",
+										pragmaFrag: '"div"',
+									},
+								],
 							],
 						},
 					},

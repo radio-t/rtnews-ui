@@ -1,11 +1,11 @@
-import React from "react";
+import { createElement, Component } from "react";
 
 import { Redirect } from "react-router-dom";
 import { addArticle } from "./api.js";
 import { addNotification } from "./store.jsx";
 import { apiRoot } from "./settings.js";
 
-export default class AddArticleForm extends React.Component {
+export default class AddArticleForm extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {

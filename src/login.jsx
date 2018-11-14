@@ -1,11 +1,11 @@
-import React from "react";
+import { createElement, Component } from "react";
 
 import { setState } from "./store.jsx";
 import { login, loginViaCookies } from "./api.js";
 
 import { Redirect } from "react-router-dom";
 
-export default class LoginForm extends React.Component {
+export default class LoginForm extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {

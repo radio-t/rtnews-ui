@@ -2,7 +2,7 @@
  * Provides with different Atricle Listing views (Main, Archive, Deleted, Sorting)
  */
 
-import React from "react";
+import { createElement, Component } from "react";
 import { sleep, first, requestIdleCallback } from "./utils.js";
 import {
 	archiveSortings,
@@ -120,7 +120,7 @@ function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
  *
  * Provides news autoupdate
  */
-class BaseListing extends React.Component {
+class BaseListing extends Component {
 	/**
 	 *
 	 * Provides articles autoupdate

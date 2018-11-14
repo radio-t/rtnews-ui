@@ -1,6 +1,6 @@
-import React from "react";
+import { createElement, Component } from "react";
 
-export default class NotFound extends React.Component {
+export default class NotFound extends Component {
 	componentDidMount() {
 		document.title = "Ошибка | Новости для Радио-Т";
 	}

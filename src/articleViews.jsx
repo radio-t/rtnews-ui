@@ -1,4 +1,4 @@
-import React from "react";
+import { createElement, Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils.js";
 import { postsPrefix, isSafari } from "./settings.js";
@@ -365,7 +365,7 @@ function Draggable(Component) {
 /**
  * Views which used in main, archive and deleted listings
  */
-class ArticleBriefBasic extends React.Component {
+class ArticleBriefBasic extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -532,7 +532,7 @@ export const DraggableArticleBrief = UpdateOnlyIfVisible(
 /**
  * View which used in sorting listing "/sort/"
  */
-export class ArticleSortBasic extends React.Component {
+export class ArticleSortBasic extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {

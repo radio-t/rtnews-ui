@@ -1,4 +1,4 @@
-import React from "react";
+import { createElement, PureComponent } from "react";
 
 import { formatDate, scrollIntoView } from "./utils.js";
 import { getArticle } from "./api.js";
@@ -11,7 +11,7 @@ import GearIcon from "./static/svg/gear.svg";
 import NotFound from "./notFound.jsx";
 import Error from "./error.jsx";
 
-export default class Article extends React.PureComponent {
+export default class Article extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {

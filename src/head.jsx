@@ -1,4 +1,4 @@
-import React from "react";
+import { createElement, Component } from "react";
 
 import {
 	logout,
@@ -28,7 +28,7 @@ const setTheme = v => {
 	saveTheme(v);
 };
 
-export default class Head extends React.Component {
+export default class Head extends Component {
 	render() {
 		return (
 			<div className="header wrapper page__header">
