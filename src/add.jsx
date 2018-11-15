@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import { addArticle } from "./api.js";
 import { addNotification } from "./store.jsx";
 import { apiRoot } from "./settings.js";
+import { waitFor } from "./utils.js";
 
 export default class AddArticleForm extends Component {
 	constructor(props) {
@@ -249,9 +250,9 @@ export default class AddArticleForm extends Component {
 	}
 	onSwitch() {
 		this.setState({ manual: !this.state.manual });
-		setTimeout(() => {
+		waitFor(() => this.autoref || this.manualref).then(() => {
 			(this.autoref || this.manualref).focus();
-		}, 500);
+		});
 	}
 	onDragover(e) {
 		if (e.dataTransfer.types.indexOf("text/plain") !== -1) {
