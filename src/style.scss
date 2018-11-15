@@ -1045,6 +1045,12 @@ p {
 		overflow: auto;
 	}
 
+	@media screen and (max-width: 38rem) {
+		&__full-content-content {
+			padding: 0.4rem;
+		}
+	}
+
 	&__full-content-hide {
 		width: 1.5rem;
 		font-size: 2rem;
