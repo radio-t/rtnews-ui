@@ -1,7 +1,7 @@
 import { createElement, PureComponent } from "react";
 
 import { getFeeds, addFeed, removeFeed } from "./api.js";
-import { formatDate, sleep } from "./utils.js";
+import { formatDate, sleep, waitFor } from "./utils.js";
 import { Redirect } from "react-router-dom";
 
 import Loading from "./loading.jsx";
@@ -27,6 +27,11 @@ export default class FeedsForm extends PureComponent {
 	}
 	componentWillMount() {
 		document.title = "Управление фидами | Новости Радио-Т";
+	}
+	componentDidMount() {
+		waitFor(() => this.input, 10000).then(() => {
+			this.input.focus();
+		});
 	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
@@ -76,6 +81,7 @@ export default class FeedsForm extends PureComponent {
 						placeholder="Добавить фид"
 						value={this.state.feedurl}
 						onChange={e => this.setState({ feedurl: e.target.value })}
+						ref={ref => (this.input = ref)}
 					/>
 					<input
 						className="feeds__add-submit"
