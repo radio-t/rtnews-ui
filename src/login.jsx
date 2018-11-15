@@ -4,6 +4,7 @@ import { setState } from "./store.jsx";
 import { login, loginViaCookies } from "./api.js";
 
 import { Redirect } from "react-router-dom";
+import { waitFor } from "./utils.js";
 
 export default class LoginForm extends Component {
 	constructor(props) {
@@ -20,10 +21,9 @@ export default class LoginForm extends Component {
 			this.setState({ loggedIn });
 		});
 		document.title = "Вход | Новости Радио-Т";
-		setTimeout(() => {
-			const el = document.querySelector("input.login-form__user");
-			if (el) el.focus();
-		}, 500);
+		waitFor(() => document.querySelector("input.login-form__user")).then(() => {
+			document.querySelector("input.login-form__user").focus();
+		});
 	}
 	render() {
 		if (this.state.loggedIn) return <Redirect to="/" />;
