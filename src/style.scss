@@ -1106,6 +1106,11 @@ p {
 		object-fit: scale-down;
 	}
 
+	iframe,
+	figure {
+		max-width: 100%;
+	}
+
 	code,
 	pre {
 		overflow: scroll;
