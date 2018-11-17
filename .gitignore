@@ -1,5 +1,4 @@
-dev/_blocks/
 node_modules/
+public/*
+!public/.gitkeep
 *.sublime-*
-dev/html/test
-public/test

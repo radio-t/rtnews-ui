@@ -1,22 +1,16 @@
-FROM node:4.2.3
-
-ENV DISQUS=test \
-    APIPATH=/api
-
-ADD . /srv/rtnews-ui
-
+FROM node:10-alpine AS rtnews_deps
+COPY ./package.json ./package-lock.json /app/
 RUN \
-	cd /srv/rtnews-ui && \
-	npm i -g gulpjs/gulp#4.0 && \
-	npm i && \
-	npm run build && \
-	mkdir -p /var/www && \
-	mv ./public /var/www/webapp && \
-	mv /srv/rtnews-ui/dockerinit.sh /init.sh && \
-	chmod +x /init.sh	
+	cd /app && \
+	npm ci --loglevel error
 
-VOLUME ["/var/www/webapp"]
 
-ENTRYPOINT ["/init.sh"]
+FROM node:10-alpine as rtnews_base
+RUN apk add --update --no-cache make
 
-CMD ["sleep", "100"]
+
+FROM rtnews_base
+COPY --from=rtnews_deps /app /app
+EXPOSE 9000
+WORKDIR /app
+ENTRYPOINT ["/bin/ash"]
