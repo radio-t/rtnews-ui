@@ -11,6 +11,7 @@ RUN apk add --update --no-cache make
 
 FROM rtnews_base
 COPY --from=rtnews_deps /app /app
+VOLUME /app/public
 EXPOSE 9000
 WORKDIR /app
 ENTRYPOINT ["/bin/ash"]
