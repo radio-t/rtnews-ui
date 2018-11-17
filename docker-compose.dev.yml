@@ -4,7 +4,7 @@ services:
     builder:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile.dev
         image: "rtnews/builder"
         container_name: "rtnews_builder"
         environment:

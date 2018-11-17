@@ -1,17 +1,13 @@
-FROM node:10-alpine AS rtnews_deps
-COPY ./package.json ./package-lock.json /app/
+FROM node:10-alpine AS rtnews_frontend_build
+COPY ./ /app/
 RUN \
 	cd /app && \
-	npm ci --loglevel error
+	npm ci --loglevel error && \
+	./node_modules/.bin/webpack --mode production
 
 
-FROM node:10-alpine as rtnews_base
-RUN apk add --update --no-cache make
-
-
-FROM rtnews_base
-COPY --from=rtnews_deps /app /app
-VOLUME /app/public
-EXPOSE 9000
-WORKDIR /app
-ENTRYPOINT ["/bin/ash"]
+FROM node:10-alpine
+COPY --from=rtnews_frontend_build /app/public /var/www/webapp
+VOLUME ["/var/www/webapp"]
+CMD ["-c", "tail -f /dev/null"]
+ENTRYPOINT ["/bin/sh"]
