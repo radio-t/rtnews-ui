@@ -38,13 +38,6 @@ export const sortings = [
 		},
 	},
 	{
-		title: "По дате новости",
-		fn(a, b) {
-			if (a.ts === b.ts) return 0;
-			return a.parsedts > b.parsedts ? -1 : 1;
-		},
-	},
-	{
 		title: "По дате добавления",
 		fn(a, b) {
 			if (a.ats === b.ats) return 0;
