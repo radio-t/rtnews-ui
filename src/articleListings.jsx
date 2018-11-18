@@ -5,7 +5,6 @@
 import { createElement, Component } from "react";
 import { sleep, first, requestIdleCallback } from "./utils.js";
 import {
-	archiveSortings,
 	postRecentness,
 	postLevels,
 	sortings,
@@ -18,8 +17,6 @@ import {
 	setPostLevel,
 	getSorting,
 	setSorting,
-	getArchiveSorting,
-	setArchiveSorting,
 	activateArticle,
 	makeArticleGeek,
 	makeArticleNotGeek,
@@ -437,9 +434,6 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 	constructor(props) {
 		super(props);
 		this.state = {
-			postRecentness: postRecentness[0],
-			postLevel: postLevels[0],
-			sort: getArchiveSorting(),
 			news: [],
 			loaded: false,
 			error: null,
@@ -469,18 +463,15 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 		if (!this.state.loaded) return <Loading />;
 		return (
 			<div className="news page__news">
-				{this.state.news
-					.slice(0)
-					.sort((a, b) => this.state.sort.fn(a, b))
-					.map(x => (
-						<ArticleBrief
-							key={x.id}
-							article={x}
-							archive={true}
-							controls={this.props.isAdmin ? ["remove"] : null}
-							onChange={(id, data) => this.onArticleChange(x, id, data)}
-						/>
-					))}
+				{this.state.news.map(x => (
+					<ArticleBrief
+						key={x.id}
+						article={x}
+						archive={true}
+						controls={this.props.isAdmin ? ["remove"] : null}
+						onChange={(id, data) => this.onArticleChange(x, id, data)}
+					/>
+				))}
 			</div>
 		);
 	}
@@ -493,9 +484,6 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 	constructor(props) {
 		super(props);
 		this.state = {
-			postRecentness: postRecentness[0],
-			postLevel: postLevels[0],
-			sort: getArchiveSorting(),
 			news: [],
 			loaded: false,
 			error: null,

@@ -53,10 +53,6 @@ export const sortings = [
 	},
 ];
 
-export const archiveSortings = sortings.filter(
-	x => x.title !== "По приоритету"
-);
-
 const now = new Date();
 const day = 1000 * 60 * 60 * 24;
 const month = day * 30;
