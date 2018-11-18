@@ -458,21 +458,23 @@ class ArticleBriefBasic extends Component {
 							__html: formatDate(new Date(Date.parse(this.props.article.ats))),
 						}}
 					/>
-					<HashLink
-						className="post__comments-link"
-						to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
-						scroll={el => {
-							setTimeout(() => {
-								scrollIntoView(el);
-							}, 500);
-						}}
-					>
-						<SVGInline
-							className="icon post__comments-icon"
-							svg={CommentsIcon}
-						/>
-						{this.props.article.comments}
-					</HashLink>
+					{!this.props.archive && (
+						<HashLink
+							className="post__comments-link"
+							to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
+							scroll={el => {
+								setTimeout(() => {
+									scrollIntoView(el);
+								}, 500);
+							}}
+						>
+							<SVGInline
+								className="icon post__comments-icon"
+								svg={CommentsIcon}
+							/>
+							{this.props.article.comments}
+						</HashLink>
+					)}
 				</div>
 				{!this.props.archive && [
 					<div key="paragraph" className="post__snippet">
