@@ -110,7 +110,8 @@ npm install && ./node_modules/.bin/webpack --mode "development"
     "snippet": "At GitHub we place an emphasis on stability, availability, and performance. A large component of ensuring we excel in these areas is deploying services on bare-metal hardware. This allows us to&hellip;",
     "title": "GitHub's Metal Cloud - GitHub Engineering",
     "ts": "2015-12-05T05:17:21Z",
-    "votes": 0
+    "votes": 0,
+    "origlink": "http://githubengineering.com/githubs-metal-cloud/"
 }
 ```
 
@@ -119,4 +120,6 @@ npm install && ./node_modules/.bin/webpack --mode "development"
 1. `activets` – момент активации новости
 1. `ts` – время новости из rss
 1. `ats` – когда новость добавлена в систему
+
+Как правило, `link` и `origlink` идентичны, однако в некоторых случаях они могут отличаться. `origlink` всегда содержит исходную ссылку, а `link` - это конечная ссылка после всех возможных редиректов.
 
