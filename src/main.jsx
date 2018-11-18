@@ -86,7 +86,12 @@ class App extends Component {
 							<Route path="/sort/" render={() => <Sorter {...this.props} />} />
 							<Route
 								path={`${postsPrefix}/:slug`}
-								render={props => <Article slug={props.match.params.slug} />}
+								render={props => (
+									<Article
+										slug={props.match.params.slug}
+										editable={this.props.isAdmin}
+									/>
+								)}
 							/>
 							<Route path="/login/" exact={true} render={() => <LoginForm />} />
 							<Route component={NotFound} />

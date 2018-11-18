@@ -1,7 +1,8 @@
 import { createElement, PureComponent } from "react";
 
-import { formatDate, scrollIntoView } from "./utils.js";
-import { getArticle } from "./api.js";
+import { formatDate, scrollIntoView, waitFor } from "./utils.js";
+import { getArticle, addArticle } from "./api.js";
+import articleCache from "./articleCache";
 import { remark } from "./settings.js";
 
 import Remark from "./remark.jsx";
@@ -10,6 +11,8 @@ import SVGInline from "react-svg-inline";
 import GearIcon from "./static/svg/gear.svg";
 import NotFound from "./notFound.jsx";
 import Error from "./error.jsx";
+import RichEditor from "./richEditor.jsx";
+import { addNotification } from "./store.jsx";
 
 export default class Article extends PureComponent {
 	constructor(props) {
@@ -17,6 +20,10 @@ export default class Article extends PureComponent {
 		this.state = {
 			article: null,
 			error: null,
+			/**
+			 * view|edit
+			 */
+			mode: "view",
 		};
 	}
 	componentDidMount() {
@@ -58,8 +65,8 @@ export default class Article extends PureComponent {
 			);
 		if (this.state.article === null) return <Loading />;
 		return (
-			<article className="full-post">
-				<h3 className="title full-post__title">
+			<article className="article">
+				<h3 className="title article__title">
 					{this.state.article.geek && (
 						<SVGInline
 							className="icon post__title-geek-icon"
@@ -71,7 +78,7 @@ export default class Article extends PureComponent {
 						{this.state.article.title}
 					</a>
 				</h3>
-				<div className="post__meta full-post__meta">
+				<div className="post__meta article__meta">
 					<a
 						className="post__original-link"
 						href={this.state.article.origlink}
@@ -87,15 +94,122 @@ export default class Article extends PureComponent {
 						}}
 					/>
 				</div>
-				<div
-					className="article-content full-post__content"
-					dangerouslySetInnerHTML={{
-						__html: this.state.article.content || this.state.article.snippet,
-					}}
-				/>
-				<hr className="full-post__break" />
+				{this.props.editable && [
+					this.state.mode === "view" && (
+						<div class="post__edit">
+							<span
+								class="pseudo post__edit-button"
+								onClick={async () => {
+									this.setState({ mode: "edit" });
+									await waitFor(() => this.snippeteditor, 10000);
+									this.snippeteditor.focus();
+								}}
+							>
+								Редактировать
+							</span>
+						</div>
+					),
+					this.state.mode === "edit" && (
+						<div class="post__edit">
+							<span
+								class="pseudo post__edit-button"
+								onClick={() => {
+									this.setState({ mode: "view" });
+								}}
+							>
+								Отменить
+							</span>
+							{" / "}
+							<span
+								class="pseudo post__edit-button"
+								onClick={async () => {
+									try {
+										const snippet = this.snippeteditor.getContent();
+										const content = this.editor.getContent();
+										await addArticle(
+											this.state.article.link,
+											this.state.article.title,
+											snippet,
+											content
+										);
+										articleCache.invalidate();
+										this.setState({
+											article: { ...this.state.article, snippet, content },
+											mode: "view",
+										});
+									} catch (e) {
+										console.error(e);
+										addNotification({
+											data: (
+												<span>
+													Ошибка при сохранении,{" "}
+													<span
+														class="pseudo"
+														onClick={() => {
+															window.location.reload;
+														}}
+													>
+														обновить страницу?
+													</span>
+												</span>
+											),
+											level: "error",
+											time: 10000,
+										});
+									}
+								}}
+							>
+								Сохранить
+							</span>
+						</div>
+					),
+				]}
+				{!this.props.editable && (
+					<div
+						className="article-content article__content"
+						dangerouslySetInnerHTML={{
+							__html: this.state.article.content || this.state.article.snippet,
+						}}
+					/>
+				)}
+				{this.props.editable &&
+					this.state.mode === "view" && [
+						<div
+							className="article__snippet"
+							dangerouslySetInnerHTML={{
+								__html: this.state.article.snippet || "",
+							}}
+						/>,
+						<div
+							className="article-content article__content"
+							dangerouslySetInnerHTML={{
+								__html: this.state.article.content || "",
+							}}
+						/>,
+					]}
+				{this.state.mode === "edit" && [
+					<div className="article__editor-title article__editor-title-content">
+						Сниппет
+					</div>,
+					<RichEditor
+						className="article__editor"
+						content={this.state.article.snippet || ""}
+						ref={ref => (this.snippeteditor = ref)}
+						placeholder="сниппет"
+					/>,
+					<div className="article__editor-title article__editor-title-snippet">
+						Контент
+					</div>,
+					<RichEditor
+						className="article__editor"
+						content={this.state.article.content || ""}
+						ref={ref => (this.editor = ref)}
+						placeholder="контент"
+					/>,
+				]}
+				<hr className="article__break" />
 				<Remark
-					className="full-post__comments"
+					className="article__comments"
 					id="to-comments"
 					baseurl={remark.baseurl}
 					site_id={remark.site_id}

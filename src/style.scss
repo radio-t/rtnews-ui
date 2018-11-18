@@ -1022,6 +1022,10 @@ p {
 		margin-right: 0.4em;
 	}
 
+	&__edit {
+		margin-bottom: 1rem;
+	}
+
 	&__full-content {
 		position: relative;
 		z-index: 2;
@@ -1072,9 +1076,10 @@ p {
 	}
 }
 
-/* full-post */
+/* article */
+/* denotes full post on /post/* route */
 
-.full-post {
+.article {
 	&__title {
 		font-size: 2em;
 		margin-bottom: 0.5em;
@@ -1090,6 +1095,26 @@ p {
 
 	&__comments {
 		margin-top: 2rem;
+	}
+
+	&__editor-title-snippet {
+		margin-top: 1rem;
+	}
+
+	&__snippet {
+		background: hsla(40, 60%, 50%, 0.06);
+		border-radius: 0.2rem;
+		padding: 1rem 0.5rem 0.5rem 0.5rem;
+		width: 100%;
+		margin-left: -0.5rem;
+	}
+
+	&__snippet::before {
+		content: "Сниппет:";
+		display: block;
+		opacity: 0.6;
+		position: relative;
+		top: -0.7rem;
 	}
 }
 
@@ -1118,6 +1143,12 @@ p {
 
 	figure {
 		margin: 0;
+	}
+
+	blockquote {
+		font-style: italic;
+		margin: 0;
+		opacity: 0.8;
 	}
 }
 
@@ -1162,6 +1193,24 @@ p {
 	&-target-bottom {
 		border-bottom: 2px dashed hsla(200, 60%, 40%, 1);
 	}
+}
+
+/* quill editor overrides */
+
+.ql-container {
+	min-height: 6rem;
+	height: auto;
+	max-height: calc(100vh - 6rem);
+	font: inherit;
+}
+
+.ql-editor {
+	max-height: calc(100vh - 6rem);
+	height: auto;
+}
+
+.ql-editor a {
+	text-decoration: none !important;
 }
 
 /* NIGHT THEME */
@@ -1314,9 +1363,9 @@ html[data-theme="night"] {
 		background: rgba(255, 255, 255, 0.26);
 	}
 
-	/* full-post */
+	/* article */
 
-	.full-post__comments {
+	.article__comments {
 		background: #fff;
 		padding: 1rem;
 	}
