@@ -468,31 +468,20 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 			);
 		if (!this.state.loaded) return <Loading />;
 		return (
-			<>
-				<ListingActions
-					includeFilters={false}
-					sort={this.state.sort}
-					sortings={archiveSortings}
-					onSortingChange={sort => {
-						this.setState({ sort });
-						setArchiveSorting(sort);
-					}}
-				/>
-				<div className="news page__news">
-					{this.state.news
-						.slice(0)
-						.sort((a, b) => this.state.sort.fn(a, b))
-						.map(x => (
-							<ArticleBrief
-								key={x.id}
-								article={x}
-								archive={true}
-								controls={this.props.isAdmin ? ["remove"] : null}
-								onChange={(id, data) => this.onArticleChange(x, id, data)}
-							/>
-						))}
-				</div>
-			</>
+			<div className="news page__news">
+				{this.state.news
+					.slice(0)
+					.sort((a, b) => this.state.sort.fn(a, b))
+					.map(x => (
+						<ArticleBrief
+							key={x.id}
+							article={x}
+							archive={true}
+							controls={this.props.isAdmin ? ["remove"] : null}
+							onChange={(id, data) => this.onArticleChange(x, id, data)}
+						/>
+					))}
+			</div>
 		);
 	}
 }
