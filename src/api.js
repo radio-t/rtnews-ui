@@ -1,7 +1,6 @@
 import {
 	apiRoot,
 	sortings,
-	archiveSortings,
 	postRecentness,
 	postLevels,
 	remark as RemarkConfig,
@@ -234,15 +233,6 @@ export function getSorting() {
 
 export function setSorting(value) {
 	localStorage.setItem("sorting", value.title);
-}
-
-export function getArchiveSorting() {
-	const s = localStorage.getItem("archiveSorting");
-	return first(sortings, x => x.title === s) || archiveSortings[0];
-}
-
-export function setArchiveSorting(value) {
-	localStorage.setItem("archiveSorting", value.title);
 }
 
 export function getTheme() {
