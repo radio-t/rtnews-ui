@@ -65,7 +65,7 @@ export default class RichEditor extends PureComponent {
 					theme: "snow",
 					placeholder: this.props.placeholder || "",
 					modules: {
-						toolbar: [],
+						toolbar: null,
 					},
 					formats: [],
 				});
