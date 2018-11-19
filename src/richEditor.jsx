@@ -31,6 +31,11 @@ export default class RichEditor extends PureComponent {
 				/* webpackMode: "lazy" */
 				"quill/dist/quill.snow.css"
 			),
+			import(
+				/* webpackChunkName: "quill" */
+				/* webpackMode: "lazy" */
+				"./quill-overloads.css"
+			),
 		]).then(([ImportedQuill]) => {
 			this.setState({loaded: true})
 			Quill = ImportedQuill.default;
