@@ -33,7 +33,7 @@ import {
 	DeletedListing,
 	Sorter,
 } from "./articleListings.jsx";
-import Article from "./article.jsx";
+import { Article, EditableArticle } from "./article.jsx";
 import Feeds from "./feeds.jsx";
 import LoginForm from "./login.jsx";
 import NotFound from "./notFound.jsx";
@@ -86,12 +86,13 @@ class App extends Component {
 							<Route path="/sort/" render={() => <Sorter {...this.props} />} />
 							<Route
 								path={`${postsPrefix}/:slug`}
-								render={props => (
-									<Article
-										slug={props.match.params.slug}
-										editable={this.props.isAdmin}
-									/>
-								)}
+								render={props =>
+									this.props.isAdmin ? (
+										<EditableArticle slug={props.match.params.slug} />
+									) : (
+										<Article slug={props.match.params.slug} />
+									)
+								}
 							/>
 							<Route path="/login/" exact={true} render={() => <LoginForm />} />
 							<Route component={NotFound} />

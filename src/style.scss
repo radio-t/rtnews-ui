@@ -1107,6 +1107,7 @@ p {
 		padding: 1rem 0.5rem 0.5rem 0.5rem;
 		width: 100%;
 		margin-left: -0.5rem;
+		margin-bottom: 0.5rem;
 	}
 
 	&__snippet::before {
@@ -1198,15 +1199,15 @@ p {
 /* quill editor overrides */
 
 .ql-container {
-	min-height: 6rem;
-	height: auto;
-	max-height: calc(100vh - 6rem);
-	font: inherit;
+	min-height: 6rem !important;
+	height: auto !important;
+	max-height: calc(100vh - 6rem) !important;
+	font: inherit !important;
 }
 
 .ql-editor {
-	max-height: calc(100vh - 6rem);
-	height: auto;
+	max-height: calc(100vh - 6rem) !important;
+	height: auto !important;
 }
 
 .ql-editor a {
