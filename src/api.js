@@ -138,9 +138,7 @@ export function addArticle(link, title = "", snippet = "", content = "") {
 	const url = title.length > 0 ? "/news/manual" : "/news";
 
 	for (let [slug, article] of articlesCache.entries()) {
-		console.log(slug, article);
 		if (article.title === title) {
-			console.log("hit!");
 			articlesCache.delete(slug);
 			articlesIdSlugMap.delete(article.id);
 		}

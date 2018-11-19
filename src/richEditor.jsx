@@ -9,22 +9,35 @@ export default class RichEditor extends PureComponent {
 	}
 	componentDidMount(...args) {
 		super.componentDidMount && super.componentDidMount(...args);
-		this.quill = new Quill(this.editor, {
-			theme: "snow",
-			placeholder: this.props.placeholder || "",
-			modules: {
-				toolbar: [
-					[{ header: [1, 2, 3, 4, 5, 6, false] }],
-					["bold", "italic", "underline", "strike"],
-					[{ align: [] }],
-					[{ list: "ordered" }, { list: "bullet" }],
-					[{ script: "sub" }, { script: "super" }],
-					["clean"],
-				],
-			},
-		});
+
+		if (this.props.rich) {
+			this.quill = new Quill(this.editor, {
+				theme: "snow",
+				placeholder: this.props.placeholder || "",
+				modules: {
+					toolbar: [
+						[{ header: [1, 2, 3, 4, 5, 6, false] }],
+						["bold", "italic", "underline", "strike"],
+						[{ align: [] }],
+						[{ list: "ordered" }, { list: "bullet" }],
+						[{ script: "sub" }, { script: "super" }],
+						["clean"],
+					],
+				},
+			});
+		} else {
+			this.quill = new Quill(this.editor, {
+				theme: "snow",
+				placeholder: this.props.placeholder || "",
+				modules: {
+					toolbar: [],
+				},
+				formats: [],
+			});
+		}
 	}
 	getContent() {
+		if (!this.props.rich) return this.quill.root.textContent;
 		return this.quill.root.innerHTML;
 	}
 	focus() {

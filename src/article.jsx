@@ -257,6 +257,7 @@ export default class Article extends PureComponent {
 						content={this.state.previewSnippet || ""}
 						ref={ref => (this.snippeteditor = ref)}
 						placeholder="сниппет"
+						rich={false}
 					/>,
 					<div className="article__editor-title article__editor-title-snippet">
 						Контент
@@ -266,6 +267,7 @@ export default class Article extends PureComponent {
 						content={this.state.previewContent || ""}
 						ref={ref => (this.editor = ref)}
 						placeholder="контент"
+						rich={true}
 					/>,
 				]}
 				<hr className="article__break" />
