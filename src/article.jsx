@@ -12,7 +12,7 @@ import GearIcon from "./static/svg/gear.svg";
 import NotFound from "./notFound.jsx";
 import Error from "./error.jsx";
 import RichEditor from "./richEditor.jsx";
-import { addNotification } from "./store.jsx";
+import { addNotification, removeNotification } from "./store.jsx";
 
 function ArticleFactory(editable = false) {
 	return class Article extends PureComponent {
@@ -70,6 +70,7 @@ function ArticleFactory(editable = false) {
 			this.setState({ mode: "preview" });
 		}
 		async save() {
+			let notification;
 			try {
 				const snippet = this.snippeteditor
 					? this.snippeteditor.getContent()
@@ -77,6 +78,10 @@ function ArticleFactory(editable = false) {
 				const content = this.editor
 					? this.editor.getContent()
 					: this.state.previewContent;
+				notification = addNotification({
+					data: "Сохраняю новость",
+					time: null,
+				});
 				await addArticle(
 					this.state.article.link,
 					this.state.article.title,
@@ -90,8 +95,14 @@ function ArticleFactory(editable = false) {
 					article: { ...this.state.article, snippet, content },
 					mode: "view",
 				});
+				removeNotification(notification);
+				addNotification({
+					data: "Новость сохранена",
+					time: 3000,
+				});
 			} catch (e) {
 				console.error(e);
+				removeNotification(notification);
 				addNotification({
 					data: (
 						<span>
