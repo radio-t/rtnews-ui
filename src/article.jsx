@@ -20,8 +20,10 @@ export default class Article extends PureComponent {
 		this.state = {
 			article: null,
 			error: null,
+			previewSnippet: null,
+			previewContent: null,
 			/**
-			 * view|edit
+			 * view|edit|preview
 			 */
 			mode: "view",
 		};
@@ -44,6 +46,69 @@ export default class Article extends PureComponent {
 				scrollIntoView(el);
 			}
 		}, 200);
+	}
+	async edit() {
+		this.setState({
+			previewSnippet: this.state.article.snippet || "",
+			previewContent: this.state.article.content || "",
+			mode: "edit",
+		});
+		await waitFor(() => this.snippeteditor, 10000);
+		this.snippeteditor.focus();
+	}
+	cancelEdit() {
+		this.setState({
+			previewContent: null,
+			previewSnippet: null,
+			mode: "view",
+		});
+	}
+	preview() {
+		this.state.previewSnippet = this.snippeteditor.getContent();
+		this.state.previewContent = this.editor.getContent();
+		this.setState({ mode: "preview" });
+	}
+	async save() {
+		try {
+			const snippet = this.snippeteditor
+				? this.snippeteditor.getContent()
+				: this.state.previewSnippet;
+			const content = this.editor
+				? this.editor.getContent()
+				: this.state.previewContent;
+			await addArticle(
+				this.state.article.link,
+				this.state.article.title,
+				snippet,
+				content
+			);
+			articleCache.invalidate();
+			this.setState({
+				previewContent: null,
+				previewSnippet: null,
+				article: { ...this.state.article, snippet, content },
+				mode: "view",
+			});
+		} catch (e) {
+			console.error(e);
+			addNotification({
+				data: (
+					<span>
+						Ошибка при сохранении,{" "}
+						<span
+							class="pseudo"
+							onClick={() => {
+								window.location.reload;
+							}}
+						>
+							обновить страницу?
+						</span>
+					</span>
+				),
+				level: "error",
+				time: 10000,
+			});
+		}
 	}
 	render() {
 		if (
@@ -99,11 +164,7 @@ export default class Article extends PureComponent {
 						<div class="post__edit">
 							<span
 								class="pseudo post__edit-button"
-								onClick={async () => {
-									this.setState({ mode: "edit" });
-									await waitFor(() => this.snippeteditor, 10000);
-									this.snippeteditor.focus();
-								}}
+								onClick={() => this.edit()}
 							>
 								Редактировать
 							</span>
@@ -113,51 +174,45 @@ export default class Article extends PureComponent {
 						<div class="post__edit">
 							<span
 								class="pseudo post__edit-button"
-								onClick={() => {
-									this.setState({ mode: "view" });
-								}}
+								onClick={() => this.cancelEdit()}
 							>
 								Отменить
 							</span>
 							{" / "}
 							<span
 								class="pseudo post__edit-button"
-								onClick={async () => {
-									try {
-										const snippet = this.snippeteditor.getContent();
-										const content = this.editor.getContent();
-										await addArticle(
-											this.state.article.link,
-											this.state.article.title,
-											snippet,
-											content
-										);
-										articleCache.invalidate();
-										this.setState({
-											article: { ...this.state.article, snippet, content },
-											mode: "view",
-										});
-									} catch (e) {
-										console.error(e);
-										addNotification({
-											data: (
-												<span>
-													Ошибка при сохранении,{" "}
-													<span
-														class="pseudo"
-														onClick={() => {
-															window.location.reload;
-														}}
-													>
-														обновить страницу?
-													</span>
-												</span>
-											),
-											level: "error",
-											time: 10000,
-										});
-									}
-								}}
+								onClick={() => this.preview()}
+							>
+								Превью
+							</span>
+							{" / "}
+							<span
+								class="pseudo post__edit-button"
+								onClick={() => this.save()}
+							>
+								Сохранить
+							</span>
+						</div>
+					),
+					this.state.mode === "preview" && (
+						<div class="post__edit">
+							<span
+								class="pseudo post__edit-button"
+								onClick={() => this.cancelEdit()}
+							>
+								Отменить
+							</span>
+							{" / "}
+							<span
+								class="pseudo post__edit-button"
+								onClick={() => this.setState({ mode: "edit" })}
+							>
+								Продолжить
+							</span>
+							{" / "}
+							<span
+								class="pseudo post__edit-button"
+								onClick={() => this.save()}
 							>
 								Сохранить
 							</span>
@@ -173,17 +228,23 @@ export default class Article extends PureComponent {
 					/>
 				)}
 				{this.props.editable &&
-					this.state.mode === "view" && [
+					(this.state.mode === "view" || this.state.mode === "preview") && [
 						<div
 							className="article__snippet"
 							dangerouslySetInnerHTML={{
-								__html: this.state.article.snippet || "",
+								__html:
+									this.state.previewSnippet !== null
+										? this.state.previewSnippet
+										: this.state.article.snippet || "",
 							}}
 						/>,
 						<div
 							className="article-content article__content"
 							dangerouslySetInnerHTML={{
-								__html: this.state.article.content || "",
+								__html:
+									this.state.previewContent !== null
+										? this.state.previewContent
+										: this.state.article.content || "",
 							}}
 						/>,
 					]}
@@ -193,7 +254,7 @@ export default class Article extends PureComponent {
 					</div>,
 					<RichEditor
 						className="article__editor"
-						content={this.state.article.snippet || ""}
+						content={this.state.previewSnippet || ""}
 						ref={ref => (this.snippeteditor = ref)}
 						placeholder="сниппет"
 					/>,
@@ -202,7 +263,7 @@ export default class Article extends PureComponent {
 					</div>,
 					<RichEditor
 						className="article__editor"
-						content={this.state.article.content || ""}
+						content={this.state.previewContent || ""}
 						ref={ref => (this.editor = ref)}
 						placeholder="контент"
 					/>,
