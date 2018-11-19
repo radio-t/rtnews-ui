@@ -1130,12 +1130,14 @@ p {
 
 /* editor-container */
 
-.editor-container--poor .ql-toolbar {
-	display: none;
-}
+.editor-container--poor {
+	.ql-toolbar {
+		display: none;
+	}
 
-.ql-container {
-	border-top: 1px solid #ccc !important;
+	.ql-container {
+		border-top: 1px solid #ccc !important;
+	}
 }
 
 /* article-content */
