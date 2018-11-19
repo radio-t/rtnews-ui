@@ -290,7 +290,8 @@ p {
 
 	@media screen and (max-width: 40rem) {
 		&__item-header {
-			word-break: break-all;
+			-webkit-hyphens: auto;
+			hyphens: auto;
 		}
 	}
 
@@ -943,7 +944,8 @@ p {
 
 	@media screen and (max-width: 40rem) {
 		&__title {
-			word-break: break-all;
+			-webkit-hyphens: auto;
+			hyphens: auto;
 		}
 	}
 
