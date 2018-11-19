@@ -1,0 +1,34 @@
+/**
+ * everything is important here, it's
+ * a serious business
+ */
+
+.ql-container {
+	min-height: 6rem !important;
+	height: auto !important;
+	max-height: calc(100vh - 6rem) !important;
+	font: inherit !important;
+}
+
+.ql-editor {
+	max-height: calc(100vh - 6rem) !important;
+	height: auto !important;
+}
+
+.ql-editor a {
+	text-decoration: none !important;
+}
+
+/* night theme overloads */
+
+html[data-theme="night"] .ql-fill {
+	fill: #ccc !important;
+}
+
+html[data-theme="night"] .ql-stroke {
+	stroke: #ccc !important;
+}
+
+html[data-theme="night"] .ql-picker-label {
+	color: #ccc !important;
+}

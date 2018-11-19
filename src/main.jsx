@@ -25,6 +25,7 @@ import { waitDOMReady, sleep, scrollIntoView } from "./utils.js";
 
 import Head from "./head.jsx";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { ScrollContext } from "react-router-scroll-4";
 import { Provider, connect } from "react-redux";
 import AddArticle from "./add.jsx";
 import {
@@ -33,7 +34,7 @@ import {
 	DeletedListing,
 	Sorter,
 } from "./articleListings.jsx";
-import Article from "./article.jsx";
+import { Article, EditableArticle } from "./article.jsx";
 import Feeds from "./feeds.jsx";
 import LoginForm from "./login.jsx";
 import NotFound from "./notFound.jsx";
@@ -54,21 +55,31 @@ class App extends Component {
 								path="/"
 								exact={true}
 								render={() => (
-									<Listing
-										{...this.props}
-										ref={ref => (window[listingRef] = ref)}
-									/>
+									<ScrollContext>
+										<Listing
+											{...this.props}
+											ref={ref => (window[listingRef] = ref)}
+										/>
+									</ScrollContext>
 								)}
 							/>
 							<Route
 								path="/deleted/"
 								exact={true}
-								render={() => <DeletedListing {...this.props} />}
+								render={() => (
+									<ScrollContext>
+										<DeletedListing {...this.props} />
+									</ScrollContext>
+								)}
 							/>
 							<Route
 								path="/archive/"
 								exact={true}
-								render={() => <ArchiveListing {...this.props} />}
+								render={() => (
+									<ScrollContext>
+										<ArchiveListing {...this.props} />
+									</ScrollContext>
+								)}
 							/>
 							<Route
 								path="/add/"
@@ -86,7 +97,13 @@ class App extends Component {
 							<Route path="/sort/" render={() => <Sorter {...this.props} />} />
 							<Route
 								path={`${postsPrefix}/:slug`}
-								render={props => <Article slug={props.match.params.slug} />}
+								render={props =>
+									this.props.isAdmin ? (
+										<EditableArticle slug={props.match.params.slug} />
+									) : (
+										<Article slug={props.match.params.slug} />
+									)
+								}
 							/>
 							<Route path="/login/" exact={true} render={() => <LoginForm />} />
 							<Route component={NotFound} />

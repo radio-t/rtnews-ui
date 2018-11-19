@@ -123,19 +123,48 @@ export async function pollActiveArticle(ms = 295) {
 	}
 }
 
-export function addArticle(link, title = "", snippet = "") {
+/**
+ * Adds article or updates it if title already exists
+ */
+export function addArticle(link, title = "", snippet = "", content = "") {
 	const body = { link };
-	if (title.length > 0) body.title = title;
-	if (snippet.length > 0) body.snippet = snippet;
+	if (!title || title.length > 0) body.title = title;
+	if (!snippet || snippet.length > 0) body.snippet = snippet;
+	if (!content || content.length > 0) body.content = content;
 
 	const headers = new Headers();
 	headers.append("Content-Type", "application/json");
 
 	const url = title.length > 0 ? "/news/manual" : "/news";
 
+	for (let [slug, article] of articlesCache.entries()) {
+		if (article.title === title) {
+			articlesCache.delete(slug);
+			articlesIdSlugMap.delete(article.id);
+		}
+	}
+
 	return request(url, {
 		method: "POST",
 		body: JSON.stringify(body),
+		headers,
+	});
+}
+
+export function updateArticle(updated) {
+	for (let [slug, article] of articlesCache.entries()) {
+		if (article.id === updated.id) {
+			articlesCache.delete(slug);
+			articlesIdSlugMap.delete(article.id);
+		}
+	}
+
+	const headers = new Headers();
+	headers.append("Content-Type", "application/json");
+
+	return request("/news/manual", {
+		method: "POST",
+		body: JSON.stringify(updated),
 		headers,
 	});
 }

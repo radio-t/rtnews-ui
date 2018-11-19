@@ -290,7 +290,8 @@ p {
 
 	@media screen and (max-width: 40rem) {
 		&__item-header {
-			word-break: break-all;
+			-webkit-hyphens: auto;
+			hyphens: auto;
 		}
 	}
 
@@ -943,7 +944,8 @@ p {
 
 	@media screen and (max-width: 40rem) {
 		&__title {
-			word-break: break-all;
+			-webkit-hyphens: auto;
+			hyphens: auto;
 		}
 	}
 
@@ -1072,9 +1074,10 @@ p {
 	}
 }
 
-/* full-post */
+/* article */
+/* denotes full post on /post/* route */
 
-.full-post {
+.article {
 	&__title {
 		font-size: 2em;
 		margin-bottom: 0.5em;
@@ -1090,6 +1093,38 @@ p {
 
 	&__comments {
 		margin-top: 2rem;
+	}
+
+	&__edit-button-edit {
+		opacity: 0.6;
+	}
+
+	&__editor-title-snippet {
+		margin-top: 1rem;
+	}
+
+	&__edit {
+		margin-top: -1rem;
+		margin-bottom: 1rem;
+		text-align: right;
+		font-size: 0.8em;
+	}
+
+	&__snippet {
+		background: hsla(40, 60%, 50%, 0.06);
+		border-radius: 0.2rem;
+		padding: 1rem 0.5rem 0.5rem 0.5rem;
+		width: 100%;
+		margin-left: -0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	&__snippet::before {
+		content: "Сниппет:";
+		display: block;
+		opacity: 0.6;
+		position: relative;
+		top: -0.7rem;
 	}
 }
 
@@ -1118,6 +1153,27 @@ p {
 
 	figure {
 		margin: 0;
+	}
+
+	blockquote {
+		font-style: italic;
+		margin: 0;
+		opacity: 0.8;
+	}
+
+	.ql-align-center {
+		text-align: center;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.ql-align-right {
+		text-align: right;
+	}
+
+	.ql-align-left {
+		text-align: left;
 	}
 }
 
@@ -1314,11 +1370,15 @@ html[data-theme="night"] {
 		background: rgba(255, 255, 255, 0.26);
 	}
 
-	/* full-post */
+	/* article */
 
-	.full-post__comments {
+	.article__comments {
 		background: #fff;
 		padding: 1rem;
+	}
+
+	.article__snippet {
+		background: hsla(40, 60%, 90%, 0.2);
 	}
 
 	/* drop */

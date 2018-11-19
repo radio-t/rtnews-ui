@@ -12,6 +12,8 @@ module.exports = (a, args) => {
 		context: path.resolve(__dirname, "src"),
 		output: {
 			path: path.resolve(__dirname, "public"),
+			filename: "[name].js",
+			chunkFilename: "[name].component.js",
 			publicPath: "/",
 		},
 		mode: args.mode || "production",
@@ -23,6 +25,7 @@ module.exports = (a, args) => {
 					use: {
 						loader: "babel-loader",
 						options: {
+							plugins: ["@babel/plugin-syntax-dynamic-import"],
 							presets: [
 								[
 									"@babel/preset-env",
@@ -41,6 +44,7 @@ module.exports = (a, args) => {
 					use: {
 						loader: "babel-loader",
 						options: {
+							plugins: ["@babel/plugin-syntax-dynamic-import"],
 							presets: [
 								[
 									"@babel/preset-env",
@@ -59,6 +63,15 @@ module.exports = (a, args) => {
 							],
 						},
 					},
+				},
+				{
+					test: /\.css$/,
+					use: [
+						{
+							loader: MiniCssExtractPlugin.loader,
+						},
+						"css-loader",
+					],
 				},
 				{
 					test: /\.scss$/,
@@ -131,7 +144,7 @@ module.exports = (a, args) => {
 						test: /[\\/]node_modules[\\/]/,
 						name: "vendors",
 						enforce: true,
-						chunks: "all",
+						chunks: "initial",
 					},
 				},
 			},
