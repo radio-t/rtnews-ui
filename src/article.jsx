@@ -175,9 +175,9 @@ function ArticleFactory(editable = false) {
 					</div>
 					{editable && [
 						this.state.mode === "view" && (
-							<div class="post__edit">
+							<div class="article__edit">
 								<span
-									class="pseudo post__edit-button"
+									class="pseudo article__edit-button"
 									onClick={() => this.edit()}
 								>
 									Редактировать
@@ -185,23 +185,23 @@ function ArticleFactory(editable = false) {
 							</div>
 						),
 						this.state.mode === "edit" && (
-							<div class="post__edit">
+							<div class="article__edit">
 								<span
-									class="pseudo post__edit-button"
+									class="pseudo article__edit-button"
 									onClick={() => this.cancelEdit()}
 								>
 									Отменить
 								</span>
 								{" / "}
 								<span
-									class="pseudo post__edit-button"
+									class="pseudo article__edit-button"
 									onClick={() => this.preview()}
 								>
 									Превью
 								</span>
 								{" / "}
 								<span
-									class="pseudo post__edit-button"
+									class="pseudo article__edit-button"
 									onClick={() => this.save()}
 								>
 									Сохранить
@@ -209,23 +209,23 @@ function ArticleFactory(editable = false) {
 							</div>
 						),
 						this.state.mode === "preview" && (
-							<div class="post__edit">
+							<div class="article__edit">
 								<span
-									class="pseudo post__edit-button"
+									class="pseudo article__edit-button"
 									onClick={() => this.cancelEdit()}
 								>
 									Отменить
 								</span>
 								{" / "}
 								<span
-									class="pseudo post__edit-button"
+									class="pseudo article__edit-button"
 									onClick={() => this.setState({ mode: "edit" })}
 								>
 									Продолжить
 								</span>
 								{" / "}
 								<span
-									class="pseudo post__edit-button"
+									class="pseudo article__edit-button"
 									onClick={() => this.save()}
 								>
 									Сохранить
