@@ -242,17 +242,19 @@ function ArticleFactory(editable = false) {
 							}}
 						/>
 					)}
+					{editable && this.state.mode === "preview" && (
+						<div
+							className="article__snippet"
+							dangerouslySetInnerHTML={{
+								__html:
+									this.state.previewSnippet !== null
+										? this.state.previewSnippet
+										: this.state.article.snippet || "",
+							}}
+						/>
+					)}
 					{editable &&
-						(this.state.mode === "view" || this.state.mode === "preview") && [
-							<div
-								className="article__snippet"
-								dangerouslySetInnerHTML={{
-									__html:
-										this.state.previewSnippet !== null
-											? this.state.previewSnippet
-											: this.state.article.snippet || "",
-								}}
-							/>,
+						(this.state.mode === "view" || this.state.mode === "preview") && (
 							<div
 								className="article-content article__content"
 								dangerouslySetInnerHTML={{
@@ -261,8 +263,8 @@ function ArticleFactory(editable = false) {
 											? this.state.previewContent
 											: this.state.article.content || "",
 								}}
-							/>,
-						]}
+							/>
+						)}
 					{this.state.mode === "edit" && [
 						<div className="article__editor-title article__editor-title-content">
 							Сниппет
