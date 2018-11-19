@@ -1,7 +1,7 @@
 import { createElement, PureComponent } from "react";
 
 import { formatDate, scrollIntoView, waitFor } from "./utils.js";
-import { getArticle, addArticle } from "./api.js";
+import { getArticle, updateArticle } from "./api.js";
 import articleCache from "./articleCache";
 import { remark } from "./settings.js";
 
@@ -82,12 +82,7 @@ function ArticleFactory(editable = false) {
 					data: "Сохраняю новость",
 					time: null,
 				});
-				await addArticle(
-					this.state.article.link,
-					this.state.article.title,
-					snippet,
-					content
-				);
+				await updateArticle({ ...this.state.article, content, snippet });
 				articleCache.invalidate();
 				this.setState({
 					previewContent: null,
@@ -117,7 +112,6 @@ function ArticleFactory(editable = false) {
 							</span>
 						</span>
 					),
-					level: "error",
 					time: 10000,
 				});
 			}

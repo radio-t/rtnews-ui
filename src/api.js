@@ -151,6 +151,24 @@ export function addArticle(link, title = "", snippet = "", content = "") {
 	});
 }
 
+export function updateArticle(updated) {
+	for (let [slug, article] of articlesCache.entries()) {
+		if (article.id === updated.id) {
+			articlesCache.delete(slug);
+			articlesIdSlugMap.delete(article.id);
+		}
+	}
+
+	const headers = new Headers();
+	headers.append("Content-Type", "application/json");
+
+	return request("/news/manual", {
+		method: "POST",
+		body: JSON.stringify(updated),
+		headers,
+	});
+}
+
 export function moveArticle(id, offset) {
 	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
 }
