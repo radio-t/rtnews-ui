@@ -171,7 +171,7 @@ function ArticleFactory(editable = false) {
 						this.state.mode === "view" && (
 							<div class="article__edit">
 								<span
-									class="pseudo article__edit-button"
+									class="pseudo article__edit-button article__edit-button-edit"
 									onClick={() => this.edit()}
 								>
 									Редактировать
