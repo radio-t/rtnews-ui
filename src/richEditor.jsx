@@ -87,7 +87,13 @@ export default class RichEditor extends PureComponent {
 	render() {
 		if (!this.state.loaded) return "Загружаю";
 		return (
-			<div class={"editor-container " + (this.props.className || "")}>
+			<div
+				class={
+					"editor-container " +
+					(!this.props.rich ? "editor-container--poor " : "") +
+					(this.props.className || "")
+				}
+			>
 				<div
 					class="editor"
 					ref={ref => (this.editor = ref)}
