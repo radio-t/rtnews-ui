@@ -1358,6 +1358,10 @@ html[data-theme="night"] {
 		padding: 1rem;
 	}
 
+	.article__snippet {
+		background: hsla(40, 60%, 90%, 0.2);
+	}
+
 	/* drop */
 	.drop-top {
 		border-top-color: hsla(200, 60%, 70%, 1);
