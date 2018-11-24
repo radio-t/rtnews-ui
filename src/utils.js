@@ -53,11 +53,13 @@ export async function waitDOMReady() {
 	}
 }
 
-export async function retry(fn, retries = 3) {
+export async function retry(fn, retries = 3, retryInterval = 0) {
 	for (let i = 0; i < retries; i++) {
 		try {
 			return await fn();
-		} catch (e) {}
+		} catch (e) {
+			if (retryInterval) await sleep(retryInterval);
+		}
 	}
 	throw new Error("Retry failed");
 }

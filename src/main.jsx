@@ -24,7 +24,12 @@ import {
 import { waitDOMReady, sleep, scrollIntoView } from "./utils.js";
 
 import Head from "./head.jsx";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+	BrowserRouter as Router,
+	Route,
+	Switch,
+	Redirect,
+} from "react-router-dom";
 import { ScrollContext } from "react-router-scroll-4";
 import { Provider, connect } from "react-redux";
 import AddArticle from "./add.jsx";
@@ -64,6 +69,11 @@ class App extends Component {
 								)}
 							/>
 							<Route
+								path="/admin/"
+								exact={true}
+								render={() => <Redirect to="/login/" />}
+							/>
+							<Route
 								path="/deleted/"
 								exact={true}
 								render={() => (
@@ -94,16 +104,25 @@ class App extends Component {
 								exact={true}
 								render={() => <Feeds {...this.props} />}
 							/>
-							<Route path="/sort/" render={() => <Sorter {...this.props} />} />
+							<Route
+								path="/sort/"
+								render={() => (
+									<ScrollContext>
+										<Sorter {...this.props} />
+									</ScrollContext>
+								)}
+							/>
 							<Route
 								path={`${postsPrefix}/:slug`}
-								render={props =>
-									this.props.isAdmin ? (
-										<EditableArticle slug={props.match.params.slug} />
-									) : (
-										<Article slug={props.match.params.slug} />
-									)
-								}
+								render={props => (
+									<ScrollContext>
+										{this.props.isAdmin ? (
+											<EditableArticle slug={props.match.params.slug} />
+										) : (
+											<Article slug={props.match.params.slug} />
+										)}
+									</ScrollContext>
+								)}
 							/>
 							<Route path="/login/" exact={true} render={() => <LoginForm />} />
 							<Route component={NotFound} />
