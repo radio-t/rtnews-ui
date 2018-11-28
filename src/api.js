@@ -292,7 +292,11 @@ export function login(user, password) {
 		mode: "cors",
 	}).then(response => {
 		if (response.status === 200) {
-			document.cookie = `auth=${auth};max-age=94608000;path=/;samesite=strict`;
+			const d = new Date();
+			d.setFullYear(d.getFullYear() + 3);
+			document.cookie = `auth=${encodeURIComponent(
+				auth
+			)};expires=${d.toUTCString()};path=/`;
 			return true;
 		}
 		return false;
@@ -300,25 +304,27 @@ export function login(user, password) {
 }
 
 export function loginViaCookies() {
-	const cookies = document.cookie
-		.split(";")
-		.map(x => x.trim())
-		.reduce((c, x) => {
-			const [key, value] = x.split("=");
-			c[key] = value;
-			return c;
-		}, {});
+	const cookies = document.cookie.split(";").reduce((c, x) => {
+		if (!x) return c;
+		const [key, value] = x.split("=");
+		if (!key) return c;
+		c[key.trim()] = value.trim();
+		return c;
+	}, {});
 	if (!cookies.hasOwnProperty("auth")) return Promise.resolve(false);
 	const headers = new Headers();
-	const auth = cookies.auth;
+	const auth = decodeURIComponent(cookies.auth);
 	headers.append("Authorization", "Basic " + auth);
-	return retry(() =>
-		fetch(apiRoot + "/news/reload", {
-			method: "PUT",
-			headers: headers,
-			credentials: "omit",
-			mode: "cors",
-		})
+	return retry(
+		() =>
+			fetch(apiRoot + "/news/reload", {
+				method: "PUT",
+				headers: headers,
+				credentials: "omit",
+				mode: "cors",
+			}),
+		3,
+		1000
 	)
 		.then(response => response.status === 200)
 		.catch(e => {
