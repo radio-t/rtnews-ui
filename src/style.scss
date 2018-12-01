@@ -683,6 +683,13 @@ p {
 		margin: 0;
 	}
 
+	&__issue-number {
+		color: #e05020;
+		font-size: 50%;
+		margin-left: 0.2rem;
+		vertical-align: super;
+	}
+
 	@media screen and (max-width: 28rem) {
 		&__title {
 			font-size: 1.6em;

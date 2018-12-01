@@ -20,6 +20,7 @@ import {
 	loginViaCookies,
 	getTheme,
 	getArticleById,
+	getIssueNumber,
 } from "./api.js";
 import { waitDOMReady, sleep, scrollIntoView } from "./utils.js";
 
@@ -157,6 +158,12 @@ async function main() {
 	});
 
 	setState({ autoScroll: getAutoScroll() });
+
+	getIssueNumber().then(issueNumber => {
+		if (issueNumber) {
+			setState({ issueNumber });
+		}
+	});
 
 	render(
 		<Provider store={store}>
