@@ -1,5 +1,6 @@
 import "./style.scss";
 import "intersection-observer";
+import "whatwg-fetch";
 import "./ganalitics.js";
 
 import { createElement, Component } from "react";

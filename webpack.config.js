@@ -51,6 +51,9 @@ module.exports = (a, args) => {
 									{
 										useBuiltIns: "usage",
 										modules: false,
+										targets: {
+											ie: "11",
+										},
 									},
 								],
 								[
