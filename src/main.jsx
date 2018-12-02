@@ -142,6 +142,8 @@ class App extends Component {
 						<hr />
 						<a href="http://radio-t.com/">Radio-T</a>,{" "}
 						{new Date().getFullYear()}
+						<br />
+						<span class="footer__buildtime">built on {BUILDTIME}</span>
 					</div>
 					<Notifications
 						className="page__notifications"

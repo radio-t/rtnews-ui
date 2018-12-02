@@ -112,6 +112,7 @@ module.exports = (a, args) => {
 			}),
 			new CopyWebpackPlugin([{ from: "./static", to: "static" }]),
 			new webpack.DefinePlugin({
+				BUILDTIME: JSON.stringify(new Date().toUTCString()),
 				"process.env.NODE_ENV": JSON.stringify(
 					args.mode === "development" ? "development" : "production"
 				),

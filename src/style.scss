@@ -702,6 +702,13 @@ p {
 	}
 }
 
+.footer {
+	&__buildtime {
+		opacity: 0.4;
+		font-size: 70%;
+	}
+}
+
 /* listing-actions */
 
 .listing-actions {
