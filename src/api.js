@@ -35,37 +35,16 @@ function processArticle(article) {
 	return article;
 }
 
-function setIssueNumber(value) {
-	const expires = new Date();
-	// plus hour;
-	expires.setTime(expires.getTime() + 1000 * 60 * 60);
-	localStorage.setItem(
-		"rt-news.issue-number",
-		JSON.stringify({
-			value,
-			expires,
-		})
-	);
-}
-
 export function getIssueNumber() {
-	try {
-		const val = localStorage.getItem("rt-news.issue-number");
-		if (val) {
-			const obj = JSON.parse(val);
-			const expires = new Date(obj.expires);
-			if (new Date() < expires) return Promise.resolve(obj.value);
-		}
-	} catch {}
-
-	return fetch("https://radio-t.com/site-api/last/1?categories=podcast")
+	return retry(() =>
+		fetch("https://radio-t.com/site-api/last/1?categories=podcast")
+	)
 		.then(resp => resp.json())
 		.then(json => {
 			const passedReg = /^Радио-Т (\d+)$/i;
 			const match = json[0].title.match(passedReg);
 			if (match && match.length > 1) {
 				const value = parseInt(match[1], 10) + 1;
-				setIssueNumber(value);
 				return value;
 			}
 			return null;
