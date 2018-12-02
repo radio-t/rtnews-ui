@@ -37,8 +37,8 @@ function processArticle(article) {
 
 function setIssueNumber(value) {
 	const expires = new Date();
-	// plus halfday;
-	expires.setTime(expires.getTime() + 1000 * 60 * 60 * 12);
+	// plus hour;
+	expires.setTime(expires.getTime() + 1000 * 60 * 60);
 	localStorage.setItem(
 		"rt-news.issue-number",
 		JSON.stringify({
@@ -58,27 +58,15 @@ export function getIssueNumber() {
 		}
 	} catch {}
 
-	return fetch("https://radio-t.com")
-		.then(resp => resp.text())
-		.then(text => new DOMParser().parseFromString(text, "text/html"))
-		.then(dom => {
-			const elements = dom.querySelectorAll(".entry-title");
-			const upcomingReg = /^Темы для (\d+)$/i;
+	return fetch("https://radio-t.com/site-api/last/1?categories=podcast")
+		.then(resp => resp.json())
+		.then(json => {
 			const passedReg = /^Радио-Т (\d+)$/i;
-			for (let element of elements) {
-				const text = element.textContent.trim();
-				const matchUpcoming = text.match(upcomingReg);
-				if (matchUpcoming && matchUpcoming.length > 1) {
-					const value = parseInt(matchUpcoming[1], 10);
-					setIssueNumber(value);
-					return value;
-				}
-				const matchPassed = text.match(passedReg);
-				if (matchPassed && matchPassed.length > 1) {
-					const value = parseInt(matchPassed[1], 10) + 1;
-					setIssueNumber(value);
-					return value;
-				}
+			const match = json[0].title.match(passedReg);
+			if (match && match.length > 1) {
+				const value = parseInt(match[1], 10) + 1;
+				setIssueNumber(value);
+				return value;
 			}
 			return null;
 		})
