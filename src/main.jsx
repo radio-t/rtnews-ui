@@ -62,7 +62,7 @@ class App extends Component {
 								path="/"
 								exact={true}
 								render={() => (
-									<ScrollContext>
+									<ScrollContext scrollKey="main">
 										<Listing
 											{...this.props}
 											ref={ref => (window[listingRef] = ref)}
@@ -116,15 +116,23 @@ class App extends Component {
 							/>
 							<Route
 								path={`${postsPrefix}/:slug`}
-								render={props => (
-									<ScrollContext>
-										{this.props.isAdmin ? (
+								render={props =>
+									this.props.isAdmin ? (
+										<ScrollContext
+											scrollKey="post"
+											shouldUpdateScroll={(_, cur) => !!cur.location.key}
+										>
 											<EditableArticle slug={props.match.params.slug} />
-										) : (
+										</ScrollContext>
+									) : (
+										<ScrollContext
+											scrollKey="post"
+											shouldUpdateScroll={(_, cur) => !!cur.location.key}
+										>
 											<Article slug={props.match.params.slug} />
-										)}
-									</ScrollContext>
-								)}
+										</ScrollContext>
+									)
+								}
 							/>
 							<Route path="/login/" exact={true} render={() => <LoginForm />} />
 							<Route component={NotFound} />

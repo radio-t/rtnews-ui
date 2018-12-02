@@ -170,6 +170,10 @@ export default class Head extends Component {
 									onClick={e => {
 										e.preventDefault();
 										const el = document.getElementById("to-comments");
+										if (!el) {
+											console.error("Comments node not found");
+											return;
+										}
 										scrollIntoView(el);
 										sleep(500).then(() => {
 											window.location.hash = "to-comments";
