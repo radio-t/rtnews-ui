@@ -101,7 +101,8 @@ export const scrollIntoView = (() => {
 				return el.scrollIntoView({ behavior, block: "start" });
 			else {
 				const startPosition = window.scrollY || window.pageYOffset;
-				const targetPosition = startPosition + el.getBoundingClientRect().y;
+				const rect = el.getBoundingClientRect();
+				const targetPosition = startPosition + (rect.y || rect.top);
 				const timeStart = performance.now();
 				const duration = 500;
 
