@@ -34,6 +34,9 @@ export default class Head extends Component {
 			<div className="header wrapper page__header">
 				<h1 className="title header__title">
 					Новости для <span class="no-break">Радио-Т</span>
+					{this.props.issueNumber && (
+						<span class="header__issue-number">{this.props.issueNumber}</span>
+					)}
 				</h1>
 				<ul
 					className="navigation header__navigation"
@@ -167,6 +170,10 @@ export default class Head extends Component {
 									onClick={e => {
 										e.preventDefault();
 										const el = document.getElementById("to-comments");
+										if (!el) {
+											console.error("Comments node not found");
+											return;
+										}
 										scrollIntoView(el);
 										sleep(500).then(() => {
 											window.location.hash = "to-comments";

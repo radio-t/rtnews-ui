@@ -35,6 +35,23 @@ function processArticle(article) {
 	return article;
 }
 
+export function getIssueNumber() {
+	return retry(() =>
+		fetch("https://radio-t.com/site-api/last/1?categories=podcast")
+	)
+		.then(resp => resp.json())
+		.then(json => {
+			const passedReg = /^Радио-Т (\d+)$/i;
+			const match = json[0].title.match(passedReg);
+			if (match && match.length > 1) {
+				const value = parseInt(match[1], 10) + 1;
+				return value;
+			}
+			return null;
+		})
+		.catch(() => null);
+}
+
 function processArticles(articles) {
 	if (!Array.isArray(articles)) return articles;
 	return articles.map(processArticle);

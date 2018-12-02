@@ -1,5 +1,6 @@
 import "./style.scss";
 import "intersection-observer";
+import "whatwg-fetch";
 import "./ganalitics.js";
 
 import { createElement, Component } from "react";
@@ -20,6 +21,7 @@ import {
 	loginViaCookies,
 	getTheme,
 	getArticleById,
+	getIssueNumber,
 } from "./api.js";
 import { waitDOMReady, sleep, scrollIntoView } from "./utils.js";
 
@@ -60,7 +62,7 @@ class App extends Component {
 								path="/"
 								exact={true}
 								render={() => (
-									<ScrollContext>
+									<ScrollContext scrollKey="main">
 										<Listing
 											{...this.props}
 											ref={ref => (window[listingRef] = ref)}
@@ -114,15 +116,23 @@ class App extends Component {
 							/>
 							<Route
 								path={`${postsPrefix}/:slug`}
-								render={props => (
-									<ScrollContext>
-										{this.props.isAdmin ? (
+								render={props =>
+									this.props.isAdmin ? (
+										<ScrollContext
+											scrollKey="post"
+											shouldUpdateScroll={(_, cur) => !!cur.location.key}
+										>
 											<EditableArticle slug={props.match.params.slug} />
-										) : (
+										</ScrollContext>
+									) : (
+										<ScrollContext
+											scrollKey="post"
+											shouldUpdateScroll={(_, cur) => !!cur.location.key}
+										>
 											<Article slug={props.match.params.slug} />
-										)}
-									</ScrollContext>
-								)}
+										</ScrollContext>
+									)
+								}
 							/>
 							<Route path="/login/" exact={true} render={() => <LoginForm />} />
 							<Route component={NotFound} />
@@ -132,6 +142,8 @@ class App extends Component {
 						<hr />
 						<a href="http://radio-t.com/">Radio-T</a>,{" "}
 						{new Date().getFullYear()}
+						<br />
+						<span class="footer__buildtime">built on {BUILDTIME}</span>
 					</div>
 					<Notifications
 						className="page__notifications"
@@ -157,6 +169,12 @@ async function main() {
 	});
 
 	setState({ autoScroll: getAutoScroll() });
+
+	getIssueNumber().then(issueNumber => {
+		if (issueNumber) {
+			setState({ issueNumber });
+		}
+	});
 
 	render(
 		<Provider store={store}>

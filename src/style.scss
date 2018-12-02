@@ -666,7 +666,7 @@ p {
 	}
 
 	&__content {
-		flex: 1;
+		flex: 1 0 auto;
 	}
 
 	&__footer {
@@ -683,6 +683,13 @@ p {
 		margin: 0;
 	}
 
+	&__issue-number {
+		color: #e05020;
+		font-size: 50%;
+		margin-left: 0.2rem;
+		vertical-align: super;
+	}
+
 	@media screen and (max-width: 28rem) {
 		&__title {
 			font-size: 1.6em;
@@ -692,6 +699,13 @@ p {
 	&__navigation {
 		margin-top: 0.2em;
 		margin-bottom: 1em;
+	}
+}
+
+.footer {
+	&__buildtime {
+		opacity: 0.4;
+		font-size: 70%;
 	}
 }
 
@@ -1044,7 +1058,7 @@ p {
 		max-width: calc(100% - 1.5rem);
 		box-sizing: border-box;
 		flex: 1;
-		overflow: auto;
+		overflow-x: auto;
 	}
 
 	@media screen and (max-width: 38rem) {
@@ -1134,7 +1148,7 @@ p {
 	position: relative;
 	box-sizing: border-box;
 	max-width: 100%;
-	overflow-y: scroll;
+	overflow-x: auto;
 
 	img {
 		max-width: 100%;
@@ -1148,7 +1162,7 @@ p {
 
 	code,
 	pre {
-		overflow: scroll;
+		overflow-x: auto;
 	}
 
 	figure {
