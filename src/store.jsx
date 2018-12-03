@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { createStore } from "redux";
 
 const initialState = {
-	issue: null,
+	issueNumber: null,
 	isAdmin: false,
 	notifications: [],
 	activeId: null,
