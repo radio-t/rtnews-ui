@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 import { addNotification } from "./store.jsx";
 import { listingRef } from "./symbols.js";
 import { sleep, waitFor, scrollIntoView } from "./utils.js";

@@ -1,4 +1,4 @@
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 import { setState } from "./store.jsx";
 import { login, loginViaCookies } from "./api.js";

@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 export default function FeedLabel(props) {
 	if (props.feed.length === 0) return null;
 	if (props.feed === "manual") return null;

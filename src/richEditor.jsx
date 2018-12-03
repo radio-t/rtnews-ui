@@ -1,4 +1,4 @@
-import { createElement, PureComponent } from "react";
+import { PureComponent } from "react";
 import { waitFor } from "./utils";
 
 let Quill = null;

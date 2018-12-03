@@ -1,4 +1,4 @@
-import { createElement, PureComponent } from "react";
+import { PureComponent } from "react";
 
 import { formatDate, scrollIntoView, waitFor } from "./utils.js";
 import { getArticle, updateArticle } from "./api.js";

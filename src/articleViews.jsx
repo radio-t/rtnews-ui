@@ -1,4 +1,4 @@
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils.js";
 import { postsPrefix, isSafari } from "./settings.js";

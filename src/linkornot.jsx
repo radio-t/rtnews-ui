@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 export default function(props) {
 	if (
 		props.href === window.location.pathname ||

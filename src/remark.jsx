@@ -1,4 +1,4 @@
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 export default class Remark extends Component {
 	constructor(props) {

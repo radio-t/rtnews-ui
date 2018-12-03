@@ -110,6 +110,9 @@ module.exports = (a, args) => {
 				filename: "[name].css",
 				chunkFilename: "[name].css",
 			}),
+			new webpack.ProvidePlugin({
+				createElement: ["react", "createElement"],
+			}),
 			new CopyWebpackPlugin([{ from: "./static", to: "static" }]),
 			new webpack.DefinePlugin({
 				BUILDTIME: JSON.stringify(new Date().toUTCString()),

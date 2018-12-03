@@ -1,4 +1,4 @@
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 import { Redirect } from "react-router-dom";
 import { addArticle } from "./api.js";

@@ -1,4 +1,4 @@
-import { createElement, PureComponent } from "react";
+import { PureComponent } from "react";
 
 import { getFeeds, addFeed, removeFeed } from "./api.js";
 import { formatDate, sleep, waitFor } from "./utils.js";
