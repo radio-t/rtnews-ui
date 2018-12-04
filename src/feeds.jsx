@@ -61,7 +61,7 @@ export default class FeedsForm extends PureComponent {
 								className="feeds__updated-at"
 								dangerouslySetInnerHTML={{
 									__html:
-										"Обновлено в " +
+										"Обновлено " +
 										formatDate(new Date(Date.parse(feed.updated))),
 								}}
 							/>
