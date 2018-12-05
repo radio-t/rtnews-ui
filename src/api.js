@@ -48,7 +48,7 @@ export function getIssueNumber() {
 				const number = parseInt(match[1], 10);
 				return {
 					number,
-					link: json[0].url,
+					link: json[0].url + "#remark42",
 				};
 			}
 			const upcomingMatch = json[0].title.match(upcomingReg);
