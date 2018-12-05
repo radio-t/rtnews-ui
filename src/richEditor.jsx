@@ -52,7 +52,8 @@ export default class RichEditor extends PureComponent {
 					modules: {
 						toolbar: [
 							[{ header: [1, 2, 3, 4, 5, 6, false] }],
-							["bold", "italic", "underline", "strike"],
+							["bold", "italic", "underline", "strike", "link"],
+							["blockquote", "code-block"],
 							[{ align: [] }],
 							[{ list: "ordered" }, { list: "bullet" }],
 							[{ script: "sub" }, { script: "super" }],
