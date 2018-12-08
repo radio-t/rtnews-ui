@@ -1,4 +1,4 @@
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 import { postRecentness, postLevels, sortings } from "./settings.js";
 import Select from "./select.jsx";

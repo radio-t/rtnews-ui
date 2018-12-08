@@ -3,7 +3,7 @@ import "intersection-observer";
 import "whatwg-fetch";
 import "./ganalitics.js";
 
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 import { postsPrefix } from "./settings.js";
 import { render } from "react-dom";

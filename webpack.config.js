@@ -4,9 +4,13 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const rthost = process.env.RTHOST && JSON.stringify(process.env.RTHOST);
-
 module.exports = (a, args) => {
+	const APIROOT =
+		process.env.RTHOST ||
+		(args.mode === "development"
+			? "http://jess.umputun.com:8780/api/v1"
+			: "https://news.radio-t.com/api/v1");
+
 	return {
 		entry: "./main.jsx",
 		context: path.resolve(__dirname, "src"),
@@ -105,10 +109,14 @@ module.exports = (a, args) => {
 				template: "./index.html",
 				filename: "index.html",
 				hash: true,
+				APIROOT,
 			}),
 			new MiniCssExtractPlugin({
 				filename: "[name].css",
 				chunkFilename: "[name].css",
+			}),
+			new webpack.ProvidePlugin({
+				createElement: ["react", "createElement"],
 			}),
 			new CopyWebpackPlugin([{ from: "./static", to: "static" }]),
 			new webpack.DefinePlugin({
@@ -120,11 +128,7 @@ module.exports = (a, args) => {
 				ENV: JSON.stringify(
 					args.mode === "development" ? "development" : "production"
 				),
-				APIROOT:
-					rthost ||
-					(args.mode === "development"
-						? '"http://jess.umputun.com:8780/api/v1"'
-						: '"https://news.radio-t.com/api/v1"'),
+				APIROOT: JSON.stringify(APIROOT),
 			}),
 		],
 		devServer: {

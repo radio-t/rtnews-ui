@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 const controls = {
 	"make-current": {
 		title: "Сделать текущей",

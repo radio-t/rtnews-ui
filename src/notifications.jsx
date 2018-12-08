@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 import { removeNotification } from "./store.jsx";
 
 export default function Notifications(props) {

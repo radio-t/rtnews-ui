@@ -1,4 +1,4 @@
-import { createElement, PureComponent } from "react";
+import { PureComponent } from "react";
 
 import { getFeeds, addFeed, removeFeed } from "./api.js";
 import { formatDate, sleep, waitFor } from "./utils.js";
@@ -61,7 +61,7 @@ export default class FeedsForm extends PureComponent {
 								className="feeds__updated-at"
 								dangerouslySetInnerHTML={{
 									__html:
-										"Обновлено в " +
+										"Обновлено " +
 										formatDate(new Date(Date.parse(feed.updated))),
 								}}
 							/>

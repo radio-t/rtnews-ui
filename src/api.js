@@ -37,15 +37,27 @@ function processArticle(article) {
 
 export function getIssueNumber() {
 	return retry(() =>
-		fetch("https://radio-t.com/site-api/last/1?categories=podcast")
+		fetch("https://radio-t.com/site-api/last/1?categories=podcast,prep")
 	)
 		.then(resp => resp.json())
 		.then(json => {
-			const passedReg = /^Радио-Т (\d+)$/i;
+			const passedReg = /^Темы для (\d+)$/i;
+			const upcomingReg = /^Радио-Т (\d+)$/i;
 			const match = json[0].title.match(passedReg);
 			if (match && match.length > 1) {
-				const value = parseInt(match[1], 10) + 1;
-				return value;
+				const number = parseInt(match[1], 10);
+				return {
+					number,
+					link: json[0].url + "#remark42",
+				};
+			}
+			const upcomingMatch = json[0].title.match(upcomingReg);
+			if (upcomingMatch && upcomingMatch.length > 1) {
+				const number = parseInt(upcomingMatch[1], 10) + 1;
+				return {
+					number,
+					link: null,
+				};
 			}
 			return null;
 		})

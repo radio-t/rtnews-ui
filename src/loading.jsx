@@ -1,4 +1,4 @@
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 export default class Loading extends Component {
 	constructor(props) {

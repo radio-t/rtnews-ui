@@ -1,4 +1,4 @@
-import { createElement, Component } from "react";
+import { Component } from "react";
 
 import {
 	logout,
@@ -35,7 +35,15 @@ export default class Head extends Component {
 				<h1 className="title header__title">
 					Новости для <span class="no-break">Радио-Т</span>
 					{this.props.issueNumber && (
-						<span class="header__issue-number">{this.props.issueNumber}</span>
+						<span class="header__issue-number">
+							{this.props.issueNumber.link ? (
+								<a href={this.props.issueNumber.link} title="Темы слушателей">
+									{this.props.issueNumber.number}
+								</a>
+							) : (
+								this.props.issueNumber.number
+							)}
+						</span>
 					)}
 				</h1>
 				<ul

@@ -2,7 +2,7 @@
  * Provides with different Atricle Listing views (Main, Archive, Deleted, Sorting)
  */
 
-import { createElement, Component } from "react";
+import { Component } from "react";
 import { sleep, first, requestIdleCallback } from "./utils.js";
 import {
 	postRecentness,
