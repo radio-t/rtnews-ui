@@ -98,21 +98,10 @@ export default class AddArticleForm extends Component {
 			}
 		};
 
-		const cookies = document.cookie
-			.split(";")
-			.map(x => x.trim())
-			.reduce((c, x) => {
-				const [key, value] = x.split("=");
-				c[key] = value;
-				return c;
-			}, {});
-
-		if (!cookies.hasOwnProperty("auth")) return "";
-
 		const href = hrefFunc
 			.toString()
 			.replace(/#LOCATION#/g, apiRoot)
-			.replace(/#AUTH#/g, cookies.auth)
+			.replace(/#AUTH#/g, localStorage.getItem("rt-news.auth") || "")
 			.replace(/\s{2,}/g, " ");
 
 		return "javascript:(" + encodeURIComponent(href) + ")();";

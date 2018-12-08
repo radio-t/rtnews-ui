@@ -1,7 +1,7 @@
 import { Component } from "react";
 
 import { setState } from "./store.jsx";
-import { login, loginViaCookies } from "./api.js";
+import { login, loginViaStorage } from "./api.js";
 
 import { Redirect } from "react-router-dom";
 import { waitFor } from "./utils.js";
@@ -17,7 +17,7 @@ export default class LoginForm extends Component {
 		};
 	}
 	componentDidMount() {
-		loginViaCookies().then(loggedIn => {
+		loginViaStorage().then(loggedIn => {
 			this.setState({ loggedIn });
 		});
 		document.title = "Вход | Новости Радио-Т";
