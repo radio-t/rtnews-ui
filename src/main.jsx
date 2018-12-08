@@ -18,7 +18,7 @@ import {
 	getActiveArticle,
 	pollActiveArticle,
 	getAutoScroll,
-	loginViaCookies,
+	loginViaStorage,
 	getTheme,
 	getArticleById,
 	getIssueNumber,
@@ -164,7 +164,7 @@ async function main() {
 		return state;
 	})(App);
 
-	await loginViaCookies().then(isAdmin => {
+	await loginViaStorage().then(isAdmin => {
 		setState({ isAdmin });
 	});
 

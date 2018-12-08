@@ -73,16 +73,11 @@ function request(endpoint, options = {}) {
 	if (!options.hasOwnProperty("headers")) {
 		options.headers = new Headers();
 	}
-	const cookies = document.cookie
-		.split(";")
-		.map(x => x.trim())
-		.reduce((c, x) => {
-			const [key, value] = x.split("=");
-			c[key] = value;
-			return c;
-		}, {});
-	if (cookies.hasOwnProperty("auth")) {
-		options.headers.append("Authorization", "Basic " + cookies.auth);
+	if (localStorage.getItem("rt-news.auth")) {
+		options.headers.append(
+			"Authorization",
+			"Basic " + localStorage.getItem("rt-news.auth")
+		);
 	}
 	return fetch(
 		apiRoot + endpoint + `?timestamp=${new Date().getTime()}`,
@@ -321,28 +316,17 @@ export function login(user, password) {
 		mode: "cors",
 	}).then(response => {
 		if (response.status === 200) {
-			const d = new Date();
-			d.setFullYear(d.getFullYear() + 3);
-			document.cookie = `auth=${encodeURIComponent(
-				auth
-			)};expires=${d.toUTCString()};path=/`;
+			localStorage.setItem("rt-news.auth", auth);
 			return true;
 		}
 		return false;
 	});
 }
 
-export function loginViaCookies() {
-	const cookies = document.cookie.split(";").reduce((c, x) => {
-		if (!x) return c;
-		const [key, value] = x.split("=");
-		if (!key) return c;
-		c[key.trim()] = value.trim();
-		return c;
-	}, {});
-	if (!cookies.hasOwnProperty("auth")) return Promise.resolve(false);
+export function loginViaStorage() {
+	if (!localStorage.getItem("rt-news.auth")) return Promise.resolve(false);
 	const headers = new Headers();
-	const auth = decodeURIComponent(cookies.auth);
+	const auth = localStorage.getItem("rt-news.auth");
 	headers.append("Authorization", "Basic " + auth);
 	return retry(
 		() =>
@@ -356,13 +340,11 @@ export function loginViaCookies() {
 		1000
 	)
 		.then(response => response.status === 200)
-		.catch(e => {
-			return false;
-		});
+		.catch(() => false);
 }
 
 export function logout() {
-	document.cookie = "auth=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/";
+	localStorage.removeItem("rt-news.auth");
 }
 
 /**
