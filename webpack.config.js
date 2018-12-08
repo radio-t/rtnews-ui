@@ -4,11 +4,9 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const rthost = process.env.RTHOST && JSON.stringify(process.env.RTHOST);
-
 module.exports = (a, args) => {
 	const APIROOT =
-		rthost ||
+		process.env.RTHOST ||
 		(args.mode === "development"
 			? "http://jess.umputun.com:8780/api/v1"
 			: "https://news.radio-t.com/api/v1");
