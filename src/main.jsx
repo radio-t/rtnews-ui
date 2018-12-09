@@ -155,9 +155,13 @@ class App extends Component {
 }
 
 async function main() {
-	const theme = getTheme();
-	document.documentElement.dataset.theme = theme;
-	setTheme(theme, true);
+	try {
+		const theme = getTheme();
+		document.documentElement.dataset.theme = theme;
+		setTheme(theme, true);
+	} catch (e) {
+		console.error(e);
+	}
 
 	const CApp = connect(state => {
 		return state;
