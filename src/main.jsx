@@ -183,56 +183,58 @@ async function main() {
 		document.querySelector(".app")
 	);
 
-	getActiveArticle().then(async activeId => {
-		setState({ activeId });
-		await waitDOMReady();
-		while (true) {
-			try {
-				const activeId = await pollActiveArticle();
-				if (activeId === store.getState().activeId) {
-					removeNotificationsWithContext("active-article");
-					addNotification({
-						data: <b>Тема активирована</b>,
-						time: 3000,
-					});
-					continue;
-				}
-				setState({ activeId });
-				setImmediate(async () => {
-					if (store.getState().autoScroll) {
-						setTimeout(() => {
-							const el = document.querySelector(".post-active");
-							if (el) scrollIntoView(el);
-						}, 500);
-					}
-					sleep(700).then(() => {
-						document.title = "* Тема обновлена | Новости Радио-Т";
-					});
-					const article = await getArticleById(activeId);
-
-					if (article && article.hasOwnProperty("title")) {
+	getActiveArticle()
+		.catch(() => null)
+		.then(async activeId => {
+			setState({ activeId });
+			await waitDOMReady();
+			while (true) {
+				try {
+					const activeId = await pollActiveArticle();
+					if (activeId === store.getState().activeId) {
 						removeNotificationsWithContext("active-article");
-						addNotification(remove => ({
-							data: (
-								<span>
-									Тема обновлена:
-									<br />
-									<LinkToCurrent
-										title={`“${article.title}”`}
-										onClick={() => remove()}
-									/>
-								</span>
-							),
-							time: null,
-							context: "active-article",
-						}));
+						addNotification({
+							data: <b>Тема активирована</b>,
+							time: 3000,
+						});
+						continue;
 					}
-				});
-			} catch (e) {
-				await sleep(60000);
+					setState({ activeId });
+					setTimeout(async () => {
+						if (store.getState().autoScroll) {
+							setTimeout(() => {
+								const el = document.querySelector(".post-active");
+								if (el) scrollIntoView(el);
+							}, 500);
+						}
+						sleep(700).then(() => {
+							document.title = "* Тема обновлена | Новости Радио-Т";
+						});
+						const article = await getArticleById(activeId);
+
+						if (article && article.hasOwnProperty("title")) {
+							removeNotificationsWithContext("active-article");
+							addNotification(remove => ({
+								data: (
+									<span>
+										Тема обновлена:
+										<br />
+										<LinkToCurrent
+											title={`“${article.title}”`}
+											onClick={() => remove()}
+										/>
+									</span>
+								),
+								time: null,
+								context: "active-article",
+							}));
+						}
+					}, 0);
+				} catch {
+					console.error("Error while setting active article");
+				}
 			}
-		}
-	});
+		});
 }
 
 main().catch(e => console.error(e));

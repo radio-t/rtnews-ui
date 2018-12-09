@@ -5,7 +5,7 @@ import {
 	postLevels,
 	remark as RemarkConfig,
 } from "./settings.js";
-import { first, retry, debounce } from "./utils.js";
+import { first, retry, debounce, sleep } from "./utils.js";
 
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;
@@ -142,8 +142,13 @@ export function getActiveArticle() {
 
 export async function pollActiveArticle(ms = 295) {
 	while (true) {
-		const req = await request(`/news/active/wait/${ms}`);
-		if (req != null && req.hasOwnProperty("id")) return req.id;
+		try {
+			const req = await request(`/news/active/wait/${ms}`);
+			if (req != null && req.hasOwnProperty("id")) return req.id;
+		} catch (e) {
+			console.error("Error while polling for active article");
+			await sleep(3000);
+		}
 	}
 }
 
