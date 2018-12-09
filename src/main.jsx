@@ -17,7 +17,6 @@ import {
 import {
 	getActiveArticle,
 	pollActiveArticle,
-	getAutoScroll,
 	loginViaStorage,
 	getTheme,
 	getArticleById,
@@ -168,8 +167,6 @@ async function main() {
 		setState({ isAdmin });
 	});
 
-	setState({ autoScroll: getAutoScroll() });
-
 	getIssueNumber().then(issueNumber => {
 		if (issueNumber) {
 			setState({ issueNumber });
@@ -201,12 +198,6 @@ async function main() {
 					}
 					setState({ activeId });
 					setTimeout(async () => {
-						if (store.getState().autoScroll) {
-							setTimeout(() => {
-								const el = document.querySelector(".post-active");
-								if (el) scrollIntoView(el);
-							}, 500);
-						}
 						sleep(700).then(() => {
 							document.title = "* Тема обновлена | Новости Радио-Т";
 						});

@@ -5,7 +5,6 @@ const initialState = {
 	isAdmin: false,
 	notifications: [],
 	activeId: null,
-	autoScroll: false,
 	theme: "day",
 };
 const rootReducer = (state = initialState, action) => {

@@ -1,12 +1,6 @@
 import { Component } from "react";
 
-import {
-	logout,
-	update,
-	startShow,
-	setAutoScroll,
-	setTheme as saveTheme,
-} from "./api.js";
+import { logout, update, startShow, setTheme as saveTheme } from "./api.js";
 import {
 	store,
 	setState,
@@ -241,11 +235,6 @@ export default class Head extends Component {
 					level: "error",
 				});
 			});
-	}
-	toggleAutoScroll() {
-		const val = !store.getState().autoScroll;
-		setState({ autoScroll: val });
-		setAutoScroll(val);
 	}
 	poehali() {
 		if (confirm("Таки поехали?")) {

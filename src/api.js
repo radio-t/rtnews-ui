@@ -266,15 +266,6 @@ export function setRecentness(value) {
 	localStorage.setItem("recentness", value.title);
 }
 
-export function getAutoScroll() {
-	const s = localStorage.getItem("autoScroll");
-	return s === "true";
-}
-
-export function setAutoScroll(value) {
-	localStorage.setItem("autoScroll", value);
-}
-
 export function getPostLevel() {
 	const s = localStorage.getItem("postLevel");
 	return first(postLevels, x => x.title === s) || postLevels[0];
