@@ -214,23 +214,28 @@ export default class Head extends Component {
 			});
 	}
 	poehali() {
-		if (confirm("Таки поехали?")) {
-			startShow()
-				.then(() => {
-					addNotification({
-						data: <b>Шоу началось</b>,
-					});
-				})
-				.catch(e => {
-					console.error(e);
-					addNotification({
-						data: <b>Ошибка при старте шоу</b>,
-						level: "error",
-					});
+		if (!confirm("Таки поехали?")) return;
+
+		addNotification({
+			data: "Стартую",
+		});
+		startShow()
+			.then(() => {
+				addNotification({
+					data: <b>Шоу началось</b>,
 				});
-		}
+			})
+			.catch(e => {
+				console.error(e);
+				addNotification({
+					data: <b>Ошибка при старте шоу</b>,
+					level: "error",
+				});
+			});
 	}
 	async startPrepTopics() {
+		if (!confirm("Таки начать?")) return;
+
 		try {
 			if (!window[listingRef]) this.props.history.push("/");
 			await waitFor(

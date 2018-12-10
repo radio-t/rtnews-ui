@@ -291,7 +291,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 	async startPrepTopics() {
 		try {
 			addNotification({
-				data: "Активирую темы слушателей",
+				data: "Начинаю темы слушателей",
 			});
 			await waitFor(() => this.state.loaded, 20000);
 			const url = await getPrepTopicsURL();
