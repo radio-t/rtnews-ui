@@ -227,7 +227,7 @@ export default class Head extends Component {
 			});
 	}
 	async startPrepTopics() {
-		if (!confirm("Таки начать?")) return;
+		if (!confirm("Таки темы слушателей?")) return;
 
 		try {
 			if (!window[listingRef]) this.props.history.push("/");
