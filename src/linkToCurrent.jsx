@@ -5,11 +5,9 @@ import { sleep, waitFor, scrollIntoView } from "./utils.js";
 import { Link } from "react-router-dom";
 
 const onMissingArticle = async () => {
+	window[listingRef] && (await window[listingRef].update(true));
 	await waitFor(
-		async () =>
-			window[listingRef] &&
-			(await window[listingRef].update(true)) &&
-			window[listingRef].state.loaded
+		async () => window[listingRef] && window[listingRef].state.loaded
 	);
 	const el = document.getElementById("active-article");
 	if (el) {
@@ -21,16 +19,10 @@ const onMissingArticle = async () => {
 					Не могу найти тему,{" "}
 					<span
 						class="pseudo"
-						onClick={async e => {
-							window[listingRef] && (await window[listingRef].update(true));
+						onClick={async () => {
 							r();
-							const el = document.getElementById("active-article");
-							if (el) {
-								scrollIntoView(el);
-							} else {
-								await sleep(1500);
-								onMissingArticle();
-							}
+							await sleep(1500);
+							onMissingArticle();
 						}}
 					>
 						обновить список?
