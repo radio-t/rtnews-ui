@@ -12,26 +12,27 @@ const onMissingArticle = async () => {
 	const el = document.getElementById("active-article");
 	if (el) {
 		scrollIntoView(el);
-	} else {
-		addNotification(r => ({
-			data: (
-				<b>
-					Не могу найти тему,{" "}
-					<span
-						class="pseudo"
-						onClick={async () => {
-							r();
-							await sleep(1500);
-							onMissingArticle();
-						}}
-					>
-						обновить список?
-					</span>
-				</b>
-			),
-			time: 30000,
-		}));
+		return;
 	}
+
+	addNotification(r => ({
+		data: (
+			<b>
+				Не могу найти тему,{" "}
+				<span
+					class="pseudo"
+					onClick={async () => {
+						r();
+						await sleep(1500);
+						onMissingArticle();
+					}}
+				>
+					обновить список?
+				</span>
+			</b>
+		),
+		time: 30000,
+	}));
 };
 
 export default function LinkToCurrent(props) {
