@@ -1,7 +1,7 @@
 export type NotificationLevel = "default" | "error" | "info" | "success";
 
 export type Notification = {
-	data: "string" | HTMLElement | ReactElement;
+	data: JSX.Element;
 	time: number | null;
 	level: NotificationLevel;
 	closable: boolean;

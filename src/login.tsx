@@ -6,7 +6,16 @@ import { login, loginViaStorage } from "./api";
 import { Redirect } from "react-router-dom";
 import { waitFor } from "./utils";
 
-export default class LoginForm extends Component {
+type Props = {};
+
+type State = {
+	user: string;
+	password: string;
+	denied: number;
+	loggedIn: boolean;
+};
+
+export default class LoginForm extends Component<Props, State> {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -21,9 +30,13 @@ export default class LoginForm extends Component {
 			this.setState({ loggedIn });
 		});
 		document.title = "Вход | Новости Радио-Т";
-		waitFor(() => document.querySelector("input.login-form__user")).then(() => {
-			document.querySelector("input.login-form__user").focus();
-		});
+		waitFor(() => !!document.querySelector("input.login-form__user")).then(
+			() => {
+				(document.querySelector(
+					"input.login-form__user"
+				) as HTMLInputElement).focus();
+			}
+		);
 	}
 	render() {
 		if (this.state.loggedIn) return <Redirect to="/" />;
@@ -63,7 +76,7 @@ export default class LoginForm extends Component {
 			</form>
 		);
 	}
-	async onSubmit(e) {
+	async onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		const loginAttempt = await login(
 			this.state.user,

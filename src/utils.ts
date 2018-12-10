@@ -83,8 +83,8 @@ export async function retry(
  */
 export async function waitFor(
 	fn: () => boolean,
-	max: number | null,
-	error: Error | null
+	max?: number | null,
+	error?: Error | null
 ) {
 	const timestamp = new Date().getTime();
 	while (true) {

@@ -1,6 +1,11 @@
 import { removeNotification } from "./store";
+import { Notification } from "./notificationInterface";
 
-export default function Notifications(props) {
+type Props = {
+	notifications: Notification[];
+};
+
+export default function Notifications(props: Props) {
 	return (
 		<div className="notifications">
 			{props.notifications &&

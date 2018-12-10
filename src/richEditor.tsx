@@ -1,10 +1,27 @@
 import { PureComponent } from "react";
 import { waitFor } from "./utils";
 
-let Quill = null;
+type Quill = import("quill").default;
 
-export default class RichEditor extends PureComponent {
-	constructor(props) {
+type QuillType = typeof import("quill").default;
+
+let Quill: QuillType | null = null;
+
+type Props = {
+	rich?: boolean;
+	className?: string;
+	placeholder?: string;
+	content: string;
+};
+
+type State = {
+	loaded: boolean;
+};
+
+export default class RichEditor extends PureComponent<Props, State> {
+	editor?: HTMLDivElement;
+	quill: Quill;
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			loaded: false,
@@ -24,16 +41,19 @@ export default class RichEditor extends PureComponent {
 			import(
 				/* webpackChunkName: "quill" */
 				/* webpackMode: "lazy" */
+				// @ts-ignore
 				"quill/dist/quill.core.css"
 			),
 			import(
 				/* webpackChunkName: "quill" */
 				/* webpackMode: "lazy" */
+				// @ts-ignore
 				"quill/dist/quill.snow.css"
 			),
 			import(
 				/* webpackChunkName: "quill" */
 				/* webpackMode: "lazy" */
+				// @ts-ignore
 				"./quill-overloads.css"
 			),
 		]).then(([ImportedQuill]) => {
@@ -41,8 +61,8 @@ export default class RichEditor extends PureComponent {
 			Quill = ImportedQuill.default;
 		});
 	}
-	componentDidMount(...args) {
-		super.componentDidMount && super.componentDidMount(...args);
+	componentDidMount() {
+		super.componentDidMount && super.componentDidMount();
 
 		waitFor(() => Quill !== null).then(() => {
 			if (this.props.rich) {
@@ -73,14 +93,14 @@ export default class RichEditor extends PureComponent {
 			}
 		});
 	}
-	getContent() {
+	getContent(): string {
 		if (!this.props.rich)
 			return this.quill.root.innerHTML
 				.replace(/(<br\/?>|<\/p><p>)/gi, " ")
 				.replace(/(<([^>]+)>)/gi, "");
 		return this.quill.root.innerHTML;
 	}
-	focus() {
+	focus(): void {
 		setTimeout(() => {
 			this.quill.root.focus();
 		}, 100);
@@ -89,14 +109,14 @@ export default class RichEditor extends PureComponent {
 		if (!this.state.loaded) return "Загружаю";
 		return (
 			<div
-				class={
+				className={
 					"editor-container " +
 					(!this.props.rich ? "editor-container--poor " : "") +
 					(this.props.className || "")
 				}
 			>
 				<div
-					class="editor"
+					className="editor"
 					ref={ref => (this.editor = ref)}
 					dangerouslySetInnerHTML={{ __html: this.props.content }}
 				/>

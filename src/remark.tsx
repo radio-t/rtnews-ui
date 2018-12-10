@@ -1,6 +1,16 @@
 import { Component } from "react";
 
-export default class Remark extends Component {
+type Props = {
+	baseurl?: string;
+	site_id: string;
+	url?: string;
+};
+
+export default class Remark extends Component<Props> {
+	ref: HTMLDivElement;
+	receiveMessages: (Event) => void;
+	postHashToIframe: (Event) => void;
+	postClickOutsideToIframe: (MouseEvent) => void;
 	constructor(props) {
 		super(props);
 	}
@@ -12,7 +22,11 @@ export default class Remark extends Component {
 
 		const BASE_URL = this.props.baseurl || "https://remark42.radio-t.com";
 
-		const remark_config = {
+		const remark_config: {
+			baseurl: string;
+			site_id: string;
+			url?: string;
+		} = {
 			baseurl: this.props.baseurl,
 			site_id: this.props.site_id,
 		};
