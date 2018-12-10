@@ -117,6 +117,7 @@ export default class Head extends Component {
 								to="/feeds/"
 								exact={true}
 								className="link navigation__item-link"
+								title="Управление фидами"
 							>
 								Фиды
 							</NavLink>
