@@ -74,11 +74,11 @@ export async function waitFor(fn, max = null, error = null) {
 	const timestamp = new Date().getTime();
 	while (true) {
 		if (await fn()) return;
-		await sleep(100);
 		if (max !== null) {
 			const delta = new Date().getTime();
 			if (delta - timestamp > max) throw error || new Error("Time passed");
 		}
+		await sleep(100);
 	}
 }
 
