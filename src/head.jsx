@@ -107,8 +107,9 @@ export default class Head extends Component {
 								to="/sort/"
 								exact={true}
 								className="link navigation__item-link"
+								title="Сортировать Темы"
 							>
-								Сортировать&nbsp;темы
+								Сортировать
 							</NavLink>
 						</li>,
 						<li className="navigation__item navigation__item_admin">
@@ -117,19 +118,8 @@ export default class Head extends Component {
 								exact={true}
 								className="link navigation__item-link"
 							>
-								Управление фидами
+								Фиды
 							</NavLink>
-						</li>,
-						<ThemeSwitchButton theme={this.props.theme} />,
-						<div className="navigation__separator" />,
-						<li className="navigation__item navigation__item_admin">
-							<span
-								role="button"
-								className="pseudo link navigation__item-link"
-								onClick={() => this.update()}
-							>
-								Обновить базу
-							</span>
 						</li>,
 						<li className="navigation__item navigation__item_admin">
 							<span
@@ -145,10 +135,12 @@ export default class Head extends Component {
 								role="button"
 								className="pseudo navigation__item-link"
 								onClick={() => this.startPrepTopics()}
+								title="Начать темы слушателей"
 							>
-								Начать темы слушателей
+								Темы слушателей
 							</span>
 						</li>,
+						<ThemeSwitchButton theme={this.props.theme} />,
 						<div className="navigation__separator" />,
 					]}
 					{this.props.activeId !== null && (
