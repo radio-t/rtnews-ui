@@ -13,7 +13,7 @@ import {
 } from "./store.jsx";
 import {
 	getActiveArticle,
-	pollActiveArticle,
+	pollActiveArticle as apiPollActiveArticle,
 	loginViaStorage,
 	getTheme,
 	getArticleById,
@@ -25,36 +25,7 @@ import { Provider, connect } from "react-redux";
 import App from "./app.jsx";
 import LinkToCurrent from "./linkToCurrent.jsx";
 
-async function main() {
-	try {
-		const theme = getTheme();
-		document.documentElement.dataset.theme = theme;
-		setTheme(theme, true);
-	} catch (e) {
-		console.error(e);
-	}
-
-	const CApp = connect(state => {
-		return state;
-	})(App);
-
-	await loginViaStorage().then(isAdmin => {
-		setState({ isAdmin });
-	});
-
-	getIssueNumber().then(issueNumber => {
-		if (issueNumber) {
-			setState({ issueNumber });
-		}
-	});
-
-	render(
-		<Provider store={store}>
-			<CApp />
-		</Provider>,
-		document.querySelector(".app")
-	);
-
+function pollActiveArticle() {
 	getActiveArticle()
 		.catch(() => null)
 		.then(async activeId => {
@@ -62,7 +33,7 @@ async function main() {
 			await waitDOMReady();
 			while (true) {
 				try {
-					const activeId = await pollActiveArticle();
+					const activeId = await apiPollActiveArticle();
 					if (activeId === store.getState().activeId) {
 						removeNotificationsWithContext("active-article");
 						addNotification({
@@ -101,6 +72,39 @@ async function main() {
 				}
 			}
 		});
+}
+
+async function main() {
+	try {
+		const theme = getTheme();
+		document.documentElement.dataset.theme = theme;
+		setTheme(theme, true);
+	} catch (e) {
+		console.error(e);
+	}
+
+	const CApp = connect(state => {
+		return state;
+	})(App);
+
+	await loginViaStorage().then(isAdmin => {
+		setState({ isAdmin });
+	});
+
+	getIssueNumber().then(issueNumber => {
+		if (issueNumber) {
+			setState({ issueNumber });
+		}
+	});
+
+	render(
+		<Provider store={store}>
+			<CApp />
+		</Provider>,
+		document.querySelector(".app")
+	);
+
+	pollActiveArticle();
 }
 
 main().catch(e => console.error(e));
