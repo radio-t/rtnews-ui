@@ -250,8 +250,8 @@ export async function getArticleById(id) {
  * @returns {string} article id
  */
 export function getActiveArticle() {
-	return request(`/news/active`)
-		.then(x => x.id)
+	return request(`/news/active/id`)
+		.then(x => x.id || null)
 		.catch(() => null);
 }
 
