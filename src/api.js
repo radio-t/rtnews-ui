@@ -7,9 +7,52 @@ import {
 } from "./settings.js";
 import { first, retry, debounce, sleep } from "./utils.js";
 
+/**
+ * @typedef {Object} Article
+ * @property {boolean} active
+ * @property {string} activets activation timestamp
+ * @property {string} parsedactivets active ts converted to {Date}
+ * @property {boolean} archived
+ * @property {string} ats added timestamp
+ * @property {Date} parsedats ats converted to Date
+ * @property {author} author
+ * @property {number} comments number of comments
+ * @property {string} content full article's content
+ * @property {boolean} del
+ * @property {string} domain
+ * @property {string} exttitle
+ * @property {string} feed
+ * @property {boolean} geek
+ * @property {string} id
+ * @property {number} likes
+ * @property {string} link direct link after redirects
+ * @property {string} origlink orignal article's link
+ * @property {string} pic article's picture url
+ * @property {number} position
+ * @property {string} slug
+ * @property {string} snippet short article's description
+ * @property {string} title
+ * @property {string} ts original article's timestamp
+ * @property {Date} parsedts ts converted to Date
+ * @property {number} votes
+ */
+
+/**
+ * @typedef {Object} Feed
+ * @property {boolean} active
+ * @property {string} feedlink
+ * @property {string} id
+ * @property {string} updated updated timestamp
+ */
+
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;
 
+/**
+ *
+ * @param {Object} article
+ * @returns {Article}
+ */
 function processArticle(article) {
 	if (typeof article !== "object" || article === null) return article;
 	if (article.hasOwnProperty("snippet")) {
@@ -35,6 +78,36 @@ function processArticle(article) {
 	return article;
 }
 
+/**
+ * Converts raw object to Article
+ *
+ * @param {object} articles raw articles from server
+ * @returns {Article[]}
+ */
+function processArticles(articles) {
+	if (!Array.isArray(articles)) return articles;
+	return articles.map(processArticle);
+}
+
+/**
+ * Gets proposed topics url
+ *
+ * @returns {Promise.<string>}
+ */
+export function getPrepTopicsURL() {
+	return fetch("https://radio-t.com/site-api/last/1?categories=prep")
+		.then(resp => resp.json())
+		.then(data => {
+			if (data.length < 1) return null;
+			return data[0].url || null;
+		});
+}
+
+/**
+ * returns next Podcast issue number
+ *
+ * @returns {Promise.<number|null>}
+ */
 export function getIssueNumber() {
 	return retry(() =>
 		fetch("https://radio-t.com/site-api/last/1?categories=podcast,prep")
@@ -64,11 +137,6 @@ export function getIssueNumber() {
 		.catch(() => null);
 }
 
-function processArticles(articles) {
-	if (!Array.isArray(articles)) return articles;
-	return articles.map(processArticle);
-}
-
 function request(endpoint, options = {}) {
 	if (!options.hasOwnProperty("headers")) {
 		options.headers = new Headers();
@@ -94,25 +162,61 @@ function request(endpoint, options = {}) {
 	});
 }
 
+/**
+ * Updates articles on the server
+ *
+ * @returns {Promise.<null>}
+ */
 export function update() {
 	return request("/news/reload", { method: "PUT" });
 }
 
+/**
+ * Gets articles from the server
+ *
+ * @returns {Promise.<Article[]>}
+ */
 export function getNews() {
 	return request("/news").then(processArticles);
 }
 
+/**
+ * Gets archive articles from the server
+ *
+ * @returns {Promise.<Article[]>}
+ */
 export function getArchiveNews() {
 	return request("/news/archive").then(processArticles);
 }
 
+/**
+ * Gets deleted articles from the server
+ *
+ * @returns {Promise.<Article[]>}
+ */
 export function getDeletedNews() {
 	return request("/news/del").then(processArticles);
 }
 
+/**
+ * maps slug to article
+ *
+ * @type {Map.<string, Article>}
+ */
 const articlesCache = new Map();
+
+/**
+ * maps id to slug
+ *
+ * @type {Map.<string, string>}
+ */
 const articlesIdSlugMap = new Map();
 
+/**
+ * Gets article by slug
+ *
+ * @param {string} slug
+ */
 export async function getArticle(slug) {
 	if (articlesCache.has(slug)) return Promise.resolve(articlesCache.get(slug));
 	const article = await request("/news/slug/" + encodeURIComponent(slug)).then(
@@ -123,6 +227,12 @@ export async function getArticle(slug) {
 	return article;
 }
 
+/**
+ * Gets article by id
+ *
+ * @param {string} id
+ * @returns {Article}
+ */
 export async function getArticleById(id) {
 	if (articlesIdSlugMap.has(id))
 		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(id)));
@@ -134,12 +244,23 @@ export async function getArticleById(id) {
 	return article;
 }
 
+/**
+ * Gets active article id
+ *
+ * @returns {string} article id
+ */
 export function getActiveArticle() {
 	return request(`/news/active`)
 		.then(x => x.id)
 		.catch(() => null);
 }
 
+/**
+ * Polls server for active article change
+ *
+ * @param {number} [ms] polling Interval. default: 295
+ * @returns {string} article id
+ */
 export async function pollActiveArticle(ms = 295) {
 	while (true) {
 		try {
@@ -153,18 +274,34 @@ export async function pollActiveArticle(ms = 295) {
 }
 
 /**
- * Adds article or updates it if title already exists
+ * Adds article or updates it ifs title already exists on server
+ *
+ * @param {string} link article url
+ * @param {string} [title]
+ * @param {string} [snippet]
+ * @param {string} [content]
+ * @param {number} [position] position where to place article
+ * @returns {Promise.<null>}
  */
-export function addArticle(link, title = "", snippet = "", content = "") {
+export function addArticle(
+	link,
+	title = "",
+	snippet = "",
+	content = "",
+	position = null
+) {
 	const body = { link };
-	if (!title || title.length > 0) body.title = title;
-	if (!snippet || snippet.length > 0) body.snippet = snippet;
-	if (!content || content.length > 0) body.content = content;
+	const isManual = !!(title || snippet || content || position);
+
+	if (title && title.length > 0) body.title = title;
+	if (snippet && snippet.length > 0) body.snippet = snippet;
+	if (content && content.length > 0) body.content = content;
+	if (position) body.position = position;
 
 	const headers = new Headers();
 	headers.append("Content-Type", "application/json");
 
-	const url = title.length > 0 ? "/news/manual" : "/news";
+	const url = isManual ? "/news/manual" : "/news";
 
 	for (let [slug, article] of articlesCache.entries()) {
 		if (article.title === title) {
@@ -180,6 +317,10 @@ export function addArticle(link, title = "", snippet = "", content = "") {
 	});
 }
 
+/**
+ *
+ * @param {object} updated updatedArticle object
+ */
 export function updateArticle(updated) {
 	for (let [slug, article] of articlesCache.entries()) {
 		if (article.id === updated.id) {
@@ -198,26 +339,52 @@ export function updateArticle(updated) {
 	});
 }
 
+/**
+ *
+ * @param {string} id
+ * @param {number} offset
+ */
 export function moveArticle(id, offset) {
 	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
 }
 
+/**
+ *
+ * @param {string} id
+ */
 export function archiveArticle(id) {
 	return request(`/news/archive/${id}`, { method: "PUT" });
 }
 
+/**
+ *
+ * @param {string} id
+ */
 export function activateArticle(id) {
 	return request(`/news/active/${id}`, { method: "PUT" });
 }
 
+/**
+ *
+ * @param {string} id
+ */
 export function removeArticle(id) {
 	return request(`/news/${id}`, { method: "DELETE" });
 }
 
+/**
+ *
+ * @param {string} id
+ */
 export function restoreArticle(id) {
 	return request(`/news/undelete/${id}`, { method: "PUT" });
 }
 
+/**
+ * Moves article to top
+ *
+ * @param {string} id
+ */
 export async function makeArticleFirst(id) {
 	const positions = await request("/news/positions");
 	if (!positions.hasOwnProperty(id))
@@ -228,18 +395,35 @@ export async function makeArticleFirst(id) {
 	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
 }
 
+/**
+ * Makes article Geek
+ *
+ * @param {string} id
+ */
 export function makeArticleGeek(id) {
 	return request(`/news/geek/${id}`, { method: "PUT" });
 }
 
+/**
+ * Removes geek indicator from article
+ *
+ * @param {string} id
+ */
 export function makeArticleNotGeek(id) {
 	return request(`/news/nogeek/${id}`, { method: "PUT" });
 }
 
+/**
+ * @returns {Promise.<Feed[]>}
+ */
 export function getFeeds() {
 	return request("/feeds");
 }
 
+/**
+ *
+ * @param {string} url
+ */
 export function addFeed(url) {
 	const headers = new Headers();
 	headers.append("Content-Type", "application/json");
@@ -249,6 +433,10 @@ export function addFeed(url) {
 	return request("/feeds", { method: "POST", headers, body });
 }
 
+/**
+ *
+ * @param {string} id
+ */
 export function removeFeed(id) {
 	return request("/feeds/" + id, { method: "DELETE" });
 }

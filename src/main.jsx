@@ -52,9 +52,11 @@ import { listingRef } from "./symbols.js";
 class App extends Component {
 	render() {
 		return (
-			<Router>
+			<Router ref={router => (this.router = router)}>
 				<div className="page">
-					<Head {...this.props} />
+					<Route
+						render={({ history }) => <Head {...this.props} history={history} />}
+					/>
 					<div class="content page__content">
 						<Switch>
 							<Route

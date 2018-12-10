@@ -3,7 +3,7 @@
  */
 
 import { Component } from "react";
-import { sleep, first, requestIdleCallback } from "./utils.js";
+import { sleep, first, requestIdleCallback, retry, waitFor } from "./utils.js";
 import {
 	postRecentness,
 	postLevels,
@@ -25,6 +25,8 @@ import {
 	removeArticle,
 	restoreArticle,
 	moveArticle,
+	getPrepTopicsURL,
+	addArticle,
 } from "./api.js";
 import { setState, addNotification, removeNotification } from "./store.jsx";
 import articleCache from "./articleCache.js";
@@ -266,6 +268,7 @@ const BaseListingWithAutoUpdate = withAutoUpdate(BaseListing);
 export class Listing extends BaseListingWithAutoUpdate {
 	constructor(props) {
 		super(props);
+
 		this.state = {
 			postRecentness: getRecentness(),
 			postLevel: getPostLevel(),
@@ -284,6 +287,58 @@ export class Listing extends BaseListingWithAutoUpdate {
 	async componentWillMount() {
 		super.componentWillMount && super.componentWillMount();
 		this.update();
+	}
+	async startPrepTopics() {
+		try {
+			addNotification({
+				data: "Активирую темы слушателей",
+			});
+			await waitFor(() => this.state.loaded, 20000);
+			const url = await getPrepTopicsURL();
+			const number = url.substr(url.length - 4, 3);
+
+			const maxPosition = this.state.news.reduce(
+				(n, a) => Math.max(n, a.position),
+				0
+			);
+
+			await addArticle(
+				url,
+				`Темы слушателей ${number}`,
+				"",
+				`<a href="${url}">Темы слушателей</a>`,
+				maxPosition + 1
+			);
+
+			const article =
+				first(this.state.news, a => a.origlink === url) ||
+				(await retry(async () => {
+					await sleep(2000);
+					await this.update(true);
+					const article = first(
+						this.state.news,
+						article => article.origlink === url
+					);
+					if (!article) throw new Error("Can't find prep article");
+					return article;
+				}, 5));
+			this.onArticleChange(article, "make-current");
+		} catch (e) {
+			console.error(e);
+			switch (e.message) {
+				case "Can't find prep article":
+					addNotification({
+						data: "Не могу найти тему слушателей в списке",
+						level: "error",
+					});
+					break;
+				default:
+					addNotification({
+						data: "Произошла ошибка при активации тем слушателей",
+						level: "error",
+					});
+			}
+		}
 	}
 	render() {
 		if (this.state.error)

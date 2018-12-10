@@ -2,7 +2,6 @@ import { Component } from "react";
 
 import { logout, update, startShow, setTheme as saveTheme } from "./api.js";
 import {
-	store,
 	setState,
 	addNotification,
 	setTheme as commitTheme,
@@ -11,7 +10,8 @@ import { postsPrefix } from "./settings.js";
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent.jsx";
-import { sleep, scrollIntoView } from "./utils.js";
+import { sleep, scrollIntoView, waitFor, retry, first } from "./utils.js";
+import { listingRef } from "./symbols.js";
 
 import SVGInline from "react-svg-inline";
 import MoonIcon from "./static/svg/moon.svg";
@@ -125,6 +125,17 @@ export default class Head extends Component {
 								onClick={() => this.poehali()}
 							>
 								Поехали!
+							</span>
+						</li>
+					)}
+					{this.props.isAdmin && (
+						<li className="navigation__item navigation__item_admin">
+							<span
+								role="button"
+								className="pseudo navigation__item-link"
+								onClick={() => this.startPrepTopics()}
+							>
+								Начать темы слушателей
 							</span>
 						</li>
 					)}
@@ -251,6 +262,23 @@ export default class Head extends Component {
 						level: "error",
 					});
 				});
+		}
+	}
+	async startPrepTopics() {
+		try {
+			if (!window[listingRef]) this.props.history.push("/");
+			await waitFor(
+				() => window[listingRef],
+				15000,
+				new Error(`Can't navigate to "/"`)
+			);
+			window[listingRef].startPrepTopics();
+		} catch (e) {
+			console.error(e);
+			addNotification({
+				data: "Произошла ошибка при активации тем слушателей",
+				level: "error",
+			});
 		}
 	}
 }

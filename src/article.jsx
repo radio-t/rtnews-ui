@@ -14,6 +14,66 @@ import Error from "./error.jsx";
 import RichEditor from "./richEditor.jsx";
 import { addNotification, removeNotification } from "./store.jsx";
 
+/**
+ * Matches if article origlink matches to listeners proposed topics url
+ */
+const prepTopicsReg = /^https?:\/\/radio-t.com\/p\/\d{4}\/\d{2}\/\d{2}\/prep-\d+\/?$/i;
+
+function ArticleHeader({ article }) {
+	return (
+		<>
+			<h3 className="title article__title">
+				{article.geek && (
+					<SVGInline
+						className="icon post__title-geek-icon"
+						svg={GearIcon}
+						title="Гиковская тема"
+					/>
+				)}
+				<a className="post__title-link" href={article.origlink}>
+					{article.title}
+				</a>
+			</h3>
+			<div className="post__meta article__meta">
+				<a
+					className="post__original-link"
+					href={article.origlink}
+					title={article.origlink}
+				>
+					{article.domain}
+				</a>
+				<span
+					className="post__timestamp"
+					title={article.ats}
+					dangerouslySetInnerHTML={{
+						__html: formatDate(new Date(Date.parse(article.ats))),
+					}}
+				/>
+			</div>
+		</>
+	);
+}
+
+function ArticleContent({ article }) {
+	return prepTopicsReg.test(article.origlink) ? (
+		<div className="article-content article__content">
+			<h3>Темы слушателей</h3>
+			<Remark
+				baseurl={remark.baseurl}
+				site_id="radiot"
+				url={article.origlink}
+			/>
+		</div>
+	) : (
+		<div
+			className="article-content article__content"
+			dangerouslySetInnerHTML={{
+				__html: article.content || article.snippet,
+			}}
+		/>
+	);
+}
+
 function ArticleFactory(editable = false) {
 	return class Article extends PureComponent {
 		constructor(props) {
@@ -135,38 +195,22 @@ function ArticleFactory(editable = false) {
 					/>
 				);
 			if (this.state.article === null) return <Loading />;
+			if (prepTopicsReg.test(this.state.article.origlink)) {
+				return (
+					<article className="article">
+						<ArticleHeader article={this.state.article} />
+						<Remark
+							baseurl={remark.baseurl}
+							site_id="radiot"
+							id="to-comments"
+							url={this.state.article.origlink}
+						/>
+					</article>
+				);
+			}
 			return (
 				<article className="article">
-					<h3 className="title article__title">
-						{this.state.article.geek && (
-							<SVGInline
-								className="icon post__title-geek-icon"
-								svg={GearIcon}
-								title="Гиковская тема"
-							/>
-						)}
-						<a className="post__title-link" href={this.state.article.origlink}>
-							{this.state.article.title}
-						</a>
-					</h3>
-					<div className="post__meta article__meta">
-						<a
-							className="post__original-link"
-							href={this.state.article.origlink}
-							title={this.state.article.origlink}
-						>
-							{this.state.article.domain}
-						</a>
-						<span
-							className="post__timestamp"
-							title={this.state.article.ats}
-							dangerouslySetInnerHTML={{
-								__html: formatDate(
-									new Date(Date.parse(this.state.article.ats))
-								),
-							}}
-						/>
-					</div>
+					<ArticleHeader article={this.state.article} />
 					{editable && [
 						this.state.mode === "view" && (
 							<div class="article__edit">

@@ -58,22 +58,26 @@ export async function retry(fn, retries = 3, retryInterval = 0) {
 		try {
 			return await fn();
 		} catch (e) {
+			if (i === retries - 1) throw e;
 			if (retryInterval) await sleep(retryInterval);
 		}
 	}
-	throw new Error("Retry failed");
 }
 
-export async function waitFor(fn, max = null) {
+/**
+ *
+ * @param {function} fn that returns bool
+ * @param {number} max timeout in ms
+ * @param {Error} error error to throw in case of timeout
+ */
+export async function waitFor(fn, max = null, error = null) {
 	const timestamp = new Date().getTime();
 	while (true) {
 		if (fn()) return;
 		await sleep(100);
 		if (max !== null) {
 			const delta = new Date().getTime();
-			if (delta - timestamp > max) {
-				throw new Error("Time passed");
-			}
+			if (delta - timestamp > max) throw error || new Error("Time passed");
 		}
 	}
 }
