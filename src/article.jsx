@@ -1,7 +1,7 @@
 import { PureComponent } from "react";
 
 import { formatDate, scrollIntoView, waitFor } from "./utils.ts";
-import { getArticle, updateArticle } from "./api.js";
+import { getArticle, updateArticle } from "./api.ts";
 import articleCache from "./articleCache";
 import { remark } from "./settings.ts";
 

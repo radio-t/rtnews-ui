@@ -1,6 +1,6 @@
 import { Component } from "react";
 
-import { getRemarkCommentsCount } from "./api.js";
+import { getRemarkCommentsCount } from "./api.ts";
 
 export default class RemarkCounter extends Component {
 	constructor(props) {

@@ -1,3 +1,5 @@
+import Article from "./articleInterface";
+
 // via webpack define plugin
 declare var APIROOT: string;
 export const apiRoot = APIROOT;
@@ -30,9 +32,9 @@ export const newsCacheValidInterval: number | null = 5;
  */
 export const isSafari = window.navigator.userAgent.indexOf("Safari") !== -1;
 
-interface Sorting {
+export interface Sorting {
 	title: string;
-	fn<T extends any>(a: T, b: T): number;
+	fn(a: Article, b: Article): number;
 }
 
 export const sortings: Sorting[] = [
@@ -63,12 +65,12 @@ const now = new Date().getTime();
 const day = 1000 * 60 * 60 * 24;
 const month = day * 30;
 
-interface PostRecentnessType {
+export interface PostRecentness {
 	title: string;
-	fn(x: any, i: number): boolean;
+	fn(x: Article, i: number): boolean;
 }
 
-export const postRecentness: PostRecentnessType[] = [
+export const postRecentness: PostRecentness[] = [
 	{
 		title: "Все",
 		fn(x, i) {
@@ -89,7 +91,7 @@ export const postRecentness: PostRecentnessType[] = [
 	},
 ];
 
-interface PostLevel {
+export interface PostLevel {
 	title: string;
 	fn(x: any, i: number): boolean;
 	isgeek?;

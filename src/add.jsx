@@ -1,7 +1,7 @@
 import { Component } from "react";
 
 import { Redirect } from "react-router-dom";
-import { addArticle } from "./api.js";
+import { addArticle } from "./api.ts";
 import { addNotification } from "./store.jsx";
 import { apiRoot } from "./settings.ts";
 import { waitFor } from "./utils.ts";

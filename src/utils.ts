@@ -1,4 +1,4 @@
-export function first<T>(arr: [T], fn: (T) => boolean): T | null {
+export function first<T>(arr: T[], fn: (T) => boolean): T | null {
 	for (let item of arr) {
 		if (fn(item)) return item;
 	}

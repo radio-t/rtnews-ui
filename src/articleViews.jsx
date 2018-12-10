@@ -2,7 +2,7 @@ import { Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils.ts";
 import { postsPrefix, isSafari } from "./settings.ts";
-import { getArticle } from "./api.js";
+import { getArticle } from "./api.ts";
 
 import ArticleControls from "./articleControls.jsx";
 import { Link } from "react-router-dom";

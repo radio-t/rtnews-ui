@@ -1,7 +1,7 @@
 import { Component } from "react";
 
 import { setState } from "./store.jsx";
-import { login, loginViaStorage } from "./api.js";
+import { login, loginViaStorage } from "./api.ts";
 
 import { Redirect } from "react-router-dom";
 import { waitFor } from "./utils.ts";

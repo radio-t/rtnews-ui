@@ -27,7 +27,7 @@ import {
 	moveArticle,
 	getPrepTopicsURL,
 	addArticle,
-} from "./api.js";
+} from "./api.ts";
 import { setState, addNotification, removeNotification } from "./store.jsx";
 import articleCache from "./articleCache.js";
 import Error from "./error.jsx";

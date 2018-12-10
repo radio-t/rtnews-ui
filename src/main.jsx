@@ -18,7 +18,7 @@ import {
 	getTheme,
 	getArticleById,
 	getIssueNumber,
-} from "./api.js";
+} from "./api.ts";
 import { waitDOMReady, sleep } from "./utils.ts";
 import { Provider, connect } from "react-redux";
 

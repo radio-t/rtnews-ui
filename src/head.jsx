@@ -1,6 +1,6 @@
 import { Component } from "react";
 
-import { logout, update, startShow, setTheme as saveTheme } from "./api.js";
+import { logout, update, startShow, setTheme as saveTheme } from "./api.ts";
 import {
 	setState,
 	addNotification,

@@ -1,5 +1,5 @@
 import { newsCacheValidInterval } from "./settings.ts";
-import { getNews, getArchiveNews, getDeletedNews } from "./api.js";
+import { getNews, getArchiveNews, getDeletedNews } from "./api.ts";
 
 /**
  * Article cache which stores articles

@@ -4,56 +4,18 @@ import {
 	postRecentness,
 	postLevels,
 	remark as RemarkConfig,
-} from "./settings.ts";
-import { first, retry, debounce, sleep } from "./utils.ts";
-
-/**
- * @typedef {Object} Article
- * @property {boolean} active
- * @property {string} activets activation timestamp
- * @property {string} parsedactivets active ts converted to {Date}
- * @property {boolean} archived
- * @property {string} ats added timestamp
- * @property {Date} parsedats ats converted to Date
- * @property {author} author
- * @property {number} comments number of comments
- * @property {string} content full article's content
- * @property {boolean} del
- * @property {string} domain
- * @property {string} exttitle
- * @property {string} feed
- * @property {boolean} geek
- * @property {string} id
- * @property {number} likes
- * @property {string} link direct link after redirects
- * @property {string} origlink orignal article's link
- * @property {string} pic article's picture url
- * @property {number} position
- * @property {string} slug
- * @property {string} snippet short article's description
- * @property {string} title
- * @property {string} ts original article's timestamp
- * @property {Date} parsedts ts converted to Date
- * @property {number} votes
- */
-
-/**
- * @typedef {Object} Feed
- * @property {boolean} active
- * @property {string} feedlink
- * @property {string} id
- * @property {string} updated updated timestamp
- */
+	PostRecentness,
+	PostLevel,
+	Sorting,
+} from "./settings";
+import { first, retry, debounce, sleep } from "./utils";
+import Article from "./articleInterface";
+import Feed from "./feedInterface";
 
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;
 
-/**
- *
- * @param {Object} article
- * @returns {Article}
- */
-function processArticle(article) {
+function processArticle(article: any): Article {
 	if (typeof article !== "object" || article === null) return article;
 	if (article.hasOwnProperty("snippet")) {
 		article.snippet = article.snippet
@@ -75,26 +37,23 @@ function processArticle(article) {
 			article.domain = url.hostname;
 		} catch (e) {}
 	}
-	return article;
+	return article as Article;
 }
 
 /**
  * Converts raw object to Article
  *
- * @param {object} articles raw articles from server
- * @returns {Article[]}
+ * @param articles raw articles from server
  */
-function processArticles(articles) {
+function processArticles(articles: any[]): Article[] {
 	if (!Array.isArray(articles)) return articles;
 	return articles.map(processArticle);
 }
 
 /**
  * Gets proposed topics url
- *
- * @returns {Promise.<string>}
  */
-export function getPrepTopicsURL() {
+export function getPrepTopicsURL(): Promise<string> {
 	return fetch("https://radio-t.com/site-api/last/1?categories=prep")
 		.then(resp => resp.json())
 		.then(data => {
@@ -105,10 +64,8 @@ export function getPrepTopicsURL() {
 
 /**
  * returns next Podcast issue number
- *
- * @returns {Promise.<number|null>}
  */
-export function getIssueNumber() {
+export function getIssueNumber(): Promise<number | null> {
 	return retry(() =>
 		fetch("https://radio-t.com/site-api/last/1?categories=podcast,prep")
 	)
@@ -137,12 +94,12 @@ export function getIssueNumber() {
 		.catch(() => null);
 }
 
-function request(endpoint, options = {}) {
+function request(endpoint: string, options: RequestInit = {}): Promise<any> {
 	if (!options.hasOwnProperty("headers")) {
 		options.headers = new Headers();
 	}
 	if (localStorage.getItem("rt-news.auth")) {
-		options.headers.append(
+		(options.headers as any).append(
 			"Authorization",
 			"Basic " + localStorage.getItem("rt-news.auth")
 		);
@@ -164,60 +121,46 @@ function request(endpoint, options = {}) {
 
 /**
  * Updates articles on the server
- *
- * @returns {Promise.<null>}
  */
-export function update() {
+export function update(): Promise<null> {
 	return request("/news/reload", { method: "PUT" });
 }
 
 /**
  * Gets articles from the server
- *
- * @returns {Promise.<Article[]>}
  */
-export function getNews() {
+export function getNews(): Promise<Article[]> {
 	return request("/news").then(processArticles);
 }
 
 /**
  * Gets archive articles from the server
- *
- * @returns {Promise.<Article[]>}
  */
-export function getArchiveNews() {
+export function getArchiveNews(): Promise<Article[]> {
 	return request("/news/archive").then(processArticles);
 }
 
 /**
  * Gets deleted articles from the server
- *
- * @returns {Promise.<Article[]>}
  */
-export function getDeletedNews() {
+export function getDeletedNews(): Promise<Article[]> {
 	return request("/news/del").then(processArticles);
 }
 
 /**
  * maps slug to article
- *
- * @type {Map.<string, Article>}
  */
-const articlesCache = new Map();
+const articlesCache: Map<string, Article> = new Map();
 
 /**
  * maps id to slug
- *
- * @type {Map.<string, string>}
  */
-const articlesIdSlugMap = new Map();
+const articlesIdSlugMap: Map<string, string> = new Map();
 
 /**
  * Gets article by slug
- *
- * @param {string} slug
  */
-export async function getArticle(slug) {
+export async function getArticle(slug: string): Promise<Article | null> {
 	if (articlesCache.has(slug)) return Promise.resolve(articlesCache.get(slug));
 	const article = await request("/news/slug/" + encodeURIComponent(slug)).then(
 		processArticle
@@ -229,11 +172,8 @@ export async function getArticle(slug) {
 
 /**
  * Gets article by id
- *
- * @param {string} id
- * @returns {Article}
  */
-export async function getArticleById(id) {
+export async function getArticleById(id: string): Promise<Article | null> {
 	if (articlesIdSlugMap.has(id))
 		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(id)));
 	const article = await request("/news/id/" + encodeURIComponent(id)).then(
@@ -246,10 +186,8 @@ export async function getArticleById(id) {
 
 /**
  * Gets active article id
- *
- * @returns {string} article id
  */
-export function getActiveArticle() {
+export function getActiveArticle(): Promise<string> {
 	return request(`/news/active/id`)
 		.then(x => x.id || null)
 		.catch(() => null);
@@ -258,10 +196,9 @@ export function getActiveArticle() {
 /**
  * Polls server for active article change
  *
- * @param {number} [ms] polling Interval. default: 295
- * @returns {string} article id
+ * @param [ms] polling Interval. default: 295
  */
-export async function pollActiveArticle(ms = 295) {
+export async function pollActiveArticle(ms: number = 295): Promise<string> {
 	while (true) {
 		try {
 			const req = await request(`/news/active/wait/${ms}`);
@@ -276,21 +213,21 @@ export async function pollActiveArticle(ms = 295) {
 /**
  * Adds article or updates it ifs title already exists on server
  *
- * @param {string} link article url
- * @param {string} [title]
- * @param {string} [snippet]
- * @param {string} [content]
- * @param {number} [position] position where to place article
- * @returns {Promise.<null>}
  */
 export function addArticle(
-	link,
-	title = "",
-	snippet = "",
-	content = "",
-	position = null
-) {
-	const body = { link };
+	link: string,
+	title: string = "",
+	snippet: string = "",
+	content: string = "",
+	position: number | null = null
+): Promise<null> {
+	const body: {
+		link: string;
+		title?: string;
+		snippet?: string;
+		content?: string;
+		position?: number;
+	} = { link };
 	const isManual = !!(title || snippet || content || position);
 
 	if (title && title.length > 0) body.title = title;
@@ -317,11 +254,7 @@ export function addArticle(
 	});
 }
 
-/**
- *
- * @param {object} updated updatedArticle object
- */
-export function updateArticle(updated) {
+export function updateArticle(updated: Partial<Article>): Promise<null> {
 	for (let [slug, article] of articlesCache.entries()) {
 		if (article.id === updated.id) {
 			articlesCache.delete(slug);
@@ -339,54 +272,31 @@ export function updateArticle(updated) {
 	});
 }
 
-/**
- *
- * @param {string} id
- * @param {number} offset
- */
-export function moveArticle(id, offset) {
+export function moveArticle(id: string, offset: number): Promise<null> {
 	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
 }
 
-/**
- *
- * @param {string} id
- */
-export function archiveArticle(id) {
+export function archiveArticle(id: string): Promise<null> {
 	return request(`/news/archive/${id}`, { method: "PUT" });
 }
 
-/**
- *
- * @param {string} id
- */
-export function activateArticle(id) {
+export function activateArticle(id: string): Promise<null> {
 	return request(`/news/active/${id}`, { method: "PUT" });
 }
 
-/**
- *
- * @param {string} id
- */
-export function removeArticle(id) {
+export function removeArticle(id: string): Promise<null> {
 	return request(`/news/${id}`, { method: "DELETE" });
 }
 
-/**
- *
- * @param {string} id
- */
-export function restoreArticle(id) {
+export function restoreArticle(id: string): Promise<null> {
 	return request(`/news/undelete/${id}`, { method: "PUT" });
 }
 
 /**
  * Moves article to top
- *
- * @param {string} id
  */
-export async function makeArticleFirst(id) {
-	const positions = await request("/news/positions");
+export async function makeArticleFirst(id: string): Promise<null> {
+	const positions: { [id: string]: number } = await request("/news/positions");
 	if (!positions.hasOwnProperty(id))
 		throw new Error("Can't find id's position");
 	const pos = positions[id];
@@ -397,34 +307,23 @@ export async function makeArticleFirst(id) {
 
 /**
  * Makes article Geek
- *
- * @param {string} id
  */
-export function makeArticleGeek(id) {
+export function makeArticleGeek(id: string): Promise<null> {
 	return request(`/news/geek/${id}`, { method: "PUT" });
 }
 
 /**
  * Removes geek indicator from article
- *
- * @param {string} id
  */
-export function makeArticleNotGeek(id) {
+export function makeArticleNotGeek(id): Promise<null> {
 	return request(`/news/nogeek/${id}`, { method: "PUT" });
 }
 
-/**
- * @returns {Promise.<Feed[]>}
- */
-export function getFeeds() {
+export function getFeeds(): Promise<Feed[]> {
 	return request("/feeds");
 }
 
-/**
- *
- * @param {string} url
- */
-export function addFeed(url) {
+export function addFeed(url: string): Promise<null> {
 	const headers = new Headers();
 	headers.append("Content-Type", "application/json");
 	const body = JSON.stringify({
@@ -433,47 +332,43 @@ export function addFeed(url) {
 	return request("/feeds", { method: "POST", headers, body });
 }
 
-/**
- *
- * @param {string} id
- */
-export function removeFeed(id) {
+export function removeFeed(id: string): Promise<null> {
 	return request("/feeds/" + id, { method: "DELETE" });
 }
 
-export function startShow() {
+export function startShow(): Promise<null> {
 	return request("/show/start", { method: "PUT" });
 }
 
-export function getRecentness() {
+export function getRecentness(): PostRecentness {
 	const s = localStorage.getItem("recentness");
 	return first(postRecentness, x => x.title === s) || postRecentness[0];
 }
 
-export function setRecentness(value) {
+export function setRecentness(value: PostRecentness): void {
 	localStorage.setItem("recentness", value.title);
 }
 
-export function getPostLevel() {
+export function getPostLevel(): PostLevel {
 	const s = localStorage.getItem("postLevel");
 	return first(postLevels, x => x.title === s) || postLevels[0];
 }
 
-export function setPostLevel(value) {
+export function setPostLevel(value: PostLevel): void {
 	localStorage.setItem("postLevel", value.title);
 }
 
-export function getSorting() {
+export function getSorting(): Sorting {
 	const s = localStorage.getItem("sorting");
 	return first(sortings, x => x.title === s) || sortings[0];
 }
 
-export function setSorting(value) {
+export function setSorting(value: Sorting): void {
 	localStorage.setItem("sorting", value.title);
 }
 
-export function getTheme() {
-	const s = localStorage.getItem("theme");
+export function getTheme(): "day" | "night" {
+	const s = localStorage.getItem("theme") as "day" | "night";
 	if (s !== null) return s;
 
 	//check system night mode
@@ -485,11 +380,11 @@ export function getTheme() {
 	return mode || "day";
 }
 
-export function setTheme(value) {
+export function setTheme(value: "day" | "night"): void {
 	localStorage.setItem("theme", value);
 }
 
-export function login(user, password) {
+export function login(user: string, password: string): Promise<boolean> {
 	const headers = new Headers();
 	const auth = btoa(user + ":" + password);
 	headers.append("Authorization", "Basic " + auth);
@@ -507,7 +402,7 @@ export function login(user, password) {
 	});
 }
 
-export function loginViaStorage() {
+export function loginViaStorage(): Promise<boolean> {
 	if (!localStorage.getItem("rt-news.auth")) return Promise.resolve(false);
 	const headers = new Headers();
 	const auth = localStorage.getItem("rt-news.auth");
@@ -527,18 +422,15 @@ export function loginViaStorage() {
 		.catch(() => false);
 }
 
-export function logout() {
+export function logout(): void {
 	localStorage.removeItem("rt-news.auth");
 }
 
 /**
  * Performs cumulative get of comment counts
  * by debouncing execution by 100ms
- *
- * @param {String} url
- * @returns {Promise} promise with response object
  */
-export const getRemarkCommentsCount = (() => {
+export const getRemarkCommentsCount: (url: string) => Promise<number> = (() => {
 	let tasksMap = new Map();
 	const worker = debounce(async () => {
 		const urls = Array.from(tasksMap.keys());
@@ -576,7 +468,7 @@ export const getRemarkCommentsCount = (() => {
 			}
 		}
 	}, 100);
-	return url => {
+	return (url: string): Promise<number> => {
 		return new Promise((resolve, reject) => {
 			const task = {
 				onGet: data => {
