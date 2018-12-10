@@ -1,7 +1,21 @@
 import { PureComponent } from "react";
 
-export default class Select extends PureComponent {
-	constructor(props) {
+type Props = {
+	className?: string;
+	items: string[];
+	value: string;
+	onChange: (string) => void;
+};
+
+type State = {
+	expanded: boolean;
+	selected: number;
+};
+
+export default class Select extends PureComponent<Props, State> {
+	ref: HTMLDivElement;
+
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			expanded: false,
@@ -15,7 +29,7 @@ export default class Select extends PureComponent {
 				className={
 					"select " + (this.props.className ? this.props.className : "")
 				}
-				tabIndex="0"
+				tabIndex={0}
 				onFocus={e =>
 					this.setState({
 						expanded: true,
@@ -61,11 +75,11 @@ export default class Select extends PureComponent {
 					}
 				}}
 			>
-				<div class="select__current">
+				<div className="select__current">
 					<span className="select__current-value">{this.props.value}</span>
 				</div>
 				{this.state.expanded && (
-					<ul class="select__items" role="listbox">
+					<ul className="select__items" role="listbox">
 						{this.props.items.map((x, i) => (
 							<li
 								role="option"
