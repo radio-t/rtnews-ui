@@ -1,6 +1,6 @@
 import { Component } from "react";
 
-import { postsPrefix } from "./settings.js";
+import { postsPrefix } from "./settings.ts";
 
 import Head from "./head.jsx";
 import {

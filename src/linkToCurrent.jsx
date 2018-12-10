@@ -1,6 +1,6 @@
 import { addNotification } from "./store.jsx";
 import { listingRef } from "./symbols.js";
-import { sleep, waitFor, scrollIntoView } from "./utils.js";
+import { sleep, waitFor, scrollIntoView } from "./utils.ts";
 
 import { Link } from "react-router-dom";
 

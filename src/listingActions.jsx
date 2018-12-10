@@ -1,6 +1,6 @@
 import { Component } from "react";
 
-import { postRecentness, postLevels, sortings } from "./settings.js";
+import { postRecentness, postLevels, sortings } from "./settings.ts";
 import Select from "./select.jsx";
 
 export default class ListingActions extends Component {

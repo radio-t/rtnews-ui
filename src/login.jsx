@@ -4,7 +4,7 @@ import { setState } from "./store.jsx";
 import { login, loginViaStorage } from "./api.js";
 
 import { Redirect } from "react-router-dom";
-import { waitFor } from "./utils.js";
+import { waitFor } from "./utils.ts";
 
 export default class LoginForm extends Component {
 	constructor(props) {

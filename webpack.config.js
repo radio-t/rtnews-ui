@@ -43,6 +43,26 @@ module.exports = (a, args) => {
 					},
 				},
 				{
+					test: /\.ts$/,
+					exclude: /node_modules/,
+					use: {
+						loader: "babel-loader",
+						options: {
+							plugins: ["@babel/plugin-syntax-dynamic-import"],
+							presets: [
+								[
+									"@babel/preset-env",
+									{
+										useBuiltIns: "usage",
+										modules: false,
+									},
+								],
+								"@babel/preset-typescript",
+							],
+						},
+					},
+				},
+				{
 					test: /\.jsx$/,
 					exclude: /node_modules/,
 					use: {
@@ -67,6 +87,36 @@ module.exports = (a, args) => {
 										pragmaFrag: '"div"',
 									},
 								],
+							],
+						},
+					},
+				},
+				{
+					test: /\.tsx$/,
+					exclude: /node_modules/,
+					use: {
+						loader: "babel-loader",
+						options: {
+							plugins: ["@babel/plugin-syntax-dynamic-import"],
+							presets: [
+								[
+									"@babel/preset-env",
+									{
+										useBuiltIns: "usage",
+										modules: false,
+										targets: {
+											ie: "11",
+										},
+									},
+								],
+								[
+									"@babel/preset-react",
+									{
+										pragma: "createElement",
+										pragmaFrag: '"div"',
+									},
+								],
+								"@babel/preset-typescript",
 							],
 						},
 					},

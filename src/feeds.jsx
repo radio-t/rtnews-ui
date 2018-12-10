@@ -1,7 +1,7 @@
 import { PureComponent } from "react";
 
 import { getFeeds, addFeed, removeFeed } from "./api.js";
-import { formatDate, sleep, waitFor } from "./utils.js";
+import { formatDate, sleep, waitFor } from "./utils.ts";
 import { Redirect } from "react-router-dom";
 
 import Loading from "./loading.jsx";

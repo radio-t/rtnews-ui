@@ -1,4 +1,5 @@
 // via webpack define plugin
+declare var APIROOT: string;
 export const apiRoot = APIROOT;
 
 export const postsPrefix = "/post";
@@ -13,7 +14,7 @@ export const remark = {
  *
  * null if off
  */
-export const newsAutoUpdateInterval = 10;
+export const newsAutoUpdateInterval: number | null = 10;
 
 /**
  * news cache interval in minutes. Used between
@@ -21,7 +22,7 @@ export const newsAutoUpdateInterval = 10;
  *
  * null if off
  */
-export const newsCacheValidInterval = 5;
+export const newsCacheValidInterval: number | null = 5;
 
 /**
  * needs for situation when dragging something
@@ -29,7 +30,12 @@ export const newsCacheValidInterval = 5;
  */
 export const isSafari = window.navigator.userAgent.indexOf("Safari") !== -1;
 
-export const sortings = [
+interface Sorting {
+	title: string;
+	fn<T extends any>(a: T, b: T): number;
+}
+
+export const sortings: Sorting[] = [
 	{
 		title: "По приоритету",
 		fn(a, b) {
@@ -53,11 +59,16 @@ export const sortings = [
 	},
 ];
 
-const now = new Date();
+const now = new Date().getTime();
 const day = 1000 * 60 * 60 * 24;
 const month = day * 30;
 
-export const postRecentness = [
+interface PostRecentnessType {
+	title: string;
+	fn(x: any, i: number): boolean;
+}
+
+export const postRecentness: PostRecentnessType[] = [
 	{
 		title: "Все",
 		fn(x, i) {
@@ -67,7 +78,7 @@ export const postRecentness = [
 	{
 		title: "Свежие",
 		fn(x, i, isgeek = true) {
-			const interval = now - x.parsedats;
+			const interval = now - (x.parsedats as Date).getTime();
 			if (isgeek && x.geek && interval < 3 * month) {
 				return true;
 			} else if (interval < 21 * day) {
@@ -78,7 +89,13 @@ export const postRecentness = [
 	},
 ];
 
-export const postLevels = [
+interface PostLevel {
+	title: string;
+	fn(x: any, i: number): boolean;
+	isgeek?;
+}
+
+export const postLevels: PostLevel[] = [
 	{
 		title: "Все",
 		fn(x, i) {

@@ -1,9 +1,9 @@
 import { PureComponent } from "react";
 
-import { formatDate, scrollIntoView, waitFor } from "./utils.js";
+import { formatDate, scrollIntoView, waitFor } from "./utils.ts";
 import { getArticle, updateArticle } from "./api.js";
 import articleCache from "./articleCache";
-import { remark } from "./settings.js";
+import { remark } from "./settings.ts";
 
 import Remark from "./remark.jsx";
 import Loading from "./loading.jsx";

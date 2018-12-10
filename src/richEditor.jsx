@@ -1,5 +1,5 @@
 import { PureComponent } from "react";
-import { waitFor } from "./utils";
+import { waitFor } from "./utils.ts";
 
 let Quill = null;
 

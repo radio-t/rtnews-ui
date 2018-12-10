@@ -1,7 +1,7 @@
 import { Component } from "react";
 
-import { formatDate, scrollIntoView } from "./utils.js";
-import { postsPrefix, isSafari } from "./settings.js";
+import { formatDate, scrollIntoView } from "./utils.ts";
+import { postsPrefix, isSafari } from "./settings.ts";
 import { getArticle } from "./api.js";
 
 import ArticleControls from "./articleControls.jsx";

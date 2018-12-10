@@ -4,8 +4,8 @@ import {
 	postRecentness,
 	postLevels,
 	remark as RemarkConfig,
-} from "./settings.js";
-import { first, retry, debounce, sleep } from "./utils.js";
+} from "./settings.ts";
+import { first, retry, debounce, sleep } from "./utils.ts";
 
 /**
  * @typedef {Object} Article

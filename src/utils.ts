@@ -1,18 +1,18 @@
-export function first(arr, fn) {
+export function first<T>(arr: [T], fn: (T) => boolean): T | null {
 	for (let item of arr) {
 		if (fn(item)) return item;
 	}
 	return null;
 }
 
-export function firstIndex(arr, fn) {
+export function firstIndex<T>(arr: [T], fn: (T) => boolean): number | null {
 	for (let i = 0; i < arr.length; i++) {
 		if (fn(arr[i])) return i;
 	}
 	return null;
 }
 
-export function formatDate(date) {
+export function formatDate(date: Date): string {
 	const day = ("0" + date.getDate()).slice(-2);
 	const month = ("0" + (date.getMonth() + 1)).slice(-2);
 	const year = date.getFullYear();
@@ -22,18 +22,22 @@ export function formatDate(date) {
 	return day + "." + month + "." + year + " в&nbsp;" + hours + ":" + mins;
 }
 
-export function oneOf(subject, ...objects) {
+export function oneOf<T>(subject: T, ...objects: [T]): boolean {
 	for (let obj of objects) {
 		if (subject === obj) return true;
 	}
 	return false;
 }
 
-export function sleep(n) {
+export function sleep(n: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, n));
 }
 
-export async function animate(fn, interval = 1000, immediate = true) {
+export async function animate(
+	fn: Function,
+	interval: number = 1000,
+	immediate: boolean = true
+): Promise<void> {
 	if (immediate) fn();
 	let t = 0;
 	let runner = async (timestamp = 0) => {
@@ -46,14 +50,21 @@ export async function animate(fn, interval = 1000, immediate = true) {
 	requestAnimationFrame(runner);
 }
 
-export async function waitDOMReady() {
+/**
+ * waits for readystate === complete
+ */
+export async function waitDOMReady(): Promise<void> {
 	while (true) {
 		if (document.readyState === "complete") return;
 		await sleep(200);
 	}
 }
 
-export async function retry(fn, retries = 3, retryInterval = 0) {
+export async function retry(
+	fn: Function,
+	retries: number = 3,
+	retryInterval: number = 0
+) {
 	for (let i = 0; i < retries; i++) {
 		try {
 			return await fn();
@@ -66,11 +77,15 @@ export async function retry(fn, retries = 3, retryInterval = 0) {
 
 /**
  *
- * @param {function} fn that returns bool
- * @param {number} max timeout in ms
- * @param {Error} error error to throw in case of timeout
+ * @param fn
+ * @param max timeout in ms
+ * @param error error to throw in case of timeout
  */
-export async function waitFor(fn, max = null, error = null) {
+export async function waitFor(
+	fn: () => boolean,
+	max: number | null,
+	error: Error | null
+) {
 	const timestamp = new Date().getTime();
 	while (true) {
 		if (await fn()) return;
@@ -84,8 +99,10 @@ export async function waitFor(fn, max = null, error = null) {
 
 export const scrollIntoView = (() => {
 	if ("scrollBehavior" in document.documentElement.style) {
-		return (el, behavior = "smooth") =>
-			el.scrollIntoView({ behavior, block: "start" });
+		return (
+			el: HTMLElement,
+			behavior: "smooth" | "auto" | "instant" = "smooth"
+		) => el.scrollIntoView({ behavior, block: "start" });
 	} else {
 		// easeOutQuart
 		const timingfn = t => -(Math.pow(t - 1, 4) - 1);
@@ -100,13 +117,17 @@ export const scrollIntoView = (() => {
 		const requestAnimationFrame =
 			window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
-		return (el, behavior = "smooth") => {
+		return (
+			el: HTMLElement,
+			behavior: "smooth" | "auto" | "instant" = "smooth"
+		) => {
 			if (behavior !== "smooth")
 				return el.scrollIntoView({ behavior, block: "start" });
 			else {
 				const startPosition = window.scrollY || window.pageYOffset;
 				const rect = el.getBoundingClientRect();
-				const targetPosition = startPosition + (rect.y || rect.top);
+				const targetPosition =
+					startPosition + (((rect as any).y as number) || rect.top);
 				const timeStart = performance.now();
 				const duration = 500;
 
@@ -127,23 +148,28 @@ export const scrollIntoView = (() => {
 	}
 })();
 
-export function debounce(fn, wait = 100, immediate = false) {
-	let timeout;
-	return function(...args) {
+export function debounce(
+	fn: Function,
+	wait: number = 100,
+	immediate: boolean = false
+): Function {
+	let timeout: number;
+	return function(...args): void {
 		const later = () => {
 			timeout = null;
 			if (!immediate) fn.apply(this, args);
 		};
 		const callNow = immediate && !timeout;
 		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
+		timeout = (setTimeout(later, wait) as unknown) as number;
 		if (callNow) fn.apply(this, args);
 	};
 }
 
-export const requestIdleCallback = (() => {
-	if ("requestIdleCallback" in window) return window.requestIdleCallback;
-	return fn => {
+export const requestIdleCallback: () => number = (() => {
+	if ("requestIdleCallback" in window)
+		return (window as any).requestIdleCallback;
+	return (fn: () => void) => {
 		fn();
 		return 0;
 	};

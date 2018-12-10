@@ -3,13 +3,13 @@
  */
 
 import { Component } from "react";
-import { sleep, first, requestIdleCallback, retry, waitFor } from "./utils.js";
+import { sleep, first, requestIdleCallback, retry, waitFor } from "./utils.ts";
 import {
 	postRecentness,
 	postLevels,
 	sortings,
 	newsAutoUpdateInterval,
-} from "./settings.js";
+} from "./settings.ts";
 import {
 	getRecentness,
 	setRecentness,

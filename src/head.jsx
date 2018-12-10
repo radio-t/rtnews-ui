@@ -6,11 +6,11 @@ import {
 	addNotification,
 	setTheme as commitTheme,
 } from "./store.jsx";
-import { postsPrefix } from "./settings.js";
+import { postsPrefix } from "./settings.ts";
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent.jsx";
-import { sleep, scrollIntoView, waitFor, retry, first } from "./utils.js";
+import { sleep, scrollIntoView, waitFor, retry, first } from "./utils.ts";
 import { listingRef } from "./symbols.js";
 
 import SVGInline from "react-svg-inline";

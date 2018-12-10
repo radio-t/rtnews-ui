@@ -3,8 +3,8 @@ import { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { addArticle } from "./api.js";
 import { addNotification } from "./store.jsx";
-import { apiRoot } from "./settings.js";
-import { waitFor } from "./utils.js";
+import { apiRoot } from "./settings.ts";
+import { waitFor } from "./utils.ts";
 
 export default class AddArticleForm extends Component {
 	constructor(props) {

@@ -19,7 +19,7 @@ import {
 	getArticleById,
 	getIssueNumber,
 } from "./api.js";
-import { waitDOMReady, sleep } from "./utils.js";
+import { waitDOMReady, sleep } from "./utils.ts";
 import { Provider, connect } from "react-redux";
 
 import App from "./app.jsx";
