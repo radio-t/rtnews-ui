@@ -73,7 +73,7 @@ export async function retry(fn, retries = 3, retryInterval = 0) {
 export async function waitFor(fn, max = null, error = null) {
 	const timestamp = new Date().getTime();
 	while (true) {
-		if (fn()) return;
+		if (await fn()) return;
 		await sleep(100);
 		if (max !== null) {
 			const delta = new Date().getTime();

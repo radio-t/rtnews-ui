@@ -4,9 +4,17 @@ import { sleep, waitFor, scrollIntoView } from "./utils.js";
 
 import { Link } from "react-router-dom";
 
-const onMissingArticle = () => {
+const onMissingArticle = async () => {
+	await waitFor(
+		async () =>
+			window[listingRef] &&
+			(await window[listingRef].update(true)) &&
+			window[listingRef].state.loaded
+	);
 	const el = document.getElementById("active-article");
-	if (!el) {
+	if (el) {
+		scrollIntoView(el);
+	} else {
 		addNotification(r => ({
 			data: (
 				<b>
