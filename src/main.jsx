@@ -1,7 +1,7 @@
 import "./style.scss";
 import "intersection-observer";
 import "whatwg-fetch";
-import "./ganalitics.js";
+import "./ganalitics";
 
 import { render } from "react-dom";
 import {
@@ -10,7 +10,7 @@ import {
 	setTheme,
 	addNotification,
 	removeNotificationsWithContext,
-} from "./store.jsx";
+} from "./store";
 import {
 	getActiveArticle,
 	pollActiveArticle as apiPollActiveArticle,
@@ -18,12 +18,12 @@ import {
 	getTheme,
 	getArticleById,
 	getIssueNumber,
-} from "./api.ts";
-import { waitDOMReady, sleep } from "./utils.ts";
+} from "./api";
+import { waitDOMReady, sleep } from "./utils";
 import { Provider, connect } from "react-redux";
 
-import App from "./app.jsx";
-import LinkToCurrent from "./linkToCurrent.jsx";
+import App from "./app";
+import LinkToCurrent from "./linkToCurrent";
 
 function pollActiveArticle() {
 	getActiveArticle()

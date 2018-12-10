@@ -1,4 +1,4 @@
-export default interface Article {
+export type Article = {
 	active: boolean;
 	/**
 	 * activation timestamp
@@ -64,4 +64,4 @@ export default interface Article {
 	 */
 	parsedts: Date;
 	votes: number;
-}
+};

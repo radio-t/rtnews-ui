@@ -1,4 +1,4 @@
-import { removeNotification } from "./store.jsx";
+import { removeNotification } from "./store";
 
 export default function Notifications(props) {
 	return (

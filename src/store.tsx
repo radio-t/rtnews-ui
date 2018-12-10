@@ -1,13 +1,36 @@
+import { Notification } from "./notificationInterface";
 import { createStore } from "redux";
 
-const initialState = {
+export interface State {
+	issueNumber: number | null;
+	isAdmin: boolean;
+	notifications: any[];
+	activeId: string | null;
+	theme: "day" | "night";
+}
+
+const initialState: State = {
 	issueNumber: null,
 	isAdmin: false,
 	notifications: [],
 	activeId: null,
 	theme: "day",
 };
-const rootReducer = (state = initialState, action) => {
+
+export interface StateAction {
+	type: "setState";
+	state: Partial<State>;
+}
+
+export interface NotificationAction {
+	type: "addNotification" | "removeNotification";
+	notification: any;
+}
+
+const rootReducer = (
+	state: State = initialState,
+	action: StateAction | NotificationAction
+): State => {
 	switch (action.type) {
 		case "setState":
 			return { ...state, ...action.state };
@@ -33,16 +56,20 @@ const rootReducer = (state = initialState, action) => {
 
 export const store = createStore(rootReducer);
 
-export function setState(state) {
+export function setState(state: Partial<State>): void {
 	store.dispatch({
 		type: "setState",
 		state,
 	});
 }
 
-let notificationId = 0;
+let notificationId: number = 0;
 
-const createNotification = notification => {
+type DeferredNotification = (remove: () => void) => Partial<Notification>;
+
+function createNotification(
+	notification: string | Partial<Notification>
+): Notification {
 	if (typeof notification === "string") {
 		notification = {
 			data: <span dangerouslySetInnerHTML={{ __html: notification }} />,
@@ -67,8 +94,8 @@ const createNotification = notification => {
 	);
 	//inject key into react component to avoid misrendering
 	notification.data.key = notification.id;
-	return notification;
-};
+	return notification as Notification;
+}
 
 export function addNotification(notification) {
 	if (typeof notification === "function") {
@@ -100,14 +127,14 @@ export function addNotification(notification) {
 	return notification;
 }
 
-export function removeNotification(notification) {
+export function removeNotification(notification: Notification): void {
 	store.dispatch({
 		type: "removeNotification",
 		notification,
 	});
 }
 
-export function removeNotificationsWithContext(context) {
+export function removeNotificationsWithContext(context: any): void {
 	setState({
 		notifications: store
 			.getState()
@@ -115,9 +142,9 @@ export function removeNotificationsWithContext(context) {
 	});
 }
 
-let themeCounter = 0;
+let themeCounter: number = 0;
 
-export function setTheme(theme, immediate = false) {
+export function setTheme(theme: "day" | "night", immediate: boolean = false) {
 	setState({ theme });
 
 	if (immediate) {

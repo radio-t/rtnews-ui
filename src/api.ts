@@ -9,8 +9,8 @@ import {
 	Sorting,
 } from "./settings";
 import { first, retry, debounce, sleep } from "./utils";
-import Article from "./articleInterface";
-import Feed from "./feedInterface";
+import { Article } from "./articleInterface";
+import { Feed } from "./feedInterface";
 
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;

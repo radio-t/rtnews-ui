@@ -1,17 +1,13 @@
 import { Component } from "react";
 
-import { logout, update, startShow, setTheme as saveTheme } from "./api.ts";
-import {
-	setState,
-	addNotification,
-	setTheme as commitTheme,
-} from "./store.jsx";
-import { postsPrefix } from "./settings.ts";
+import { logout, update, startShow, setTheme as saveTheme } from "./api";
+import { setState, addNotification, setTheme as commitTheme } from "./store";
+import { postsPrefix } from "./settings";
 
 import { Link, NavLink, Route } from "react-router-dom";
-import LinkToCurrent from "./linkToCurrent.jsx";
-import { sleep, scrollIntoView, waitFor, retry, first } from "./utils.ts";
-import { listingRef } from "./symbols.js";
+import LinkToCurrent from "./linkToCurrent";
+import { sleep, scrollIntoView, waitFor, retry, first } from "./utils";
+import { listingRef } from "./symbols";
 
 import SVGInline from "react-svg-inline";
 import MoonIcon from "./static/svg/moon.svg";

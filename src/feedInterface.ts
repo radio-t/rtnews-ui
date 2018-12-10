@@ -1,4 +1,4 @@
-export default interface Feed {
+export type Feed = {
 	active: boolean;
 	feedlink: string;
 	id: string;
@@ -6,4 +6,4 @@ export default interface Feed {
 	 * updated timestamp
 	 */
 	updated: string;
-}
+};

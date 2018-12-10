@@ -1,4 +1,4 @@
-import Article from "./articleInterface";
+import { Article } from "./articleInterface";
 
 // via webpack define plugin
 declare var APIROOT: string;

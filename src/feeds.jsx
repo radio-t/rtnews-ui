@@ -1,11 +1,11 @@
 import { PureComponent } from "react";
 
-import { getFeeds, addFeed, removeFeed } from "./api.ts";
-import { formatDate, sleep, waitFor } from "./utils.ts";
+import { getFeeds, addFeed, removeFeed } from "./api";
+import { formatDate, sleep, waitFor } from "./utils";
 import { Redirect } from "react-router-dom";
 
-import Loading from "./loading.jsx";
-import Error from "./error.jsx";
+import Loading from "./loading";
+import Error from "./error";
 
 export default class FeedsForm extends PureComponent {
 	constructor(props) {

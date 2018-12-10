@@ -1,10 +1,10 @@
 import { Component } from "react";
 
 import { Redirect } from "react-router-dom";
-import { addArticle } from "./api.ts";
-import { addNotification } from "./store.jsx";
-import { apiRoot } from "./settings.ts";
-import { waitFor } from "./utils.ts";
+import { addArticle } from "./api";
+import { addNotification } from "./store";
+import { apiRoot } from "./settings";
+import { waitFor } from "./utils";
 
 export default class AddArticleForm extends Component {
 	constructor(props) {

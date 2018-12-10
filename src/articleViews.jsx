@@ -1,13 +1,13 @@
 import { Component } from "react";
 
-import { formatDate, scrollIntoView } from "./utils.ts";
-import { postsPrefix, isSafari } from "./settings.ts";
-import { getArticle } from "./api.ts";
+import { formatDate, scrollIntoView } from "./utils";
+import { postsPrefix, isSafari } from "./settings";
+import { getArticle } from "./api";
 
-import ArticleControls from "./articleControls.jsx";
+import ArticleControls from "./articleControls";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
-import Loading from "./loading.jsx";
+import Loading from "./loading";
 import SVGInline from "react-svg-inline";
 import CommentsIcon from "./static/svg/i-comment.svg";
 import GearIcon from "./static/svg/gear.svg";

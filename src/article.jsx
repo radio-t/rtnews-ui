@@ -1,18 +1,18 @@
 import { PureComponent } from "react";
 
-import { formatDate, scrollIntoView, waitFor } from "./utils.ts";
-import { getArticle, updateArticle } from "./api.ts";
+import { formatDate, scrollIntoView, waitFor } from "./utils";
+import { getArticle, updateArticle } from "./api";
 import articleCache from "./articleCache";
-import { remark } from "./settings.ts";
+import { remark } from "./settings";
 
-import Remark from "./remark.jsx";
-import Loading from "./loading.jsx";
+import Remark from "./remark";
+import Loading from "./loading";
 import SVGInline from "react-svg-inline";
 import GearIcon from "./static/svg/gear.svg";
-import NotFound from "./notFound.jsx";
-import Error from "./error.jsx";
-import RichEditor from "./richEditor.jsx";
-import { addNotification, removeNotification } from "./store.jsx";
+import NotFound from "./notFound";
+import Error from "./error";
+import RichEditor from "./richEditor";
+import { addNotification, removeNotification } from "./store";
 
 /**
  * Matches if article origlink matches to listeners proposed topics url

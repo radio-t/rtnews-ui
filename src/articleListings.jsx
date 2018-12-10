@@ -3,13 +3,13 @@
  */
 
 import { Component } from "react";
-import { sleep, first, requestIdleCallback, retry, waitFor } from "./utils.ts";
+import { sleep, first, requestIdleCallback, retry, waitFor } from "./utils";
 import {
 	postRecentness,
 	postLevels,
 	sortings,
 	newsAutoUpdateInterval,
-} from "./settings.ts";
+} from "./settings";
 import {
 	getRecentness,
 	setRecentness,
@@ -27,20 +27,20 @@ import {
 	moveArticle,
 	getPrepTopicsURL,
 	addArticle,
-} from "./api.ts";
-import { setState, addNotification, removeNotification } from "./store.jsx";
-import articleCache from "./articleCache.js";
-import Error from "./error.jsx";
+} from "./api";
+import { setState, addNotification, removeNotification } from "./store";
+import articleCache from "./articleCache";
+import Error from "./error";
 
 import {
 	ArticleBrief,
 	DraggableArticleBrief,
 	ArticleSort,
-} from "./articleViews.jsx";
-import ListingActions from "./listingActions.jsx";
+} from "./articleViews";
+import ListingActions from "./listingActions";
 import { Redirect } from "react-router-dom";
-import AddArticle from "./add.jsx";
-import Loading from "./loading.jsx";
+import AddArticle from "./add";
+import Loading from "./loading";
 
 /**
  * Special symbol which denotes that

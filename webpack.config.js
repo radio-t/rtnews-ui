@@ -192,6 +192,7 @@ module.exports = (a, args) => {
 				react: "preact-compat",
 				"react-dom": "preact-compat",
 			},
+			extensions: [".tsx", ".ts", ".jsx", ".js"],
 		},
 		optimization: {
 			minimize: !(args.hasOwnProperty("mode") && args.mode === "development"),

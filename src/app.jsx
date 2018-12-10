@@ -1,8 +1,8 @@
 import { Component } from "react";
 
-import { postsPrefix } from "./settings.ts";
+import { postsPrefix } from "./settings";
 
-import Head from "./head.jsx";
+import Head from "./head";
 import {
 	BrowserRouter as Router,
 	Route,
