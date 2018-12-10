@@ -22,6 +22,23 @@ const setTheme = v => {
 	saveTheme(v);
 };
 
+function ThemeSwitchButton({ theme }) {
+	return (
+		<button
+			onClick={() => setTheme(theme === "day" ? "night" : "day")}
+			title={
+				theme === "day" ? "Поставить ночную тему" : "Поставить дневную тему"
+			}
+			className="inline-button navigation__item navigation__theme-switcher"
+		>
+			<SVGInline
+				svg={theme === "day" ? MoonIcon : SunIcon}
+				className="icon navigation__theme-switcher-icon"
+			/>
+		</button>
+	);
+}
+
 export default class Head extends Component {
 	render() {
 		return (
@@ -84,7 +101,7 @@ export default class Head extends Component {
 							Архив
 						</NavLink>
 					</li>
-					{this.props.isAdmin && (
+					{this.props.isAdmin && [
 						<li className="navigation__item navigation__item_admin">
 							<NavLink
 								to="/sort/"
@@ -93,9 +110,7 @@ export default class Head extends Component {
 							>
 								Сортировать&nbsp;темы
 							</NavLink>
-						</li>
-					)}
-					{this.props.isAdmin && (
+						</li>,
 						<li className="navigation__item navigation__item_admin">
 							<NavLink
 								to="/feeds/"
@@ -104,9 +119,9 @@ export default class Head extends Component {
 							>
 								Управление фидами
 							</NavLink>
-						</li>
-					)}
-					{this.props.isAdmin && (
+						</li>,
+						<ThemeSwitchButton theme={this.props.theme} />,
+						<div className="navigation__separator" />,
 						<li className="navigation__item navigation__item_admin">
 							<span
 								role="button"
@@ -115,9 +130,7 @@ export default class Head extends Component {
 							>
 								Обновить базу
 							</span>
-						</li>
-					)}
-					{this.props.isAdmin && (
+						</li>,
 						<li className="navigation__item navigation__item_admin">
 							<span
 								role="button"
@@ -126,9 +139,7 @@ export default class Head extends Component {
 							>
 								Поехали!
 							</span>
-						</li>
-					)}
-					{this.props.isAdmin && (
+						</li>,
 						<li className="navigation__item navigation__item_admin">
 							<span
 								role="button"
@@ -137,33 +148,9 @@ export default class Head extends Component {
 							>
 								Начать темы слушателей
 							</span>
-						</li>
-					)}
-					{this.props.isAdmin && this.props.theme === "day" && (
-						<span
-							onClick={() => setTheme("night")}
-							title="Поставить ночную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={MoonIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</span>
-					)}
-					{this.props.isAdmin && this.props.theme === "night" && (
-						<span
-							onClick={() => setTheme("day")}
-							title="Поставить дневную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={SunIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</span>
-					)}
-					{this.props.isAdmin && <div className="navigation__separator" />}
+						</li>,
+						<div className="navigation__separator" />,
+					]}
 					{this.props.activeId !== null && (
 						<li className="navigation__item navigation__item_to-current">
 							<span>
@@ -199,29 +186,8 @@ export default class Head extends Component {
 							</li>
 						)}
 					/>
-					{!this.props.isAdmin && this.props.theme === "day" && (
-						<button
-							onClick={() => setTheme("night")}
-							title="Поставить ночную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={MoonIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</button>
-					)}
-					{!this.props.isAdmin && this.props.theme === "night" && (
-						<button
-							onClick={() => setTheme("day")}
-							title="Поставить дневную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={SunIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</button>
+					{!this.props.isAdmin && (
+						<ThemeSwitchButton theme={this.props.theme} />
 					)}
 				</ul>
 				<hr />
