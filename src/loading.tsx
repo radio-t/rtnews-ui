@@ -1,7 +1,7 @@
 import { Component } from "react";
 
 type Props = {
-	numberOfDots: number;
+	numberOfDots?: number;
 	text?: string;
 };
 

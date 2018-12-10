@@ -82,7 +82,7 @@ export async function retry(
  * @param error error to throw in case of timeout
  */
 export async function waitFor(
-	fn: () => boolean,
+	fn: () => boolean | Promise<boolean>,
 	max?: number | null,
 	error?: Error | null
 ) {

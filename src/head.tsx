@@ -9,8 +9,11 @@ import LinkToCurrent from "./linkToCurrent";
 import { sleep, scrollIntoView, waitFor, retry, first } from "./utils";
 import { listingRef } from "./symbols";
 
+// @ts-ignore
 import SVGInline from "react-svg-inline";
+// @ts-ignore
 import MoonIcon from "./static/svg/moon.svg";
+// @ts-ignore
 import SunIcon from "./static/svg/sun.svg";
 
 const setTheme = v => {
@@ -18,7 +21,7 @@ const setTheme = v => {
 	saveTheme(v);
 };
 
-function ThemeSwitchButton({ theme }) {
+function ThemeSwitchButton({ theme }: { theme: "day" | "night" }) {
 	return (
 		<button
 			onClick={() => setTheme(theme === "day" ? "night" : "day")}
@@ -35,14 +38,29 @@ function ThemeSwitchButton({ theme }) {
 	);
 }
 
-export default class Head extends Component {
+type Props = {
+	issueNumber: {
+		link?: string;
+		number: number;
+	};
+	isAdmin: boolean;
+	activeId: string | null;
+	theme: "day" | "night";
+	history: {
+		push: (string) => void;
+	};
+};
+
+type State = {};
+
+export default class Head extends Component<Props, State> {
 	render() {
 		return (
 			<div className="header wrapper page__header">
 				<h1 className="title header__title">
-					Новости для <span class="no-break">Радио-Т</span>
+					Новости для <span className="no-break">Радио-Т</span>
 					{this.props.issueNumber && (
-						<span class="header__issue-number">
+						<span className="header__issue-number">
 							{this.props.issueNumber.link ? (
 								<a href={this.props.issueNumber.link} title="Темы слушателей">
 									{this.props.issueNumber.number}

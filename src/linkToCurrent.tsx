@@ -20,7 +20,7 @@ const onMissingArticle = async () => {
 			<b>
 				Не могу найти тему,{" "}
 				<span
-					class="pseudo"
+					className="pseudo"
 					onClick={async () => {
 						r();
 						await sleep(1500);
@@ -35,7 +35,13 @@ const onMissingArticle = async () => {
 	}));
 };
 
-export default function LinkToCurrent(props) {
+type Props = {
+	onClick?: (MouseEvent) => void;
+	title: string;
+	className: string;
+};
+
+export default function LinkToCurrent(props: Props) {
 	return (
 		<Link
 			to="/"

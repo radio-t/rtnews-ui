@@ -1,6 +1,11 @@
 import { Component } from "react";
 
-export default class NotFound extends Component {
+type Props = {
+	code?: number;
+	message?: string;
+};
+
+export default class NotFound extends Component<Props> {
 	componentDidMount() {
 		document.title = "Ошибка | Новости для Радио-Т";
 	}

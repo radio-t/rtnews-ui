@@ -76,8 +76,7 @@ function createNotification(
 			time: 3000,
 			level: "default",
 		};
-	}
-	if (typeof notification.data === "string") {
+	} else if (typeof notification.data === "string") {
 		notification.data = (
 			<span dangerouslySetInnerHTML={{ __html: notification.data }} />
 		);
@@ -93,11 +92,13 @@ function createNotification(
 		notification
 	);
 	//inject key into react component to avoid misrendering
-	notification.data.key = notification.id;
+	(notification.data as JSX.Element).key = notification.id;
 	return notification as Notification;
 }
 
-export function addNotification(notification) {
+export function addNotification(
+	notification: DeferredNotification | string | Partial<Notification>
+) {
 	if (typeof notification === "function") {
 		// fuckery with indirection
 		const n = {};
