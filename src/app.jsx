@@ -10,20 +10,20 @@ import {
 	Redirect,
 } from "react-router-dom";
 import { ScrollContext } from "react-router-scroll-4";
-import AddArticle from "./add.jsx";
+import AddArticle from "./add";
 import {
 	Listing,
 	ArchiveListing,
 	DeletedListing,
 	Sorter,
-} from "./articleListings.jsx";
-import { Article, EditableArticle } from "./article.jsx";
-import Feeds from "./feeds.jsx";
-import LoginForm from "./login.jsx";
-import NotFound from "./notFound.jsx";
-import Notifications from "./notifications.jsx";
+} from "./articleListings";
+import { Article, EditableArticle } from "./article";
+import Feeds from "./feeds";
+import LoginForm from "./login";
+import NotFound from "./notFound";
+import Notifications from "./notifications";
 
-import { listingRef } from "./symbols.js";
+import { listingRef } from "./symbols";
 
 export default class App extends Component {
 	render() {

@@ -4,22 +4,42 @@ import { formatDate, scrollIntoView } from "./utils";
 import { postsPrefix, isSafari } from "./settings";
 import { getArticle } from "./api";
 
-import ArticleControls from "./articleControls";
+import ArticleControls, { ControlID } from "./articleControls";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import Loading from "./loading";
+
+// @ts-ignore
 import SVGInline from "react-svg-inline";
+// @ts-ignore
 import CommentsIcon from "./static/svg/i-comment.svg";
+// @ts-ignore
 import GearIcon from "./static/svg/gear.svg";
+import { Article } from "./articleInterface";
+
+interface ComponentWithVisibility<P> extends Component<P> {
+	visible: boolean;
+	ref: Element;
+}
+
+interface PropsWithActive {
+	active: boolean;
+}
 
 /**
  * Applies "should update only if visible" logic to component
  */
-function UpdateOnlyIfVisible(Component) {
+function UpdateOnlyIfVisible<
+	P extends object & PropsWithActive,
+	C extends Component<P>
+>(component: C) {
 	/**
 	 * Map which connects HTMLElement with React.Component
 	 */
-	const refToComponentMap = new WeakMap();
+	const refToComponentMap: WeakMap<
+		Element,
+		ComponentWithVisibility<P>
+	> = new WeakMap();
 
 	const observer = new IntersectionObserver(entries => {
 		entries.forEach(e => {
@@ -31,7 +51,10 @@ function UpdateOnlyIfVisible(Component) {
 		});
 	});
 
-	return class extends Component {
+	return class Wrapped extends Component<P>
+		implements ComponentWithVisibility<P> {
+		visible: boolean;
+		ref: HTMLElement;
 		shouldComponentUpdate(nextProps, nextState) {
 			if (nextProps.active !== this.props.active) return true;
 			if (!this.visible) return false;
@@ -56,10 +79,32 @@ function UpdateOnlyIfVisible(Component) {
 	};
 }
 
+interface DraggableComponent<P> extends Component<P> {
+	draggable: boolean;
+	initialTouch: Touch;
+	initialTransform: string;
+	clientY: number;
+	dragInterval: number;
+}
+
+interface DraggableProps {
+	draggable: boolean;
+	article: Article;
+	onChange: Function;
+}
+
+type TDragEvent = Event & {
+	data: any;
+	absoluteCoords: any;
+	relativeCoords: any;
+};
+
 /**
  * Applies drag'n'drop logic to component
  */
-function Draggable(Component) {
+function Draggable<P extends object & DraggableProps, C extends Component<P>>(
+	component: C
+) {
 	/**
 	 * touchmove targets used by ArticleBase.onHandleTouchMove
 	 */
@@ -70,7 +115,14 @@ function Draggable(Component) {
 	 */
 	const eventIdentifier = "RTNEWSDATADRAG";
 
-	return class extends Component {
+	return class extends Component<P> implements DraggableComponent<P> {
+		draggable: boolean;
+		initialTouch: Touch;
+		initialTransform: string;
+		clientY: number;
+		dragInterval: number;
+		handle?: HTMLElement;
+		ref?: HTMLElement;
 		componentDidMount() {
 			super.componentDidMount && super.componentDidMount();
 			if (!(this.handle && this.ref)) return;
@@ -189,17 +241,17 @@ function Draggable(Component) {
 			this.ref.classList.add("touch-drag-item");
 			this.ref.classList.remove("touch-drag-item__start");
 			this.initialTouch = e.touches[0];
-			this.initialTransform = this.ref.style.tranform;
+			this.initialTransform = this.ref.style.transform;
 
 			// handle scroll over borders
 			this.clientY = e.touches[0].clientY;
-			this.dragInterval = setInterval(() => {
+			this.dragInterval = (setInterval(() => {
 				if (this.clientY <= 80) {
 					window.scrollBy(0, -((80 - this.clientY) / 2));
 				} else if (this.clientY >= window.innerHeight - 80) {
 					window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
 				}
-			}, 30);
+			}, 30) as unknown) as number;
 		}
 		onHandleTouchMove(e) {
 			this.clientY = e.touches[0].clientY;
@@ -225,13 +277,13 @@ function Draggable(Component) {
 				const event = new Event(eventIdentifier, {
 					bubbles: false,
 					cancelable: true,
-				});
+				}) as TDragEvent;
 				const tRect = x.getBoundingClientRect();
-				event.absoluteCoords = {
+				(event as any).absoluteCoords = {
 					x: e.touches[0].clientX,
 					y: e.touches[0].clientY,
 				};
-				event.relativeCoords = {
+				(event as any).relativeCoords = {
 					x: e.touches[0].clientX - tRect.x,
 					y: e.touches[0].clientY - tRect.y,
 				};
@@ -257,7 +309,7 @@ function Draggable(Component) {
 				const event = new Event(`${eventIdentifier}End`, {
 					bubbles: false,
 					cancelable: true,
-				});
+				}) as TDragEvent;
 				event.data = article;
 				const rect = x.getBoundingClientRect();
 				event.absoluteCoords = {
@@ -265,8 +317,8 @@ function Draggable(Component) {
 					y: e.changedTouches[0].clientY,
 				};
 				event.relativeCoords = {
-					x: e.changedTouches[0].clientX - rect.x,
-					y: e.changedTouches[0].clientY - rect.y,
+					x: e.changedTouches[0].clientX - ((rect as any).x || rect.left),
+					y: e.changedTouches[0].clientY - ((rect as any).y || rect.top),
 				};
 				x.dispatchEvent(event);
 			});
@@ -284,13 +336,13 @@ function Draggable(Component) {
 
 			if (isSafari) {
 				this.clientY = e.clientY;
-				this.dragInterval = setInterval(() => {
+				this.dragInterval = (setInterval(() => {
 					if (this.clientY <= 80) {
 						window.scrollBy(0, -((80 - this.clientY) / 2));
 					} else if (this.clientY >= window.innerHeight - 80) {
 						window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
 					}
-				}, 30);
+				}, 30) as unknown) as number;
 			}
 		}
 		onDrag(e) {
@@ -362,10 +414,34 @@ function Draggable(Component) {
 	};
 }
 
+type ArticleBriefBasicProps = {
+	article: Article;
+	active?: boolean;
+	draggable?: boolean;
+	controls: ControlID[];
+	onChange?: (ControlID) => void;
+	archive?: boolean;
+};
+
+type ArticleBriefBasicState = {
+	articleText: string | null;
+	detailedExpanded: boolean;
+	draggable: boolean;
+	visible: boolean;
+};
+
 /**
  * Views which used in main, archive and deleted listings
  */
-class ArticleBriefBasic extends Component {
+class ArticleBriefBasic extends Component<
+	ArticleBriefBasicProps,
+	ArticleBriefBasicState
+> {
+	fetchLock: boolean;
+	ref: HTMLElement;
+	handle: HTMLElement;
+	detailedRef: HTMLSpanElement;
+	draggable: boolean;
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -485,7 +561,6 @@ class ArticleBriefBasic extends Component {
 					<span
 						key="detailed"
 						className="pseudo post__detailed-link"
-						to={`${postsPrefix}/${this.props.article.slug}`}
 						ref={ref => (this.detailedRef = ref)}
 						onClick={e => {
 							this.setState({ detailedExpanded: !this.state.detailedExpanded });
@@ -502,7 +577,7 @@ class ArticleBriefBasic extends Component {
 						) : (
 							<div className="post__full-content" key="fulltext">
 								<div
-									class="article-content post__full-content-content"
+									className="article-content post__full-content-content"
 									dangerouslySetInnerHTML={{ __html: this.state.articleText }}
 								/>
 								<div
@@ -510,7 +585,8 @@ class ArticleBriefBasic extends Component {
 									onClick={() => {
 										if (this.ref) {
 											const rect = this.ref.getBoundingClientRect();
-											if (rect.y < 0) scrollIntoView(this.ref);
+											if (((rect as any).y || rect.top) < 0)
+												scrollIntoView(this.ref);
 										}
 										this.setState({ detailedExpanded: false });
 									}}
@@ -526,15 +602,33 @@ class ArticleBriefBasic extends Component {
 	}
 }
 
-export const ArticleBrief = UpdateOnlyIfVisible(ArticleBriefBasic);
-export const DraggableArticleBrief = UpdateOnlyIfVisible(
-	Draggable(ArticleBriefBasic)
+export const ArticleBrief = UpdateOnlyIfVisible(
+	(ArticleBriefBasic as unknown) as Component<PropsWithActive>
 );
+export const DraggableArticleBrief = UpdateOnlyIfVisible((Draggable(
+	(ArticleBriefBasic as unknown) as Component<DraggableProps>
+) as unknown) as Component<PropsWithActive>);
+
+type ArticleSortBasicProps = {
+	active?: boolean;
+	article: Article;
+	onChange: (ControlID) => void;
+};
+
+type ArticleSortBasicState = {
+	draggable: boolean;
+};
 
 /**
  * View which used in sorting listing "/sort/"
  */
-export class ArticleSortBasic extends Component {
+export class ArticleSortBasic extends Component<
+	ArticleSortBasicProps,
+	ArticleSortBasicState
+> {
+	controls: () => ControlID[];
+	ref: HTMLDivElement;
+	handle: HTMLDivElement;
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -546,7 +640,7 @@ export class ArticleSortBasic extends Component {
 				this.props.article.geek ? "make-ungeek" : "make-geek",
 				"archive",
 				"remove",
-			].filter(x => x !== null);
+			].filter(x => x !== null) as ControlID[];
 	}
 	render() {
 		return (
@@ -618,4 +712,6 @@ export class ArticleSortBasic extends Component {
 	}
 }
 
-export const ArticleSort = UpdateOnlyIfVisible(Draggable(ArticleSortBasic));
+export const ArticleSort = UpdateOnlyIfVisible((Draggable(
+	(ArticleSortBasic as unknown) as Component<DraggableProps>
+) as unknown) as Component<PropsWithActive>);

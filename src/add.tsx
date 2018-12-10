@@ -6,7 +6,24 @@ import { addNotification } from "./store";
 import { apiRoot } from "./settings";
 import { waitFor } from "./utils";
 
-export default class AddArticleForm extends Component {
+type Props = {
+	isAdmin: boolean;
+	style: React.CSSProperties;
+	onAdd: () => void;
+};
+
+type State = {
+	manual: boolean;
+	autolink: string;
+	manualLink: string;
+	manualTitle: string;
+	manualText: string;
+	posting: boolean;
+};
+
+export default class AddArticleForm extends Component<Props, State> {
+	autoref: HTMLInputElement;
+	manualref: HTMLInputElement;
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -20,7 +37,7 @@ export default class AddArticleForm extends Component {
 		this.onDragover = this.onDragover.bind(this);
 		this.onDrop = this.onDrop.bind(this);
 	}
-	bookmarklet() {
+	bookmarklet(): string {
 		const hrefFunc = function() {
 			var w = window,
 				d = document,
@@ -32,7 +49,7 @@ export default class AddArticleForm extends Component {
 			s.left = "0";
 			s.right = "0";
 			s.top = "0";
-			s.zIndex = 16777271;
+			s.zIndex = "16777271";
 			s.height = "0";
 			s.width = "100%";
 			s.overflow = "hidden";
@@ -239,17 +256,17 @@ export default class AddArticleForm extends Component {
 	}
 	onSwitch() {
 		this.setState({ manual: !this.state.manual });
-		waitFor(() => this.autoref || this.manualref).then(() => {
+		waitFor(() => !!(this.autoref || this.manualref)).then(() => {
 			(this.autoref || this.manualref).focus();
 		});
 	}
-	onDragover(e) {
+	onDragover(e: DragEvent) {
 		if (e.dataTransfer.types.indexOf("text/plain") !== -1) {
 			e.dataTransfer.dropEffect = "copy";
 			e.preventDefault();
 		}
 	}
-	async onDrop(e) {
+	async onDrop(e: DragEvent) {
 		if (e.dataTransfer.types.indexOf("text/plain") === -1) return;
 		const data = e.dataTransfer.getData("text/plain");
 		const isLink = /^https?:\/\/.*/.test(data);
@@ -293,16 +310,18 @@ export default class AddArticleForm extends Component {
 		try {
 			if (!this.state.manual) {
 				await addArticle(this.state.autolink);
-				this.state.autolink = "";
+				this.setState({ autolink: "" });
 			} else {
 				await addArticle(
 					this.state.manualLink,
 					this.state.manualTitle,
 					this.state.manualText
 				);
-				this.state.manualLink = "";
-				this.state.manualTitle = "";
-				this.state.manualText = "";
+				this.setState({
+					manualLink: "",
+					manualTitle: "",
+					manualText: "",
+				});
 			}
 			addNotification({
 				data: <b>Новость добавлена</b>,

@@ -4,6 +4,8 @@ type Props = {
 	baseurl?: string;
 	site_id: string;
 	url?: string;
+	id?: string;
+	className?: string;
 };
 
 export default class Remark extends Component<Props> {

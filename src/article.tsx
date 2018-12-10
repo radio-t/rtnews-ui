@@ -4,22 +4,26 @@ import { formatDate, scrollIntoView, waitFor } from "./utils";
 import { getArticle, updateArticle } from "./api";
 import articleCache from "./articleCache";
 import { remark } from "./settings";
+import { Article as ArticleType } from "./articleInterface";
 
 import Remark from "./remark";
 import Loading from "./loading";
-import SVGInline from "react-svg-inline";
-import GearIcon from "./static/svg/gear.svg";
 import NotFound from "./notFound";
-import Error from "./error";
+import ErrorComponent from "./error";
 import RichEditor from "./richEditor";
 import { addNotification, removeNotification } from "./store";
+
+// @ts-ignore
+import SVGInline from "react-svg-inline";
+// @ts-ignore
+import GearIcon from "./static/svg/gear.svg";
 
 /**
  * Matches if article origlink matches to listeners proposed topics url
  */
 const prepTopicsReg = /^https?:\/\/radio-t.com\/p\/\d{4}\/\d{2}\/\d{2}\/prep-\d+\/?$/i;
 
-function ArticleHeader({ article }) {
+function ArticleHeader({ article }: { article: ArticleType }) {
 	return (
 		<>
 			<h3 className="title article__title">
@@ -54,28 +58,28 @@ function ArticleHeader({ article }) {
 	);
 }
 
-function ArticleContent({ article }) {
-	return prepTopicsReg.test(article.origlink) ? (
-		<div className="article-content article__content">
-			<h3>Темы слушателей</h3>
-			<Remark
-				baseurl={remark.baseurl}
-				site_id="radiot"
-				url={article.origlink}
-			/>
-		</div>
-	) : (
-		<div
-			className="article-content article__content"
-			dangerouslySetInnerHTML={{
-				__html: article.content || article.snippet,
-			}}
-		/>
-	);
-}
+type ArticleMode = "view" | "preview" | "edit";
 
-function ArticleFactory(editable = false) {
-	return class Article extends PureComponent {
+type Props = {
+	slug: string;
+};
+
+type State = {
+	article: ArticleType | null;
+	error: {
+		status?: number;
+		statusText?: string;
+		message: string;
+	} | null;
+	previewSnippet: string | null;
+	previewContent: string | null;
+	mode: ArticleMode;
+};
+
+function ArticleFactory(editable: boolean = false) {
+	return class Article extends PureComponent<Props, State> {
+		snippeteditor: RichEditor | null;
+		editor: RichEditor | null;
 		constructor(props) {
 			super(props);
 			this.state = {
@@ -114,7 +118,7 @@ function ArticleFactory(editable = false) {
 				previewContent: this.state.article.content || "",
 				mode: "edit",
 			});
-			await waitFor(() => this.snippeteditor, 10000);
+			await waitFor(() => !!this.snippeteditor, 10000);
 			this.snippeteditor.focus();
 		}
 		cancelEdit() {
@@ -125,9 +129,11 @@ function ArticleFactory(editable = false) {
 			});
 		}
 		preview() {
-			this.state.previewSnippet = this.snippeteditor.getContent();
-			this.state.previewContent = this.editor.getContent();
-			this.setState({ mode: "preview" });
+			this.setState({
+				previewSnippet: this.snippeteditor.getContent(),
+				previewContent: this.editor.getContent(),
+				mode: "preview",
+			});
 		}
 		async save() {
 			let notification;
@@ -163,7 +169,7 @@ function ArticleFactory(editable = false) {
 						<span>
 							Ошибка при сохранении,{" "}
 							<span
-								class="pseudo"
+								className="pseudo"
 								onClick={() => {
 									window.location.reload;
 								}}
@@ -185,7 +191,7 @@ function ArticleFactory(editable = false) {
 				return <NotFound />;
 			if (this.state.error)
 				return (
-					<Error
+					<ErrorComponent
 						code={this.state.error.status || 500}
 						message={
 							this.state.error.statusText ||
@@ -213,9 +219,9 @@ function ArticleFactory(editable = false) {
 					<ArticleHeader article={this.state.article} />
 					{editable && [
 						this.state.mode === "view" && (
-							<div class="article__edit">
+							<div className="article__edit">
 								<span
-									class="pseudo article__edit-button article__edit-button-edit"
+									className="pseudo article__edit-button article__edit-button-edit"
 									onClick={() => this.edit()}
 								>
 									Редактировать
@@ -223,23 +229,23 @@ function ArticleFactory(editable = false) {
 							</div>
 						),
 						this.state.mode === "edit" && (
-							<div class="article__edit">
+							<div className="article__edit">
 								<span
-									class="pseudo article__edit-button"
+									className="pseudo article__edit-button"
 									onClick={() => this.cancelEdit()}
 								>
 									Отменить
 								</span>
 								{" / "}
 								<span
-									class="pseudo article__edit-button"
+									className="pseudo article__edit-button"
 									onClick={() => this.preview()}
 								>
 									Превью
 								</span>
 								{" / "}
 								<span
-									class="pseudo article__edit-button"
+									className="pseudo article__edit-button"
 									onClick={() => this.save()}
 								>
 									Сохранить
@@ -247,23 +253,23 @@ function ArticleFactory(editable = false) {
 							</div>
 						),
 						this.state.mode === "preview" && (
-							<div class="article__edit">
+							<div className="article__edit">
 								<span
-									class="pseudo article__edit-button"
+									className="pseudo article__edit-button"
 									onClick={() => this.cancelEdit()}
 								>
 									Отменить
 								</span>
 								{" / "}
 								<span
-									class="pseudo article__edit-button"
+									className="pseudo article__edit-button"
 									onClick={() => this.setState({ mode: "edit" })}
 								>
 									Продолжить
 								</span>
 								{" / "}
 								<span
-									class="pseudo article__edit-button"
+									className="pseudo article__edit-button"
 									onClick={() => this.save()}
 								>
 									Сохранить
