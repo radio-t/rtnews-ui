@@ -80,7 +80,7 @@ function ArticleFactory(editable: boolean = false) {
 	return class Article extends PureComponent<Props, State> {
 		snippeteditor: RichEditor | null;
 		editor: RichEditor | null;
-		constructor(props) {
+		constructor(props: Props) {
 			super(props);
 			this.state = {
 				article: null,
