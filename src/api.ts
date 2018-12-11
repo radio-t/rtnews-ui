@@ -272,7 +272,10 @@ export function updateArticle(updated: Partial<Article>): Promise<null> {
 	});
 }
 
-export function moveArticle(id: string, offset: number): Promise<null> {
+export function moveArticle(
+	id: string,
+	offset: number
+): Promise<{ [id: string]: number }> {
 	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
 }
 
@@ -295,7 +298,9 @@ export function restoreArticle(id: string): Promise<null> {
 /**
  * Moves article to top
  */
-export async function makeArticleFirst(id: string): Promise<null> {
+export async function makeArticleFirst(
+	id: string
+): Promise<{ [id: string]: number }> {
 	const positions: { [id: string]: number } = await request("/news/positions");
 	if (!positions.hasOwnProperty(id))
 		throw new Error("Can't find id's position");
