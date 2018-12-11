@@ -73,13 +73,13 @@ export interface PostRecentness {
 export const postRecentness: PostRecentness[] = [
 	{
 		title: "Все",
-		fn(x, i) {
+		fn() {
 			return true;
 		},
 	},
 	{
 		title: "Свежие",
-		fn(x, i, isgeek = true) {
+		fn(x, _, isgeek = true) {
 			const interval = now - (x.parsedats as Date).getTime();
 			if (isgeek && x.geek && interval < 3 * month) {
 				return true;
@@ -100,19 +100,19 @@ export interface PostLevel {
 export const postLevels: PostLevel[] = [
 	{
 		title: "Все",
-		fn(x, i) {
+		fn() {
 			return true;
 		},
 	},
 	{
 		title: "Обычные",
-		fn(x, i) {
+		fn(x, _) {
 			return !x.geek;
 		},
 	},
 	{
 		title: "Гиковские",
-		fn(x, i) {
+		fn(x, _) {
 			return x.geek;
 		},
 		isgeek: true,

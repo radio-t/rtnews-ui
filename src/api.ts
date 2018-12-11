@@ -114,7 +114,7 @@ function request(endpoint: string, options: RequestInit = {}): Promise<any> {
 		)
 	).then(req => {
 		if (req.status >= 400) throw req;
-		return req.json().catch(e => null);
+		return req.json().catch(() => null);
 	});
 }
 

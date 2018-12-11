@@ -8,13 +8,14 @@ type CacheLabel = "common" | "archive" | "deleted";
  * Article cache which stores articles
  * imlements smooth back/forward history navigation
  */
-export default (() => {
+
+const ArticleCache: {
+	get: (label?: CacheLabel, force?: boolean) => Promise<Article[]>;
+	invalidate: (label?: CacheLabel) => void;
+} = (() => {
 	if (newsCacheValidInterval === null) {
 		return {
-			async get(
-				label: CacheLabel = "common",
-				force: boolean = false
-			): Promise<Article[]> {
+			async get(label: CacheLabel = "common"): Promise<Article[]> {
 				let data;
 				switch (label) {
 					case "common":
@@ -31,7 +32,7 @@ export default (() => {
 				}
 				return data;
 			},
-			invalidate(label: CacheLabel | null = null) {},
+			invalidate() {},
 		};
 	}
 
@@ -90,3 +91,5 @@ export default (() => {
 	};
 	return { get, invalidate };
 })();
+
+export default ArticleCache;
