@@ -1,7 +1,3 @@
-// via webpack
-declare var ENV: string;
-declare var ga: Function;
-
 if (ENV !== "development") {
 	(function(i, s, o, g, r, a, m) {
 		i["GoogleAnalyticsObject"] = r;
@@ -10,7 +6,7 @@ if (ENV !== "development") {
 			function() {
 				(i[r].q = i[r].q || []).push(arguments);
 			}),
-			(i[r].l = 1 * ((new Date() as unknown) as number));
+			(i[r].l = 1 * new Date());
 		(a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
 		a.async = 1;
 		a.src = g;

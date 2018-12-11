@@ -139,7 +139,7 @@ export function removeNotificationsWithContext(context: any): void {
 	setState({
 		notifications: store
 			.getState()
-			.notifications.filter(n => n.context !== context),
+			.notifications.filter((n: Notification) => n.context !== context),
 	});
 }
 

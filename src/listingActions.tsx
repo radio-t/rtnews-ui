@@ -36,7 +36,7 @@ export default class ListingActions extends Component<Props> {
 										? "listing-actions__news-recent-button-active"
 										: "")
 								}
-								onMouseDown={e => {
+								onMouseDown={() => {
 									const val =
 										this.props.postRecentness === postRecentness[0]
 											? postRecentness[1]
@@ -91,7 +91,7 @@ export default class ListingActions extends Component<Props> {
 								<li
 									role="button"
 									className="sortings-list__item"
-									onMouseDown={e =>
+									onMouseDown={() =>
 										this.props.onSortingChange && this.props.onSortingChange(x)
 									}
 									key={x.title}

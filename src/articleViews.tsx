@@ -212,7 +212,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.ref.classList.add("touch-drag-target-bottom");
 			}
 		}
-		onTouchDragLeave(e: TDragEvent) {
+		onTouchDragLeave() {
 			this.ref.classList.remove("touch-drag-target-top");
 			this.ref.classList.remove("touch-drag-target-bottom");
 		}
@@ -377,11 +377,11 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.ref.classList.add("drop-bottom");
 			}
 		}
-		onDragLeave(e: DragEvent) {
+		onDragLeave() {
 			this.ref.classList.remove("drop-top");
 			this.ref.classList.remove("drop-bottom");
 		}
-		onDragEnd(e: DragEvent) {
+		onDragEnd() {
 			clearInterval(this.dragInterval);
 			this.ref.classList.remove("drop-item");
 			this.ref.classList.remove("drop-top");
@@ -565,7 +565,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 						key="detailed"
 						className="pseudo post__detailed-link"
 						ref={ref => (this.detailedRef = ref)}
-						onClick={e => {
+						onClick={() => {
 							this.setState({ detailedExpanded: !this.state.detailedExpanded });
 							this.fetchArticle();
 						}}

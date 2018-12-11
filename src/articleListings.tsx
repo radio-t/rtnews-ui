@@ -80,6 +80,7 @@ async function en<T>(
 }
 
 class Updatable<P, S> extends Component<P, S> {
+	// @ts-ignore
 	async update(force: boolean = false): Promise<void> {}
 }
 

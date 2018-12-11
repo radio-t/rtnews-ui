@@ -11,7 +11,7 @@ type State = {
 
 export default class Loading extends Component<Props, State> {
 	interval?: number;
-	constructor(props) {
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			numberOfDots: (props.numberOfDots || 3) - 1,

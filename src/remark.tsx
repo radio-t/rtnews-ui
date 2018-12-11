@@ -10,10 +10,18 @@ type Props = {
 
 export default class Remark extends Component<Props> {
 	ref: HTMLDivElement;
-	receiveMessages: (Event) => void;
-	postHashToIframe: (Event) => void;
-	postClickOutsideToIframe: (MouseEvent) => void;
-	constructor(props) {
+	receiveMessages: (
+		event: Event & {
+			data?: any;
+		}
+	) => void;
+	postHashToIframe: (
+		event: Event & {
+			newURL?: string;
+		}
+	) => void;
+	postClickOutsideToIframe: (event: MouseEvent) => void;
+	constructor(props: Props) {
 		super(props);
 	}
 	render() {
@@ -45,7 +53,9 @@ export default class Remark extends Component<Props> {
 		const query = Object.keys(remark_config)
 			.map(
 				key =>
-					`${encodeURIComponent(key)}=${encodeURIComponent(remark_config[key])}`
+					`${encodeURIComponent(key)}=${encodeURIComponent(
+						(remark_config as any)[key]
+					)}`
 			)
 			.join("&");
 
@@ -105,7 +115,7 @@ export default class Remark extends Component<Props> {
 		};
 
 		this.postClickOutsideToIframe = function(e) {
-			if (!iframe.contains(e.target)) {
+			if (!iframe.contains(e.target as HTMLElement)) {
 				iframe.contentWindow &&
 					iframe.contentWindow.postMessage(
 						JSON.stringify({ clickOutside: true }),
@@ -120,13 +130,27 @@ export default class Remark extends Component<Props> {
 		setTimeout(this.postHashToIframe, 1000);
 
 		const remarkRootId = "remark-km423lmfdslkm34";
-		const userInfo = {
+		const userInfo: {
+			node: HTMLElement | null;
+			back: HTMLElement | null;
+			closeEl: HTMLElement | null;
+			iframe: HTMLElement | null;
+			style: HTMLElement | null;
+			init: (user: any) => void;
+			close: () => void;
+			delay: number;
+			events: string[];
+			animationStop: any;
+			onAnimationClose: () => void;
+			remove: () => void;
+			onKeyDown: (e: KeyboardEvent) => void;
+		} = {
 			node: null,
 			back: null,
 			closeEl: null,
 			iframe: null,
 			style: null,
-			init(user) {
+			init(user: any) {
 				this.animationStop();
 				if (!this.style) {
 					this.style = document.createElement("style");
@@ -247,7 +271,7 @@ export default class Remark extends Component<Props> {
 					return;
 				}
 				this.delay = setTimeout(this.animationStop, 1000);
-				this.events.forEach(event =>
+				this.events.forEach((event: string) =>
 					el.addEventListener(event, this.animationStop, false)
 				);
 			},

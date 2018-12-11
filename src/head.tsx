@@ -83,7 +83,7 @@ export default class Head extends Component<Props, State> {
 							<span
 								role="button"
 								className="pseudo navigation__item-link"
-								onClick={e => this.logout()}
+								onClick={() => this.logout()}
 							>
 								Выйти
 							</span>

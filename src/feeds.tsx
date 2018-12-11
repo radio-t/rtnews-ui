@@ -27,7 +27,7 @@ type State = {
 
 export default class FeedsForm extends PureComponent<Props, State> {
 	input: HTMLInputElement;
-	constructor(props) {
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			feeds: [],

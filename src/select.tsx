@@ -4,7 +4,7 @@ type Props = {
 	className?: string;
 	items: string[];
 	value: string;
-	onChange: (string) => void;
+	onChange: (change: string) => void;
 };
 
 type State = {
@@ -30,13 +30,13 @@ export default class Select extends PureComponent<Props, State> {
 					"select " + (this.props.className ? this.props.className : "")
 				}
 				tabIndex={0}
-				onFocus={e =>
+				onFocus={() =>
 					this.setState({
 						expanded: true,
 						selected: this.props.items.indexOf(this.props.value),
 					})
 				}
-				onBlur={e =>
+				onBlur={() =>
 					this.setState({
 						expanded: false,
 					})
@@ -89,7 +89,7 @@ export default class Select extends PureComponent<Props, State> {
 									(i === this.state.selected ? "select__item--selected " : "")
 								}
 								aria-selected={x === this.props.value ? true : null}
-								onClick={e => {
+								onClick={() => {
 									this.ref.blur();
 									if (x !== this.props.value) {
 										this.props.onChange(x);

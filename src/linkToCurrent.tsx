@@ -5,9 +5,11 @@ import { sleep, waitFor, scrollIntoView } from "./utils";
 import { Link } from "react-router-dom";
 
 const onMissingArticle = async () => {
-	window[listingRef] && (await window[listingRef].update(true));
+	(window as any)[listingRef] &&
+		(await (window as any)[listingRef].update(true));
 	await waitFor(
-		async () => window[listingRef] && window[listingRef].state.loaded
+		async () =>
+			(window as any)[listingRef] && (window as any)[listingRef].state.loaded
 	);
 	const el = document.getElementById("active-article");
 	if (el) {
@@ -36,7 +38,7 @@ const onMissingArticle = async () => {
 };
 
 type Props = {
-	onClick?: (MouseEvent) => void;
+	onClick?: (event: Event) => void;
 	title: string;
 	className: string;
 };
@@ -47,10 +49,12 @@ export default function LinkToCurrent(props: Props) {
 			to="/"
 			onClick={async e => {
 				if (window.location.pathname === "/") e.preventDefault();
-				props.onClick && props.onClick(e);
+				props.onClick && props.onClick((e as unknown) as Event);
 				await sleep(100);
 				await waitFor(
-					() => window[listingRef] && window[listingRef].state.loaded
+					() =>
+						(window as any)[listingRef] &&
+						(window as any)[listingRef].state.loaded
 				);
 				await waitFor(() => !!document.getElementById("active-article"), 2000)
 					.then(() => {
