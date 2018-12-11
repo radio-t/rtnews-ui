@@ -1,11 +1,14 @@
-export function first<T>(arr: T[], fn: (T) => boolean): T | null {
+export function first<T>(arr: T[], fn: (item: T) => boolean): T | null {
 	for (let item of arr) {
 		if (fn(item)) return item;
 	}
 	return null;
 }
 
-export function firstIndex<T>(arr: [T], fn: (T) => boolean): number | null {
+export function firstIndex<T>(
+	arr: [T],
+	fn: (item: T) => boolean
+): number | null {
 	for (let i = 0; i < arr.length; i++) {
 		if (fn(arr[i])) return i;
 	}
@@ -105,9 +108,14 @@ export const scrollIntoView = (() => {
 		) => el.scrollIntoView({ behavior, block: "start" });
 	} else {
 		// easeOutQuart
-		const timingfn = t => -(Math.pow(t - 1, 4) - 1);
+		const timingfn = (t: number) => -(Math.pow(t - 1, 4) - 1);
 
-		const easing = (time, duration, from, to) => {
+		const easing = (
+			time: number,
+			duration: number,
+			from: number,
+			to: number
+		) => {
 			if (time >= duration) return to;
 			const percentage = timingfn(time / duration);
 			const delta = to - from;
@@ -131,7 +139,7 @@ export const scrollIntoView = (() => {
 				const timeStart = performance.now();
 				const duration = 500;
 
-				function loop(timeCurrent) {
+				function loop(timeCurrent: number) {
 					const elapsed = timeCurrent - timeStart;
 					const next = easing(elapsed, duration, startPosition, targetPosition);
 					window.scrollTo(0, next);
@@ -154,7 +162,7 @@ export function debounce(
 	immediate: boolean = false
 ): Function {
 	let timeout: number;
-	return function(...args): void {
+	return function(...args: any): void {
 		const later = () => {
 			timeout = null;
 			if (!immediate) fn.apply(this, args);
@@ -167,7 +175,7 @@ export function debounce(
 }
 
 export const requestIdleCallback: (
-	Function,
+	fn: Function,
 	options?: { timeout?: number }
 ) => number = (() => {
 	if ("requestIdleCallback" in window)
