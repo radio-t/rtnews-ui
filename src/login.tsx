@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, FormEvent } from "react";
 
 import { setState } from "./store";
 import { login, loginViaStorage } from "./api";
@@ -76,7 +76,7 @@ export default class LoginForm extends Component<Props, State> {
 			</form>
 		);
 	}
-	async onSubmit(e: React.FormEvent) {
+	async onSubmit(e: FormEvent) {
 		e.preventDefault();
 		const loginAttempt = await login(
 			this.state.user,

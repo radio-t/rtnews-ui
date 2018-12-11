@@ -1,4 +1,4 @@
-import { PureComponent } from "react";
+import { PureComponent, FormEvent } from "react";
 
 import { getFeeds, addFeed, removeFeed } from "./api";
 import { formatDate, sleep, waitFor } from "./utils";
@@ -127,7 +127,7 @@ export default class FeedsForm extends PureComponent<Props, State> {
 			}
 		}
 	}
-	async onSubmit(e: React.FormEvent): Promise<void> {
+	async onSubmit(e: FormEvent): Promise<void> {
 		e.preventDefault();
 		this.setState({ posting: true });
 		try {

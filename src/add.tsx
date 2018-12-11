@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, CSSProperties } from "react";
 
 import { Redirect } from "react-router-dom";
 import { addArticle } from "./api";
@@ -8,7 +8,7 @@ import { waitFor } from "./utils";
 
 type Props = {
 	isAdmin?: boolean;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 	onAdd?: () => void;
 };
 
