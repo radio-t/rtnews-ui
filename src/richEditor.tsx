@@ -1,11 +1,7 @@
 import { PureComponent } from "react";
 import { waitFor } from "./utils";
 
-type Quill = import("quill").default;
-
-type QuillType = typeof import("quill").default;
-
-let Quill: QuillType | null = null;
+let Quill: any = null;
 
 type Props = {
 	rich?: boolean;
@@ -20,7 +16,7 @@ type State = {
 
 export default class RichEditor extends PureComponent<Props, State> {
 	editor?: HTMLDivElement;
-	quill: Quill;
+	quill: any;
 	constructor(props: Props) {
 		super(props);
 		this.state = {

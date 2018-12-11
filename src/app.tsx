@@ -27,6 +27,7 @@ import Notifications from "./notifications";
 import { Notification } from "./notificationInterface";
 
 import { listingRef } from "./symbols";
+import { ThemeType } from "./themeInterface";
 
 type AppProps = {
 	issueNumber: {
@@ -35,7 +36,7 @@ type AppProps = {
 	} | null;
 	isAdmin: boolean;
 	activeId: null | string;
-	theme: "day" | "night";
+	theme: ThemeType;
 	notifications: Notification[];
 };
 

@@ -15,13 +15,14 @@ import SVGInline from "react-svg-inline";
 import MoonIcon from "./static/svg/moon.svg";
 // @ts-ignore
 import SunIcon from "./static/svg/sun.svg";
+import { ThemeType } from "./themeInterface";
 
-const setTheme = (v: "day" | "night") => {
+const setTheme = (v: ThemeType) => {
 	commitTheme(v);
 	saveTheme(v);
 };
 
-function ThemeSwitchButton({ theme }: { theme: "day" | "night" }) {
+function ThemeSwitchButton({ theme }: { theme: ThemeType }) {
 	return (
 		<button
 			onClick={() => setTheme(theme === "day" ? "night" : "day")}
@@ -49,7 +50,7 @@ type Props = {
 	} | null;
 	isAdmin: boolean;
 	activeId: string | null;
-	theme: "day" | "night";
+	theme: ThemeType;
 	history: History;
 };
 

@@ -1,12 +1,13 @@
 import { Notification } from "./notificationInterface";
 import { createStore } from "redux";
+import { ThemeType } from "./themeInterface";
 
 export interface State {
 	issueNumber: number | null;
 	isAdmin: boolean;
 	notifications: any[];
 	activeId: string | null;
-	theme: "day" | "night";
+	theme: ThemeType;
 }
 
 const initialState: State = {
@@ -145,7 +146,7 @@ export function removeNotificationsWithContext(context: any): void {
 
 let themeCounter: number = 0;
 
-export function setTheme(theme: "day" | "night", immediate: boolean = false) {
+export function setTheme(theme: ThemeType, immediate: boolean = false) {
 	setState({ theme });
 
 	if (immediate) {

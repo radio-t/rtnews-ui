@@ -10,6 +10,7 @@ import {
 import { first, retry, sleep } from "./utils";
 import { Article } from "./articleInterface";
 import { Feed } from "./feedInterface";
+import { ThemeType } from "./themeInterface";
 
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;
@@ -371,8 +372,8 @@ export function setSorting(value: Sorting): void {
 	localStorage.setItem("sorting", value.title);
 }
 
-export function getTheme(): "day" | "night" {
-	const s = localStorage.getItem("theme") as "day" | "night";
+export function getTheme(): ThemeType {
+	const s = localStorage.getItem("theme") as ThemeType;
 	if (s !== null) return s;
 
 	//check system night mode
@@ -384,7 +385,7 @@ export function getTheme(): "day" | "night" {
 	return mode || "day";
 }
 
-export function setTheme(value: "day" | "night"): void {
+export function setTheme(value: ThemeType): void {
 	localStorage.setItem("theme", value);
 }
 
