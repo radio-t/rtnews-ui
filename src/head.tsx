@@ -38,17 +38,19 @@ function ThemeSwitchButton({ theme }: { theme: "day" | "night" }) {
 	);
 }
 
+interface History {
+	push: (string) => void;
+}
+
 type Props = {
 	issueNumber: {
 		link?: string;
 		number: number;
-	};
+	} | null;
 	isAdmin: boolean;
 	activeId: string | null;
 	theme: "day" | "night";
-	history: {
-		push: (string) => void;
-	};
+	history: History;
 };
 
 type State = {};

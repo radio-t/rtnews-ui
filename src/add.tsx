@@ -7,9 +7,9 @@ import { apiRoot } from "./settings";
 import { waitFor } from "./utils";
 
 type Props = {
-	isAdmin: boolean;
-	style: React.CSSProperties;
-	onAdd: () => void;
+	isAdmin?: boolean;
+	style?: React.CSSProperties;
+	onAdd?: () => void;
 };
 
 type State = {

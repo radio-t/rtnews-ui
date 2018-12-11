@@ -3,6 +3,7 @@ import { Notification } from "./notificationInterface";
 
 type Props = {
 	notifications: Notification[];
+	className?: string;
 };
 
 export default function Notifications(props: Props) {

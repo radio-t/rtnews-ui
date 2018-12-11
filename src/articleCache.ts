@@ -2,7 +2,7 @@ import { newsCacheValidInterval } from "./settings";
 import { getNews, getArchiveNews, getDeletedNews } from "./api";
 import { Article } from "./articleInterface";
 
-type CacheType = "common" | "archive" | "deleted";
+type CacheLabel = "common" | "archive" | "deleted";
 
 /**
  * Article cache which stores articles
@@ -11,7 +11,10 @@ type CacheType = "common" | "archive" | "deleted";
 export default (() => {
 	if (newsCacheValidInterval === null) {
 		return {
-			async get(label: CacheType = "common"): Promise<Article[]> {
+			async get(
+				label: CacheLabel = "common",
+				force: boolean = false
+			): Promise<Article[]> {
 				let data;
 				switch (label) {
 					case "common":
@@ -28,22 +31,23 @@ export default (() => {
 				}
 				return data;
 			},
-			invalidate() {},
+			invalidate(label: CacheLabel | null = null) {},
 		};
 	}
 
 	const cache: Map<
-		CacheType,
+		CacheLabel,
 		{
 			data: Article[];
 			timestamp: number;
 		}
 	> = new Map();
+
 	/**
 	 * label options are: common, arrhive, deleted
 	 */
 	const get = async (
-		label: CacheType = "common",
+		label: CacheLabel = "common",
 		force: boolean = false
 	): Promise<Article[]> => {
 		const timestamp = new Date().getTime();
@@ -77,7 +81,7 @@ export default (() => {
 		return data;
 	};
 
-	const invalidate = (label = null) => {
+	const invalidate = (label: CacheLabel | null = null) => {
 		if (label === null) {
 			cache.clear();
 			return;

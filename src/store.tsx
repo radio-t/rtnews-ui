@@ -98,7 +98,7 @@ function createNotification(
 
 export function addNotification(
 	notification: DeferredNotification | string | Partial<Notification>
-) {
+): Notification {
 	if (typeof notification === "function") {
 		// fuckery with indirection
 		const n = {};
@@ -125,7 +125,7 @@ export function addNotification(
 			});
 		}, notification.time);
 	}
-	return notification;
+	return notification as Notification;
 }
 
 export function removeNotification(notification: Notification): void {

@@ -1,3 +1,5 @@
+declare const BUILDTIME: string;
+
 import { Component } from "react";
 
 import { postsPrefix } from "./settings";
@@ -12,20 +14,33 @@ import {
 import { ScrollContext } from "react-router-scroll-4";
 import AddArticle from "./add";
 import {
-	Listing,
-	ArchiveListing,
-	DeletedListing,
-	Sorter,
+	ListingWithAutoUpdate,
+	ArchiveListingWithAutoUpdate,
+	DeletedListingWithAutoUpdate,
+	SorterWithAutoUpdate,
 } from "./articleListings";
 import { Article, EditableArticle } from "./article";
 import Feeds from "./feeds";
 import LoginForm from "./login";
 import NotFound from "./notFound";
 import Notifications from "./notifications";
+import { Notification } from "./notificationInterface";
 
 import { listingRef } from "./symbols";
 
-export default class App extends Component {
+type AppProps = {
+	issueNumber: {
+		link?: string;
+		number: number;
+	} | null;
+	isAdmin: boolean;
+	activeId: null | string;
+	theme: "day" | "night";
+	notifications: Notification[];
+};
+
+export default class App extends Component<AppProps> {
+	router: Router;
 	render() {
 		return (
 			<Router ref={router => (this.router = router)}>
@@ -33,14 +48,14 @@ export default class App extends Component {
 					<Route
 						render={({ history }) => <Head {...this.props} history={history} />}
 					/>
-					<div class="content page__content">
+					<div className="content page__content">
 						<Switch>
 							<Route
 								path="/"
 								exact={true}
 								render={() => (
 									<ScrollContext scrollKey="main">
-										<Listing
+										<ListingWithAutoUpdate
 											{...this.props}
 											ref={ref => (window[listingRef] = ref)}
 										/>
@@ -57,7 +72,7 @@ export default class App extends Component {
 								exact={true}
 								render={() => (
 									<ScrollContext>
-										<DeletedListing {...this.props} />
+										<DeletedListingWithAutoUpdate {...this.props} />
 									</ScrollContext>
 								)}
 							/>
@@ -66,7 +81,7 @@ export default class App extends Component {
 								exact={true}
 								render={() => (
 									<ScrollContext>
-										<ArchiveListing {...this.props} />
+										<ArchiveListingWithAutoUpdate {...this.props} />
 									</ScrollContext>
 								)}
 							/>
@@ -87,7 +102,7 @@ export default class App extends Component {
 								path="/sort/"
 								render={() => (
 									<ScrollContext>
-										<Sorter {...this.props} />
+										<SorterWithAutoUpdate {...this.props} />
 									</ScrollContext>
 								)}
 							/>
@@ -120,7 +135,7 @@ export default class App extends Component {
 						<a href="http://radio-t.com/">Radio-T</a>,{" "}
 						{new Date().getFullYear()}
 						<br />
-						<span class="footer__buildtime">built on {BUILDTIME}</span>
+						<span className="footer__buildtime">built on {BUILDTIME}</span>
 					</div>
 					<Notifications
 						className="page__notifications"

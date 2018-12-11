@@ -2,13 +2,16 @@
  * Provides with different Atricle Listing views (Main, Archive, Deleted, Sorting)
  */
 
-import { Component } from "react";
+import { Component, ComponentClass } from "react";
 import { sleep, first, requestIdleCallback, retry, waitFor } from "./utils";
 import {
 	postRecentness,
 	postLevels,
 	sortings,
 	newsAutoUpdateInterval,
+	PostLevel,
+	PostRecentness,
+	Sorting,
 } from "./settings";
 import {
 	getRecentness,
@@ -30,7 +33,10 @@ import {
 } from "./api";
 import { setState, addNotification, removeNotification } from "./store";
 import articleCache from "./articleCache";
-import Error from "./error";
+import ErrorComponent from "./error";
+import { Notification } from "./notificationInterface";
+import { Article } from "./articleInterface";
+import { ControlID } from "./articleControls";
 
 import {
 	ArticleBrief,
@@ -53,12 +59,16 @@ export const REMOVE_CHANGE = Symbol();
  * fuction which shows notification, fires function
  * and upon completition removes notification
  */
-async function en(message, fn, context = null) {
+async function en<T>(
+	message: string | Partial<Notification>,
+	fn: () => Promise<T>,
+	context: any | null = null
+): Promise<T> {
 	const notification = addNotification({
 		data: message,
 		time: 30000,
 		context,
-	});
+	} as Partial<Notification>);
 	try {
 		const o = await fn();
 		return o;
@@ -69,23 +79,37 @@ async function en(message, fn, context = null) {
 	}
 }
 
-function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
-	if (updateInterval === null) return Component;
+class Updatable<P, S> extends Component<P, S> {
+	async update(force: boolean = false): Promise<void> {}
+}
 
-	return class extends Component {
+function withAutoUpdate<P extends object, S extends object>(
+	BaseClass: new (props: P) => Updatable<P, S>,
+	updateInterval: number | null = newsAutoUpdateInterval
+) {
+	if (updateInterval === null) return BaseClass;
+
+	return class extends BaseClass {
+		updateTimestamp: number;
+		/**
+		 * setInterval id
+		 */
+		updateInterval: number;
+
 		componentDidMount() {
 			super.componentDidMount && super.componentDidMount();
 
 			this.updateTimestamp = new Date().getTime();
 
-			this.updateInterval = setInterval(async () => {
+			this.updateInterval = (setInterval(async () => {
 				let stamp = new Date().getTime();
 				if (stamp - this.updateTimestamp > updateInterval * 60000) {
 					await new Promise(resolve => {
 						requestIdleCallback(
 							() => {
-								this.update()
-									.then(resolve)
+								super
+									.update()
+									.then(() => resolve())
 									.catch(e => {
 										console.error(e);
 										resolve();
@@ -97,29 +121,48 @@ function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
 						);
 					});
 				}
-			}, 30000);
+			}, 30000) as unknown) as number;
 		}
+
 		componentWillUnmount() {
 			super.componentWillUnmount && super.componentWillUnmount();
 			clearInterval(this.updateInterval);
 		}
-		async update(...args) {
-			const o = await super.update(...args);
+
+		async update(force: boolean) {
+			const o = super.update(force);
 			this.updateTimestamp = new Date().getTime();
 			return o;
 		}
 	};
 }
 
+type BaseListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type BaseListingState = {
+	loaded: boolean;
+	error: {
+		status?: number;
+		statusText?: string;
+		message: string;
+	} | null;
+	news: Article[];
+};
+
 /**
  * Base for listing components
  *
  * Provides onChange handlers such as
  * "make geek", "make first" etc...
- *
- * Provides news autoupdate
  */
-class BaseListing extends Component {
+class BaseListing<
+	P extends BaseListingProps,
+	S extends BaseListingState
+> extends Component<P, S> {
+	dataProvider: (boolean) => Promise<Article[]>;
 	/**
 	 *
 	 * Provides articles autoupdate
@@ -129,7 +172,7 @@ class BaseListing extends Component {
 
 		this.updateArticle = this.updateArticle.bind(this);
 		this.onArticleChange = this.onArticleChange.bind(this);
-		this.dataProvider = () => [];
+		this.dataProvider = () => Promise.resolve([]);
 	}
 	async update(force = false) {
 		try {
@@ -146,7 +189,10 @@ class BaseListing extends Component {
 			}
 		}
 	}
-	updateArticle(article, change) {
+	updateArticle(
+		article: Article,
+		change: Partial<Article> | typeof REMOVE_CHANGE
+	) {
 		const articleIndex = this.state.news.indexOf(article);
 		if (articleIndex === -1) return;
 		if (change === REMOVE_CHANGE) {
@@ -169,7 +215,11 @@ class BaseListing extends Component {
 		});
 		return updatedArticle;
 	}
-	async onArticleChange(article, change, data = null) {
+	async onArticleChange(
+		article: Article,
+		change: ControlID | "move",
+		data: any = null
+	) {
 		switch (change) {
 			case "make-first":
 				{
@@ -260,15 +310,37 @@ class BaseListing extends Component {
 	}
 }
 
-const BaseListingWithAutoUpdate = withAutoUpdate(BaseListing);
+type ListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type ListingState = {
+	loaded: boolean;
+	error: {
+		status?: number;
+		statusText?: string;
+		message: string;
+	} | null;
+	news: Article[];
+
+	postRecentness: PostRecentness;
+	postLevel: PostLevel;
+	sort: Sorting;
+	addFormExpanded: boolean;
+};
 
 /**
  * Listing for main "/" route
  */
-export class Listing extends BaseListingWithAutoUpdate {
+export class Listing<
+	P extends ListingProps,
+	S extends ListingState
+> extends BaseListing<P, S> {
 	constructor(props) {
 		super(props);
 
+		//@ts-ignore
 		this.state = {
 			postRecentness: getRecentness(),
 			postLevel: getPostLevel(),
@@ -343,7 +415,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 	render() {
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -367,7 +439,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 					className={this.props.isAdmin ? "listing-actions-all" : ""}
 					//
 					postRecentness={this.state.postRecentness}
-					onRecentnessChange={postRecentness => {
+					onRecentnessChange={(postRecentness: PostRecentness) => {
 						this.setState({ postRecentness });
 						setRecentness(postRecentness);
 					}}
@@ -400,7 +472,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 								onClick={() => {
 									this.setState({ addFormExpanded: true });
 									setTimeout(() => {
-										const el =
+										const el: HTMLInputElement =
 											document.querySelector(".add-form__article-url") ||
 											document.querySelector(".add-form__article-manual-link");
 										if (el) el.focus();
@@ -482,10 +554,30 @@ export class Listing extends BaseListingWithAutoUpdate {
 	}
 }
 
+export const ListingWithAutoUpdate = withAutoUpdate(Listing);
+
+type ArchiveListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type ArchiveListingState = {
+	news: Article[];
+	loaded: boolean;
+	error: {
+		status?: number;
+		statusText?: string;
+		message: string;
+	} | null;
+};
+
 /**
  * Listing for archive "/arhive/"
  */
-export class ArchiveListing extends BaseListingWithAutoUpdate {
+export class ArchiveListing extends BaseListing<
+	ArchiveListingProps,
+	ArchiveListingState
+> {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -506,7 +598,7 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 	render() {
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -532,10 +624,30 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 	}
 }
 
+export const ArchiveListingWithAutoUpdate = withAutoUpdate(ArchiveListing);
+
+type DeletedListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type DeletedListingState = {
+	news: Article[];
+	loaded: boolean;
+	error: {
+		status?: number;
+		statusText?: string;
+		message: string;
+	} | null;
+};
+
 /**
  * Listing for deleted articles "/deleted/"
  */
-export class DeletedListing extends BaseListingWithAutoUpdate {
+export class DeletedListing extends BaseListing<
+	DeletedListingProps,
+	DeletedListingState
+> {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -561,7 +673,7 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -586,10 +698,27 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 	}
 }
 
+export const DeletedListingWithAutoUpdate = withAutoUpdate(DeletedListing);
+
+type SorterProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type SorterState = {
+	news: Article[];
+	loaded: boolean;
+	error: {
+		status?: number;
+		statusText?: string;
+		message: string;
+	} | null;
+};
+
 /**
  * Listing for sorting view "/sort/"
  */
-export class Sorter extends BaseListingWithAutoUpdate {
+export class Sorter extends BaseListing<SorterProps, SorterState> {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -611,7 +740,7 @@ export class Sorter extends BaseListingWithAutoUpdate {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -642,3 +771,5 @@ export class Sorter extends BaseListingWithAutoUpdate {
 		);
 	}
 }
+
+export const SorterWithAutoUpdate = withAutoUpdate(Sorter);

@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, ComponentClass } from "react";
 
 import { formatDate, scrollIntoView } from "./utils";
 import { postsPrefix, isSafari } from "./settings";
@@ -17,28 +17,27 @@ import CommentsIcon from "./static/svg/i-comment.svg";
 import GearIcon from "./static/svg/gear.svg";
 import { Article } from "./articleInterface";
 
-interface ComponentWithVisibility<P> extends Component<P> {
+class ComponentWithVisibility<P, S> extends Component<P, S> {
 	visible: boolean;
 	ref: Element;
 }
 
-interface PropsWithActive {
+interface WithActiveProps {
 	active: boolean;
 }
 
 /**
  * Applies "should update only if visible" logic to component
  */
-function UpdateOnlyIfVisible<
-	P extends object & PropsWithActive,
-	C extends Component<P>
->(component: C) {
+function UpdateOnlyIfVisible<P extends WithActiveProps, S extends object>(
+	BaseClass: new (props: P) => ComponentWithVisibility<P, S>
+) {
 	/**
 	 * Map which connects HTMLElement with React.Component
 	 */
 	const refToComponentMap: WeakMap<
 		Element,
-		ComponentWithVisibility<P>
+		ComponentWithVisibility<P, S>
 	> = new WeakMap();
 
 	const observer = new IntersectionObserver(entries => {
@@ -51,11 +50,10 @@ function UpdateOnlyIfVisible<
 		});
 	});
 
-	return class Wrapped extends Component<P>
-		implements ComponentWithVisibility<P> {
+	return class WithActive extends BaseClass {
 		visible: boolean;
 		ref: HTMLElement;
-		shouldComponentUpdate(nextProps, nextState) {
+		shouldComponentUpdate(nextProps) {
 			if (nextProps.active !== this.props.active) return true;
 			if (!this.visible) return false;
 			return true;
@@ -87,11 +85,16 @@ interface DraggableComponent<P> extends Component<P> {
 	dragInterval: number;
 }
 
-interface DraggableProps {
+type DraggableProps = {
 	draggable: boolean;
 	article: Article;
 	onChange: Function;
-}
+	detailedExpanded: boolean;
+};
+
+type DraggableState = {
+	detailedExpanded?: boolean;
+};
 
 type TDragEvent = Event & {
 	data: any;
@@ -102,8 +105,8 @@ type TDragEvent = Event & {
 /**
  * Applies drag'n'drop logic to component
  */
-function Draggable<P extends object & DraggableProps, C extends Component<P>>(
-	component: C
+function Draggable<P extends DraggableProps, S extends DraggableState>(
+	BaseClass: new (props: P) => Component<P, S>
 ) {
 	/**
 	 * touchmove targets used by ArticleBase.onHandleTouchMove
@@ -115,7 +118,7 @@ function Draggable<P extends object & DraggableProps, C extends Component<P>>(
 	 */
 	const eventIdentifier = "RTNEWSDATADRAG";
 
-	return class extends Component<P> implements DraggableComponent<P> {
+	return class extends BaseClass implements DraggableComponent<P> {
 		draggable: boolean;
 		initialTouch: Touch;
 		initialTransform: string;
@@ -433,7 +436,7 @@ type ArticleBriefBasicState = {
 /**
  * Views which used in main, archive and deleted listings
  */
-class ArticleBriefBasic extends Component<
+class ArticleBriefBasic extends ComponentWithVisibility<
 	ArticleBriefBasicProps,
 	ArticleBriefBasicState
 > {
@@ -602,12 +605,10 @@ class ArticleBriefBasic extends Component<
 	}
 }
 
-export const ArticleBrief = UpdateOnlyIfVisible(
-	(ArticleBriefBasic as unknown) as Component<PropsWithActive>
+export const ArticleBrief = UpdateOnlyIfVisible(ArticleBriefBasic);
+export const DraggableArticleBrief = Draggable(
+	UpdateOnlyIfVisible(ArticleBriefBasic)
 );
-export const DraggableArticleBrief = UpdateOnlyIfVisible((Draggable(
-	(ArticleBriefBasic as unknown) as Component<DraggableProps>
-) as unknown) as Component<PropsWithActive>);
 
 type ArticleSortBasicProps = {
 	active?: boolean;
@@ -617,12 +618,13 @@ type ArticleSortBasicProps = {
 
 type ArticleSortBasicState = {
 	draggable: boolean;
+	detailedExpanded?: boolean;
 };
 
 /**
  * View which used in sorting listing "/sort/"
  */
-export class ArticleSortBasic extends Component<
+export class ArticleSortBasic extends ComponentWithVisibility<
 	ArticleSortBasicProps,
 	ArticleSortBasicState
 > {
@@ -712,6 +714,4 @@ export class ArticleSortBasic extends Component<
 	}
 }
 
-export const ArticleSort = UpdateOnlyIfVisible((Draggable(
-	(ArticleSortBasic as unknown) as Component<DraggableProps>
-) as unknown) as Component<PropsWithActive>);
+export const ArticleSort = Draggable(UpdateOnlyIfVisible(ArticleSortBasic));

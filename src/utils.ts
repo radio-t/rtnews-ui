@@ -166,7 +166,10 @@ export function debounce(
 	};
 }
 
-export const requestIdleCallback: () => number = (() => {
+export const requestIdleCallback: (
+	Function,
+	options?: { timeout?: number }
+) => number = (() => {
 	if ("requestIdleCallback" in window)
 		return (window as any).requestIdleCallback;
 	return (fn: () => void) => {

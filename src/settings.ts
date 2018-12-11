@@ -67,7 +67,7 @@ const month = day * 30;
 
 export interface PostRecentness {
 	title: string;
-	fn(x: Article, i: number): boolean;
+	fn(x: Article, i: number, isgeek?: boolean): boolean;
 }
 
 export const postRecentness: PostRecentness[] = [
