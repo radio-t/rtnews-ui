@@ -10,6 +10,7 @@ import {
 	Route,
 	Switch,
 	Redirect,
+	RouteComponentProps,
 } from "react-router-dom";
 import { ScrollContext } from "react-router-scroll-4";
 import AddArticle from "./add";
@@ -44,10 +45,12 @@ export default class App extends Component<AppProps> {
 	router: Router;
 	render() {
 		return (
-			<Router ref={router => (this.router = router)}>
+			<Router ref={(router: Router) => (this.router = router)}>
 				<div className="page">
 					<Route
-						render={({ history }) => <Head {...this.props} history={history} />}
+						render={({ history }: RouteComponentProps) => (
+							<Head {...this.props} history={history} />
+						)}
 					/>
 					<div className="content page__content">
 						<Switch>
@@ -109,7 +112,7 @@ export default class App extends Component<AppProps> {
 							/>
 							<Route
 								path={`${postsPrefix}/:slug`}
-								render={props =>
+								render={(props: RouteComponentProps) =>
 									this.props.isAdmin ? (
 										<ScrollContext
 											scrollKey="post"
@@ -117,7 +120,9 @@ export default class App extends Component<AppProps> {
 												!!cur.location.key
 											}
 										>
-											<EditableArticle slug={props.match.params.slug} />
+											<EditableArticle
+												slug={(props.match.params as any).slug}
+											/>
 										</ScrollContext>
 									) : (
 										<ScrollContext
@@ -126,7 +131,7 @@ export default class App extends Component<AppProps> {
 												!!cur.location.key
 											}
 										>
-											<Article slug={props.match.params.slug} />
+											<Article slug={(props.match.params as any).slug} />
 										</ScrollContext>
 									)
 								}

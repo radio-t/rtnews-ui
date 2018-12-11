@@ -1,5 +1,6 @@
 FROM node:10-alpine AS rtnews_frontend_build
-COPY ./package.json ./package-lock.json ./webpack.config.js /app/
+COPY ./package.json ./package-lock.json ./webpack.config.js ./tsconfig.json /app/
+COPY ./@types /app/@types
 COPY ./src /app/src
 RUN \
 	cd /app && \

@@ -45,22 +45,24 @@ module.exports = (a, args) => {
 				{
 					test: /\.ts$/,
 					exclude: /node_modules/,
-					use: {
-						loader: "babel-loader",
-						options: {
-							plugins: ["@babel/plugin-syntax-dynamic-import"],
-							presets: [
-								[
-									"@babel/preset-env",
-									{
-										useBuiltIns: "usage",
-										modules: false,
-									},
+					use: [
+						{
+							loader: "babel-loader",
+							options: {
+								plugins: ["@babel/plugin-syntax-dynamic-import"],
+								presets: [
+									[
+										"@babel/preset-env",
+										{
+											useBuiltIns: "usage",
+											modules: false,
+										},
+									],
 								],
-								"@babel/preset-typescript",
-							],
+							},
 						},
-					},
+						"ts-loader",
+					],
 				},
 				{
 					test: /\.jsx$/,
@@ -94,32 +96,34 @@ module.exports = (a, args) => {
 				{
 					test: /\.tsx$/,
 					exclude: /node_modules/,
-					use: {
-						loader: "babel-loader",
-						options: {
-							plugins: ["@babel/plugin-syntax-dynamic-import"],
-							presets: [
-								[
-									"@babel/preset-env",
-									{
-										useBuiltIns: "usage",
-										modules: false,
-										targets: {
-											ie: "11",
+					use: [
+						{
+							loader: "babel-loader",
+							options: {
+								plugins: ["@babel/plugin-syntax-dynamic-import"],
+								presets: [
+									[
+										"@babel/preset-env",
+										{
+											useBuiltIns: "usage",
+											modules: false,
+											targets: {
+												ie: "11",
+											},
 										},
-									},
+									],
+									[
+										"@babel/preset-react",
+										{
+											pragma: "createElement",
+											pragmaFrag: '"div"',
+										},
+									],
 								],
-								[
-									"@babel/preset-react",
-									{
-										pragma: "createElement",
-										pragmaFrag: '"div"',
-									},
-								],
-								"@babel/preset-typescript",
-							],
+							},
 						},
-					},
+						"ts-loader",
+					],
 				},
 				{
 					test: /\.css$/,

@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, MouseEvent } from "react";
 
 import { logout, update, startShow, setTheme as saveTheme } from "./api";
 import { setState, addNotification, setTheme as commitTheme } from "./store";
@@ -177,8 +177,8 @@ export default class Head extends Component<Props, State> {
 							<li className="navigation__item navigation__item_to-comments">
 								<Link
 									to="#to-comments"
-									onClick={e => {
-										e.preventDefault();
+									onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+										event.preventDefault();
 										const el = document.getElementById("to-comments");
 										if (!el) {
 											console.error("Comments node not found");

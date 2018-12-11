@@ -102,10 +102,8 @@ export async function waitFor(
 
 export const scrollIntoView = (() => {
 	if ("scrollBehavior" in document.documentElement.style) {
-		return (
-			el: HTMLElement,
-			behavior: "smooth" | "auto" | "instant" = "smooth"
-		) => el.scrollIntoView({ behavior, block: "start" });
+		return (el: HTMLElement, behavior: "smooth" | "auto" = "smooth") =>
+			el.scrollIntoView({ behavior, block: "start" });
 	} else {
 		// easeOutQuart
 		const timingfn = (t: number) => -(Math.pow(t - 1, 4) - 1);
@@ -125,10 +123,7 @@ export const scrollIntoView = (() => {
 		const requestAnimationFrame =
 			window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
-		return (
-			el: HTMLElement,
-			behavior: "smooth" | "auto" | "instant" = "smooth"
-		) => {
+		return (el: HTMLElement, behavior: "smooth" | "auto" = "smooth") => {
 			if (behavior !== "smooth")
 				return el.scrollIntoView({ behavior, block: "start" });
 			else {

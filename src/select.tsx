@@ -80,7 +80,7 @@ export default class Select extends PureComponent<Props, State> {
 				</div>
 				{this.state.expanded && (
 					<ul className="select__items" role="listbox">
-						{this.props.items.map((x, i) => (
+						{this.props.items.map((x: string, i: number) => (
 							<li
 								role="option"
 								className={

@@ -541,7 +541,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 						<HashLink
 							className="post__comments-link"
 							to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
-							scroll={el => {
+							scroll={(el: HTMLElement) => {
 								setTimeout(() => {
 									scrollIntoView(el);
 								}, 500);

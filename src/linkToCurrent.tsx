@@ -1,3 +1,5 @@
+import { MouseEvent } from "react";
+
 import { addNotification } from "./store";
 import { listingRef } from "./symbols";
 import { sleep, waitFor, scrollIntoView } from "./utils";
@@ -47,7 +49,7 @@ export default function LinkToCurrent(props: Props) {
 	return (
 		<Link
 			to="/"
-			onClick={async e => {
+			onClick={async (e: MouseEvent<HTMLAnchorElement>) => {
 				if (window.location.pathname === "/") e.preventDefault();
 				props.onClick && props.onClick((e as unknown) as Event);
 				await sleep(100);

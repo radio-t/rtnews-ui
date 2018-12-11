@@ -17,6 +17,7 @@ services:
             - "9000:9000"
         volumes:
             - ./src:/app/src:ro
+            - ./@types:/app/@types:ro
             - ./makefile:/app/makefile:ro
             - ./tsconfig.json:/app/tsconfig.json:ro
             - ./webpack.config.js:/app/webpack.config.js:ro

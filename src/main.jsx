@@ -1,3 +1,4 @@
+import "./declarations";
 import "./style.scss";
 import "intersection-observer";
 import "whatwg-fetch";
