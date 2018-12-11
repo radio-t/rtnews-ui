@@ -6,6 +6,7 @@
 			"module": "esnext",
 			"noImplicitReturns": true,
 			"noImplicitAny": true,
+			"noUnusedLocals": true,
 	},
 	"typeAcquisition": {"enable": true}
 }

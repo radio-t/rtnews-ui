@@ -6,7 +6,7 @@ import { postsPrefix } from "./settings";
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
-import { sleep, scrollIntoView, waitFor, retry, first } from "./utils";
+import { sleep, scrollIntoView, waitFor } from "./utils";
 import { listingRef } from "./symbols";
 
 // @ts-ignore

@@ -1,4 +1,4 @@
-import { Component, ComponentClass } from "react";
+import { Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils";
 import { postsPrefix, isSafari } from "./settings";

@@ -3,12 +3,11 @@ import {
 	sortings,
 	postRecentness,
 	postLevels,
-	remark as RemarkConfig,
 	PostRecentness,
 	PostLevel,
 	Sorting,
 } from "./settings";
-import { first, retry, debounce, sleep } from "./utils";
+import { first, retry, sleep } from "./utils";
 import { Article } from "./articleInterface";
 import { Feed } from "./feedInterface";
 
