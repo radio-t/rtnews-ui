@@ -53,7 +53,7 @@ function UpdateOnlyIfVisible<P extends WithActiveProps, S extends object>(
 	return class WithActive extends BaseClass {
 		visible: boolean;
 		ref: HTMLElement;
-		shouldComponentUpdate(nextProps) {
+		shouldComponentUpdate(nextProps: WithActiveProps) {
 			if (nextProps.active !== this.props.active) return true;
 			if (!this.visible) return false;
 			return true;
@@ -96,7 +96,7 @@ type DraggableState = {
 	detailedExpanded?: boolean;
 };
 
-type TDragEvent = Event & {
+type TDragEvent = TouchEvent & {
 	data: any;
 	absoluteCoords: any;
 	relativeCoords: any;
@@ -111,7 +111,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 	/**
 	 * touchmove targets used by ArticleBase.onHandleTouchMove
 	 */
-	let moveTargets = [];
+	let moveTargets: Element[] = [];
 
 	/**
 	 * Name of an event which occurs when touch-driven dragg occurs over element
@@ -195,13 +195,13 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.handle.removeEventListener("mouseleave", this.onHandleMouseLeave);
 			}
 		}
-		onHandleMouseEnter(e) {
+		onHandleMouseEnter() {
 			this.ref.draggable = this.props.draggable;
 		}
-		onHandleMouseLeave(e) {
+		onHandleMouseLeave() {
 			this.ref.draggable = false;
 		}
-		onTouchDrag(e) {
+		onTouchDrag(e: TDragEvent) {
 			const rect = this.ref.getBoundingClientRect();
 			const ratio = (e.relativeCoords.y / rect.height) * 100;
 			if (ratio < 50) {
@@ -212,11 +212,11 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.ref.classList.add("touch-drag-target-bottom");
 			}
 		}
-		onTouchDragLeave(e) {
+		onTouchDragLeave(e: TDragEvent) {
 			this.ref.classList.remove("touch-drag-target-top");
 			this.ref.classList.remove("touch-drag-target-bottom");
 		}
-		onTouchDragEnd(e) {
+		onTouchDragEnd(e: TDragEvent) {
 			this.ref.classList.remove("touch-drag-target-top");
 			this.ref.classList.remove("touch-drag-target-bottom");
 			if (e.data.position === this.props.article.position) return;
@@ -236,7 +236,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				});
 		}
 
-		onHandleTouchStart(e) {
+		onHandleTouchStart(e: TDragEvent) {
 			if (e.touches.length > 1) return;
 			e.preventDefault();
 
@@ -256,7 +256,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				}
 			}, 30) as unknown) as number;
 		}
-		onHandleTouchMove(e) {
+		onHandleTouchMove(e: TDragEvent) {
 			this.clientY = e.touches[0].clientY;
 			const deltaY = e.touches[0].pageY - this.initialTouch.pageY;
 			this.ref.style.transform = `translate(0, ${deltaY}px)`;
@@ -287,13 +287,13 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 					y: e.touches[0].clientY,
 				};
 				(event as any).relativeCoords = {
-					x: e.touches[0].clientX - tRect.x,
-					y: e.touches[0].clientY - tRect.y,
+					x: e.touches[0].clientX - ((tRect as any).x || tRect.left),
+					y: e.touches[0].clientY - ((tRect as any).y || tRect.top),
 				};
 				x.dispatchEvent(event);
 			});
 		}
-		onHandleTouchEnd(e) {
+		onHandleTouchEnd(e: TDragEvent) {
 			const article = this.props.article;
 			clearInterval(this.dragInterval);
 			this.ref.classList.remove("touch-drag-item");
@@ -327,7 +327,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 			});
 		}
 
-		onDragStart(e) {
+		onDragStart(e: DragEvent) {
 			if (!this.ref.draggable) return;
 			this.ref.classList.add("drop-item");
 			this.setState({ detailedExpanded: false });
@@ -348,12 +348,12 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				}, 30) as unknown) as number;
 			}
 		}
-		onDrag(e) {
+		onDrag(e: DragEvent) {
 			if (isSafari) {
 				this.clientY = e.clientY;
 			}
 		}
-		onDragOver(e) {
+		onDragOver(e: DragEvent) {
 			if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
 			e.preventDefault();
 			if (
@@ -364,8 +364,8 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				return;
 			}
 			let append = (() => {
-				const rect = e.currentTarget.getBoundingClientRect();
-				const y = e.clientY - rect.y;
+				const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+				const y = e.clientY - ((rect as any).y || rect.top);
 				const proportion = (y / rect.height) * 100;
 				return proportion < 60 ? 1 : 0;
 			})();
@@ -377,17 +377,17 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.ref.classList.add("drop-bottom");
 			}
 		}
-		onDragLeave(e) {
+		onDragLeave(e: DragEvent) {
 			this.ref.classList.remove("drop-top");
 			this.ref.classList.remove("drop-bottom");
 		}
-		onDragEnd(e) {
+		onDragEnd(e: DragEvent) {
 			clearInterval(this.dragInterval);
 			this.ref.classList.remove("drop-item");
 			this.ref.classList.remove("drop-top");
 			this.ref.classList.remove("drop-bottom");
 		}
-		async onDrop(e) {
+		async onDrop(e: DragEvent) {
 			clearInterval(this.dragInterval);
 			this.ref.classList.remove("drop-item");
 			this.ref.classList.remove("drop-top");
@@ -397,8 +397,8 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 			const data = JSON.parse(e.dataTransfer.getData("rtnews/article"));
 			if (data.position === this.props.article.position) return;
 			let append = (() => {
-				const rect = e.currentTarget.getBoundingClientRect();
-				const y = e.clientY - rect.y;
+				const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+				const y = e.clientY - ((rect as any).y || rect.top);
 				const proportion = (y / rect.height) * 100;
 				return proportion < 60 ? 1 : 0;
 			})();
@@ -421,16 +421,16 @@ type ArticleBriefBasicProps = {
 	article: Article;
 	active?: boolean;
 	draggable?: boolean;
-	controls: ControlID[];
-	onChange?: (ControlID) => void;
+	controls: ControlID[] | null;
+	onChange?: (change: ControlID) => void;
 	archive?: boolean;
 };
 
 type ArticleBriefBasicState = {
 	articleText: string | null;
-	detailedExpanded: boolean;
 	draggable: boolean;
 	visible: boolean;
+	detailedExpanded: boolean;
 };
 
 /**
@@ -445,7 +445,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 	handle: HTMLElement;
 	detailedRef: HTMLSpanElement;
 	draggable: boolean;
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {
 			articleText: null,
@@ -613,7 +613,7 @@ export const DraggableArticleBrief = Draggable(
 type ArticleSortBasicProps = {
 	active?: boolean;
 	article: Article;
-	onChange: (ControlID) => void;
+	onChange: (id: ControlID) => void;
 };
 
 type ArticleSortBasicState = {
@@ -631,7 +631,7 @@ export class ArticleSortBasic extends ComponentWithVisibility<
 	controls: () => ControlID[];
 	ref: HTMLDivElement;
 	handle: HTMLDivElement;
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {
 			draggable: false,

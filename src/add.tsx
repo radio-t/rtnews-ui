@@ -24,7 +24,7 @@ type State = {
 export default class AddArticleForm extends Component<Props, State> {
 	autoref: HTMLInputElement;
 	manualref: HTMLInputElement;
-	constructor(props) {
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			manual: false,
@@ -99,7 +99,7 @@ export default class AddArticleForm extends Component<Props, State> {
 					});
 			}, 500);
 
-			function e(t) {
+			function e(t: string) {
 				s.color = "#d00";
 				i.textContent = t;
 			}

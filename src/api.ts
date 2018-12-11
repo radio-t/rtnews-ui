@@ -320,7 +320,7 @@ export function makeArticleGeek(id: string): Promise<null> {
 /**
  * Removes geek indicator from article
  */
-export function makeArticleNotGeek(id): Promise<null> {
+export function makeArticleNotGeek(id: string): Promise<null> {
 	return request(`/news/nogeek/${id}`, { method: "PUT" });
 }
 

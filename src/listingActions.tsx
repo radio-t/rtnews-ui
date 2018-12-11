@@ -1,9 +1,28 @@
 import { Component } from "react";
 
-import { postRecentness, postLevels, sortings } from "./settings";
+import {
+	postRecentness,
+	PostRecentness,
+	Sorting,
+	postLevels,
+	PostLevel,
+	sortings,
+} from "./settings";
 import Select from "./select";
 
-export default class ListingActions extends Component {
+type Props = {
+	postRecentness?: PostRecentness;
+	includeFilters?: boolean;
+	className?: string;
+	postLevel: PostLevel;
+	onPostLevelChange: (label: string) => void;
+	onRecentnessChange: (value: PostRecentness) => void;
+	sortings?: Sorting[];
+	sort: Sorting;
+	onSortingChange: (sort: Sorting) => void;
+};
+
+export default class ListingActions extends Component<Props> {
 	render() {
 		return (
 			<div className={"listing-actions " + (this.props.className || "")}>
@@ -56,12 +75,12 @@ export default class ListingActions extends Component {
 								>
 									<label
 										className="sortings-list__item-content sortings-list__current-item-content"
-										tabIndex="0"
+										tabIndex={0}
 									>
 										<input
 											type="radio"
 											className="sortings-list__item-input"
-											checked="true"
+											checked={true}
 											name="post-sortings"
 											value={x.title}
 										/>
@@ -79,7 +98,7 @@ export default class ListingActions extends Component {
 								>
 									<label
 										className="sortings-list__item-content"
-										tabIndex="0"
+										tabIndex={0}
 										onKeyPress={e => {
 											if (e.keyCode === 13) {
 												e.preventDefault();

@@ -94,7 +94,7 @@ export const postRecentness: PostRecentness[] = [
 export interface PostLevel {
 	title: string;
 	fn(x: any, i: number): boolean;
-	isgeek?;
+	isgeek?: boolean;
 }
 
 export const postLevels: PostLevel[] = [

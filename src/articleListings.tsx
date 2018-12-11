@@ -152,6 +152,8 @@ type BaseListingState = {
 	news: Article[];
 };
 
+type ChangeID = ControlID | "move";
+
 /**
  * Base for listing components
  *
@@ -162,13 +164,13 @@ class BaseListing<
 	P extends BaseListingProps,
 	S extends BaseListingState
 > extends Component<P, S> {
-	dataProvider: (boolean) => Promise<Article[]>;
+	dataProvider: (force: boolean) => Promise<Article[]>;
 	/**
 	 *
 	 * Provides articles autoupdate
 	 */
-	constructor(props) {
-		super(props);
+	constructor(props: BaseListingProps) {
+		super(props as any);
 
 		this.updateArticle = this.updateArticle.bind(this);
 		this.onArticleChange = this.onArticleChange.bind(this);
@@ -192,9 +194,9 @@ class BaseListing<
 	updateArticle(
 		article: Article,
 		change: Partial<Article> | typeof REMOVE_CHANGE
-	) {
+	): Article | null {
 		const articleIndex = this.state.news.indexOf(article);
-		if (articleIndex === -1) return;
+		if (articleIndex === -1) return null;
 		if (change === REMOVE_CHANGE) {
 			this.setState({
 				news: [
@@ -202,7 +204,7 @@ class BaseListing<
 					...this.state.news.slice(articleIndex + 1),
 				],
 			});
-			return;
+			return null;
 		}
 		const storeArticle = this.state.news[articleIndex];
 		const updatedArticle = { ...storeArticle, ...change };
@@ -215,11 +217,7 @@ class BaseListing<
 		});
 		return updatedArticle;
 	}
-	async onArticleChange(
-		article: Article,
-		change: ControlID | "move",
-		data: any = null
-	) {
+	async onArticleChange(article: Article, change: ChangeID, data: any = null) {
 		switch (change) {
 			case "make-first":
 				{
@@ -333,14 +331,10 @@ type ListingState = {
 /**
  * Listing for main "/" route
  */
-export class Listing<
-	P extends ListingProps,
-	S extends ListingState
-> extends BaseListing<P, S> {
-	constructor(props) {
+export class Listing extends BaseListing<ListingProps, ListingState> {
+	constructor(props: ListingProps) {
 		super(props);
 
-		//@ts-ignore
 		this.state = {
 			postRecentness: getRecentness(),
 			postLevel: getPostLevel(),
@@ -535,7 +529,9 @@ export class Listing<
 									controls={this.props.isAdmin ? getControls() : null}
 									active={isCurrent}
 									draggable={sortIsDefault}
-									onChange={(id, data) => this.onArticleChange(x, id, data)}
+									onChange={(change: ChangeID, data: any) =>
+										this.onArticleChange(x, change, data)
+									}
 								/>
 							) : (
 								<ArticleBrief
@@ -544,7 +540,9 @@ export class Listing<
 									archive={false}
 									controls={this.props.isAdmin ? getControls() : null}
 									active={isCurrent}
-									onChange={(id, data) => this.onArticleChange(x, id, data)}
+									onChange={(change: ChangeID, data: any) =>
+										this.onArticleChange(x, change, data)
+									}
 								/>
 							);
 						})}
@@ -578,7 +576,7 @@ export class ArchiveListing extends BaseListing<
 	ArchiveListingProps,
 	ArchiveListingState
 > {
-	constructor(props) {
+	constructor(props: ArchiveListingProps) {
 		super(props);
 		this.state = {
 			news: [],
@@ -616,7 +614,9 @@ export class ArchiveListing extends BaseListing<
 						article={x}
 						archive={true}
 						controls={this.props.isAdmin ? ["remove"] : null}
-						onChange={(id, data) => this.onArticleChange(x, id, data)}
+						onChange={(id: ChangeID, data: any) =>
+							this.onArticleChange(x, id, data)
+						}
 					/>
 				))}
 			</div>
@@ -648,7 +648,7 @@ export class DeletedListing extends BaseListing<
 	DeletedListingProps,
 	DeletedListingState
 > {
-	constructor(props) {
+	constructor(props: DeletedListingProps) {
 		super(props);
 		this.state = {
 			news: [],
@@ -690,7 +690,9 @@ export class DeletedListing extends BaseListing<
 						key={x.id}
 						article={x}
 						controls={this.props.isAdmin ? ["restore"] : []}
-						onChange={(id, data) => this.onArticleChange(x, id, data)}
+						onChange={(id: ChangeID, data: any) =>
+							this.onArticleChange(x, id, data)
+						}
 					/>
 				))}
 			</div>
@@ -719,7 +721,7 @@ type SorterState = {
  * Listing for sorting view "/sort/"
  */
 export class Sorter extends BaseListing<SorterProps, SorterState> {
-	constructor(props) {
+	constructor(props: SorterProps) {
 		super(props);
 		this.state = {
 			news: [],
@@ -763,7 +765,9 @@ export class Sorter extends BaseListing<SorterProps, SorterState> {
 							article={article}
 							key={article.id}
 							active={this.props.activeId === article.id}
-							onChange={(id, data) => this.onArticleChange(article, id, data)}
+							onChange={(id: ChangeID, data: any) =>
+								this.onArticleChange(article, id, data)
+							}
 							draggable={true}
 						/>
 					))}

@@ -16,7 +16,7 @@ import MoonIcon from "./static/svg/moon.svg";
 // @ts-ignore
 import SunIcon from "./static/svg/sun.svg";
 
-const setTheme = v => {
+const setTheme = (v: "day" | "night") => {
 	commitTheme(v);
 	saveTheme(v);
 };
@@ -39,7 +39,7 @@ function ThemeSwitchButton({ theme }: { theme: "day" | "night" }) {
 }
 
 interface History {
-	push: (string) => void;
+	push: (location: string) => void;
 }
 
 type Props = {
@@ -246,13 +246,13 @@ export default class Head extends Component<Props, State> {
 		if (!confirm("Таки темы слушателей?")) return;
 
 		try {
-			if (!window[listingRef]) this.props.history.push("/");
+			if (!(window as any)[listingRef]) this.props.history.push("/");
 			await waitFor(
-				() => window[listingRef],
+				() => (window as any)[listingRef],
 				15000,
 				new Error(`Can't navigate to "/"`)
 			);
-			window[listingRef].startPrepTopics();
+			(window as any)[listingRef].startPrepTopics();
 		} catch (e) {
 			console.error(e);
 			addNotification({

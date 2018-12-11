@@ -57,7 +57,7 @@ export default class App extends Component<AppProps> {
 									<ScrollContext scrollKey="main">
 										<ListingWithAutoUpdate
 											{...this.props}
-											ref={ref => (window[listingRef] = ref)}
+											ref={ref => ((window as any)[listingRef] = ref)}
 										/>
 									</ScrollContext>
 								)}
@@ -112,14 +112,18 @@ export default class App extends Component<AppProps> {
 									this.props.isAdmin ? (
 										<ScrollContext
 											scrollKey="post"
-											shouldUpdateScroll={(_, cur) => !!cur.location.key}
+											shouldUpdateScroll={(_: any, cur: any) =>
+												!!cur.location.key
+											}
 										>
 											<EditableArticle slug={props.match.params.slug} />
 										</ScrollContext>
 									) : (
 										<ScrollContext
 											scrollKey="post"
-											shouldUpdateScroll={(_, cur) => !!cur.location.key}
+											shouldUpdateScroll={(_: any, cur: any) =>
+												!!cur.location.key
+											}
 										>
 											<Article slug={props.match.params.slug} />
 										</ScrollContext>

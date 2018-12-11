@@ -4,6 +4,8 @@
 			"target": "es2017",
 			"jsx": "preserve",
 			"module": "esnext",
+			"noImplicitReturns": true,
+			"noImplicitAny": true,
 	},
 	"typeAcquisition": {"enable": true}
 }
