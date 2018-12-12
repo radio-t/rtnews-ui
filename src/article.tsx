@@ -1,7 +1,7 @@
 import { PureComponent } from "react";
 
 import { formatDate, scrollIntoView, waitFor } from "./utils";
-import { getArticle, updateArticle } from "./api";
+import { getArticleBySlug, updateArticle } from "./api";
 import articleCache from "./articleCache";
 import { remark } from "./settings";
 import { Article as ArticleType } from "./articleInterface";
@@ -97,7 +97,7 @@ function ArticleFactory(editable: boolean = false) {
 			this.editor = null;
 		}
 		componentDidMount() {
-			getArticle(this.props.slug)
+			getArticleBySlug(this.props.slug)
 				.then(article => {
 					if (article === null) {
 						throw new Error("Unknown article");

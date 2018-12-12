@@ -2,7 +2,7 @@ import { Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils";
 import { postsPrefix, isSafari, activeArticleID } from "./settings";
-import { getArticle } from "./api";
+import { getArticleBySlug } from "./api";
 
 import ArticleControls, { ControlID, ChangeID } from "./articleControls";
 import { Link } from "react-router-dom";
@@ -483,7 +483,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 		if (this.fetchLock) return;
 		if (this.state.articleText !== null) return;
 		this.fetchLock = true;
-		getArticle(this.props.article.slug)
+		getArticleBySlug(this.props.article.slug)
 			.then(article => {
 				this.setState({ articleText: article!.content! });
 			})

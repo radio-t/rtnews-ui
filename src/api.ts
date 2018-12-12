@@ -164,25 +164,9 @@ const articlesCache: Map<string, Article> = new Map();
 const articlesIdSlugMap: Map<string, string> = new Map();
 
 /**
- * Gets article by slug
- */
-export async function getArticle(slug: string): Promise<Article | null> {
-	if (articlesCache.has(slug))
-		return Promise.resolve(articlesCache.get(slug) as Article);
-	const articleInit: object = await request(
-		"/news/slug/" + encodeURIComponent(slug)
-	);
-	if (!articleInit.hasOwnProperty("id")) return null;
-	const article = processArticle(articleInit as ArticleInit);
-	articlesCache.set(slug, article);
-	articlesIdSlugMap.set(article.id, article.slug);
-	return article;
-}
-
-/**
  * Gets article by id
  */
-export async function getArticleById(id: string): Promise<Article | null> {
+export async function getArticle(id: string): Promise<Article | null> {
 	if (articlesIdSlugMap.has(id))
 		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(
 			id
@@ -195,6 +179,22 @@ export async function getArticleById(id: string): Promise<Article | null> {
 	}
 	const article = processArticle(articleInit as ArticleInit);
 	articlesCache.set(article.slug, article);
+	articlesIdSlugMap.set(article.id, article.slug);
+	return article;
+}
+
+/**
+ * Gets article by slug
+ */
+export async function getArticleBySlug(slug: string): Promise<Article | null> {
+	if (articlesCache.has(slug))
+		return Promise.resolve(articlesCache.get(slug) as Article);
+	const articleInit: object = await request(
+		"/news/slug/" + encodeURIComponent(slug)
+	);
+	if (!articleInit.hasOwnProperty("id")) return null;
+	const article = processArticle(articleInit as ArticleInit);
+	articlesCache.set(slug, article);
 	articlesIdSlugMap.set(article.id, article.slug);
 	return article;
 }

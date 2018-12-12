@@ -15,7 +15,7 @@ import {
 	pollActiveArticle as apiPollActiveArticle,
 	loginViaStorage,
 	getTheme,
-	getArticleById,
+	getArticle,
 	getIssueNumber,
 } from "./api";
 import { waitDOMReady, sleep } from "./utils";
@@ -47,7 +47,7 @@ function pollActiveArticle() {
 						sleep(700).then(() => {
 							document.title = "* Тема обновлена | Новости Радио-Т";
 						});
-						const article = await getArticleById(activeId);
+						const article = await getArticle(activeId);
 
 						if (article && article.hasOwnProperty("title")) {
 							removeNotificationsWithContext(activeArticleID);
