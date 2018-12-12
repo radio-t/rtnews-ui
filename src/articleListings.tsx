@@ -230,7 +230,10 @@ class BaseListing<
 		switch (change) {
 			case "make-first":
 				{
-					const max = Math.max(...this.state.news.map(x => x.position));
+					const max = this.state.news.reduce(
+						(c, x) => Math.max(c, x.position),
+						0
+					);
 					this.updateArticle(article, { position: max + 1 });
 					const updated = await en(
 						"делаю тему первой",
