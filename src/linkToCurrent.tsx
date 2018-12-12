@@ -1,6 +1,6 @@
 import { MouseEvent } from "react";
 
-import { addNotification } from "./store";
+import { addNotification } from "./notifications";
 import { listingRef } from "./symbols";
 import { sleep, waitFor, scrollIntoView } from "./utils";
 

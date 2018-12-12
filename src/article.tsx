@@ -11,7 +11,7 @@ import Loading from "./loading";
 import NotFound from "./notFound";
 import ErrorComponent from "./error";
 import RichEditor from "./richEditor";
-import { addNotification, removeNotification } from "./store";
+import { addNotification, removeNotification } from "./notifications";
 
 // @ts-ignore
 import SVGInline from "react-svg-inline";

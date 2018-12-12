@@ -31,7 +31,8 @@ import {
 	getPrepTopicsURL,
 	addArticle,
 } from "./api";
-import { setState, addNotification, removeNotification } from "./store";
+import { setState } from "./store";
+import { addNotification, removeNotification } from "./notifications";
 import articleCache from "./articleCache";
 import ErrorComponent from "./error";
 import { Notification } from "./notificationInterface";
@@ -53,7 +54,13 @@ import Loading from "./loading";
  * article should be deleted in
  * BaseListing.onArticleChange
  */
-export const REMOVE_CHANGE = Symbol();
+const REMOVE_CHANGE = Symbol();
+
+type RequestError = {
+	status?: number;
+	statusText?: string;
+	message: string;
+};
 
 /**
  * fuction which shows notification, fires function
@@ -145,11 +152,7 @@ type BaseListingProps = {
 
 type BaseListingState = {
 	loaded: boolean;
-	error: {
-		status?: number;
-		statusText?: string;
-		message: string;
-	} | null;
+	error: RequestError | null;
 	news: Article[];
 };
 
@@ -316,11 +319,7 @@ type ListingProps = {
 
 type ListingState = {
 	loaded: boolean;
-	error: {
-		status?: number;
-		statusText?: string;
-		message: string;
-	} | null;
+	error: RequestError | null;
 	news: Article[];
 
 	postRecentness: PostRecentness;
@@ -563,11 +562,7 @@ type ArchiveListingProps = {
 type ArchiveListingState = {
 	news: Article[];
 	loaded: boolean;
-	error: {
-		status?: number;
-		statusText?: string;
-		message: string;
-	} | null;
+	error: RequestError | null;
 };
 
 /**
@@ -635,11 +630,7 @@ type DeletedListingProps = {
 type DeletedListingState = {
 	news: Article[];
 	loaded: boolean;
-	error: {
-		status?: number;
-		statusText?: string;
-		message: string;
-	} | null;
+	error: RequestError | null;
 };
 
 /**
@@ -711,11 +702,7 @@ type SorterProps = {
 type SorterState = {
 	news: Article[];
 	loaded: boolean;
-	error: {
-		status?: number;
-		statusText?: string;
-		message: string;
-	} | null;
+	error: RequestError | null;
 };
 
 /**

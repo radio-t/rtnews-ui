@@ -24,7 +24,7 @@ import { Article, EditableArticle } from "./article";
 import Feeds from "./feeds";
 import LoginForm from "./login";
 import NotFound from "./notFound";
-import Notifications from "./notifications";
+import {Notifications} from "./notifications";
 import { Notification } from "./notificationInterface";
 
 import { listingRef } from "./symbols";

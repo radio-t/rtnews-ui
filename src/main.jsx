@@ -5,13 +5,11 @@ import "whatwg-fetch";
 import "./ganalitics";
 
 import { render } from "react-dom";
+import { store, setState, setTheme } from "./store";
 import {
-	store,
-	setState,
-	setTheme,
 	addNotification,
 	removeNotificationsWithContext,
-} from "./store";
+} from "./notifications";
 import {
 	getActiveArticle,
 	pollActiveArticle as apiPollActiveArticle,

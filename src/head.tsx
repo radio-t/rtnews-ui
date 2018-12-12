@@ -1,7 +1,8 @@
 import { Component, MouseEvent } from "react";
 
 import { logout, update, startShow, setTheme as saveTheme } from "./api";
-import { setState, addNotification, setTheme as commitTheme } from "./store";
+import { setState, setTheme as commitTheme } from "./store";
+import { addNotification } from "./notifications";
 import { postsPrefix } from "./settings";
 
 import { Link, NavLink, Route } from "react-router-dom";
