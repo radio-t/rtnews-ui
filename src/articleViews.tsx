@@ -611,7 +611,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 						) : (
 							<div className="post__full-content" key="fulltext">
 								{prepTopicsReg.test(this.props.article.origlink) ? (
-									<div className="article-content post__full-content-content">
+									<div className="article-content post__full-content-content post__remark-comments">
 										<Remark
 											baseurl={remark.baseurl}
 											site_id="radiot"

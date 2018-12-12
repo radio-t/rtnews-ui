@@ -1042,6 +1042,10 @@ p {
 		flex-direction: row;
 	}
 
+	&__remark-comments {
+		background: hsl(0%, 0%, 98%);
+	}
+
 	&__full-content .loading {
 		padding: 0.5rem;
 		flex: 1;
@@ -1097,6 +1101,13 @@ p {
 
 	&__break {
 		opacity: 0.3;
+	}
+
+	&__remark-comments {
+		background: #fff;
+		padding: 0.5rem;
+		margin-left: -0.5rem;
+		width: 100%;
 	}
 
 	&__comments {

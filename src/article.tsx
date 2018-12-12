@@ -215,6 +215,7 @@ function ArticleFactory(editable: boolean = false) {
 							baseurl={remark.baseurl}
 							site_id="radiot"
 							id="to-comments"
+							className="article__remark-comments"
 							url={this.state.article.origlink}
 						/>
 					</article>
