@@ -1,19 +1,28 @@
 import { MouseEvent } from "react";
 
-import { addNotification } from "./notifications";
+import { addNotification, removeNotification } from "./notifications";
 import { listingRef } from "./symbols";
 import { sleep, waitFor, scrollIntoView } from "./utils";
+import { Listing } from "./articleListings";
 
 import { Link } from "react-router-dom";
 
+const defaultTitle = "Новости для Радио-Т";
+const activeArticleID = "active-article";
+
 const onMissingArticle = async () => {
-	(window as any)[listingRef] &&
-		(await (window as any)[listingRef].update(true));
-	await waitFor(
-		async () =>
-			(window as any)[listingRef] && (window as any)[listingRef].state.loaded
-	);
-	const el = document.getElementById("active-article");
+	await waitFor(async () => (window as any)[listingRef]);
+	const notification = addNotification({
+		data: "Обновляю список",
+		time: 10000,
+	});
+	const listing = (window as any)[listingRef] as Listing;
+	listing.update(true);
+	await waitFor(async () => listing.state.loaded);
+	await waitFor(async () => !!document.getElementById(activeArticleID), 5000);
+	removeNotification(notification);
+	const el = document.getElementById(activeArticleID);
+	document.title = defaultTitle;
 	if (el) {
 		scrollIntoView(el);
 		return;
@@ -52,16 +61,15 @@ export default function LinkToCurrent(props: Props) {
 			onClick={async (e: MouseEvent<HTMLAnchorElement>) => {
 				if (window.location.pathname === "/") e.preventDefault();
 				props.onClick && props.onClick((e as unknown) as Event);
-				await sleep(100);
 				await waitFor(
 					() =>
 						(window as any)[listingRef] &&
 						(window as any)[listingRef].state.loaded
 				);
-				await waitFor(() => !!document.getElementById("active-article"), 2000)
+				await waitFor(() => !!document.getElementById(activeArticleID), 500)
 					.then(() => {
-						document.title = "Новости для Радио-Т";
-						const el = document.getElementById("active-article");
+						document.title = defaultTitle;
+						const el = document.getElementById(activeArticleID);
 						if (el) scrollIntoView(el);
 					})
 					.catch(() => {

@@ -172,7 +172,7 @@ class BaseListing<
 	P extends BaseListingProps,
 	S extends BaseListingState
 > extends Component<P, S> {
-	dataProvider: (force: boolean) => Promise<Article[]>;
+	dataProvider?: (force: boolean) => Promise<Article[]>;
 	/**
 	 *
 	 * Provides articles autoupdate
@@ -182,10 +182,10 @@ class BaseListing<
 
 		this.updateArticle = this.updateArticle.bind(this);
 		this.onArticleChange = this.onArticleChange.bind(this);
-		this.dataProvider = () => Promise.resolve([]);
 	}
 	async update(force = false) {
 		try {
+			if (!this.dataProvider) return;
 			const news = await this.dataProvider(force);
 			this.setState({ news, loaded: true });
 		} catch (e) {
@@ -390,16 +390,19 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 
 			const article =
 				first(this.state.news, a => a.origlink === url) ||
-				(await retry(async () => {
-					await sleep(2000);
-					await this.update(true);
-					const article = first(
-						this.state.news,
-						article => article.origlink === url
-					);
-					if (!article) throw new Error("Can't find prep article");
-					return article;
-				}, 5));
+				(await retry(
+					async () => {
+						await this.update(true);
+						const article = first(
+							this.state.news,
+							article => article.origlink === url
+						);
+						if (!article) throw new Error("Can't find prep article");
+						return article;
+					},
+					10,
+					1000
+				));
 			this.onArticleChange(article, "make-current");
 		} catch (e) {
 			console.error(e);

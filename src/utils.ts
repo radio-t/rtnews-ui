@@ -88,7 +88,7 @@ export async function retry<T>(
 export async function waitFor(
 	fn: () => boolean | Promise<boolean>,
 	max: number | null = null,
-	error?: Error | null
+	error: Error | null = null
 ) {
 	const timestamp = new Date().getTime();
 	while (true) {
@@ -157,14 +157,14 @@ export function debounce(
 	wait: number = 100,
 	immediate: boolean = false
 ): Function {
-	let timeout: number|null;
+	let timeout: number | null;
 	return function(this: any, ...args: any): void {
 		const later = () => {
 			timeout = null;
 			if (!immediate) fn.apply(this, args);
 		};
 		const callNow = immediate && !timeout;
-		if(timeout) clearTimeout(timeout);
+		if (timeout) clearTimeout(timeout);
 		timeout = (setTimeout(later, wait) as unknown) as number;
 		if (callNow) fn.apply(this, args);
 	};
