@@ -62,7 +62,7 @@ export default function LinkToCurrent(props: Props) {
 					.then(() => {
 						document.title = "Новости для Радио-Т";
 						const el = document.getElementById("active-article");
-						scrollIntoView(el);
+						if (el) scrollIntoView(el);
 					})
 					.catch(() => {
 						onMissingArticle();

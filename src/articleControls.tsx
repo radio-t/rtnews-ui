@@ -12,6 +12,8 @@ type ControlData = {
 	id: string;
 };
 
+export type ChangeID = ControlID | "move";
+
 export const controls: { [P in ControlID]: ControlData } = {
 	"make-current": {
 		title: "Сделать текущей",

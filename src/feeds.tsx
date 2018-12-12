@@ -26,7 +26,7 @@ type State = {
 };
 
 export default class FeedsForm extends PureComponent<Props, State> {
-	input: HTMLInputElement;
+	input?: HTMLInputElement;
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -49,7 +49,7 @@ export default class FeedsForm extends PureComponent<Props, State> {
 	}
 	componentDidMount() {
 		waitFor(() => !!this.input, 10000).then(() => {
-			this.input.focus();
+			this.input!.focus();
 		});
 	}
 	render() {
@@ -100,7 +100,7 @@ export default class FeedsForm extends PureComponent<Props, State> {
 						placeholder="Добавить фид"
 						value={this.state.feedurl}
 						onChange={e => this.setState({ feedurl: e.target.value })}
-						ref={ref => (this.input = ref)}
+						ref={ref => (this.input = ref!)}
 					/>
 					<input
 						className="feeds__add-submit"

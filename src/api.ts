@@ -8,36 +8,40 @@ import {
 	Sorting,
 } from "./settings";
 import { first, retry, sleep } from "./utils";
-import { Article } from "./articleInterface";
+import { ArticleInit, Article } from "./articleInterface";
 import { Feed } from "./feedInterface";
 import { ThemeType } from "./themeInterface";
 
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;
 
-function processArticle(article: any): Article {
-	if (typeof article !== "object" || article === null) return article;
-	if (article.hasOwnProperty("snippet")) {
-		article.snippet = article.snippet
+export class ArticleParseError extends TypeError {}
+
+function processArticle(article: ArticleInit): Article {
+	if (typeof article !== "object" || article === null)
+		throw new ArticleParseError("Article type is wrong");
+	const output = { ...article } as Article;
+	if (output.hasOwnProperty("snippet")) {
+		output.snippet = output.snippet
 			.replace(whitespaceRegex, " ")
 			.replace(longWordRegex, "$1&shy;");
 	}
-	if (article.hasOwnProperty("ts")) {
-		article.parsedts = Date.parse(article.ts);
+	if (output.hasOwnProperty("ts")) {
+		output.parsedts = Date.parse(output.ts);
 	}
-	if (article.hasOwnProperty("ats")) {
-		article.parsedats = Date.parse(article.ats);
+	if (output.hasOwnProperty("ats")) {
+		output.parsedats = Date.parse(output.ats);
 	}
-	if (article.hasOwnProperty("activets")) {
-		article.parsedactivets = Date.parse(article.activets);
+	if (output.hasOwnProperty("activets")) {
+		output.parsedactivets = Date.parse(output.activets);
 	}
-	if (article.domain === "") {
+	if (output.domain === "") {
 		try {
-			const url = new URL(article.origlink);
-			article.domain = url.hostname;
+			const url = new URL(output.origlink);
+			output.domain = url.hostname;
 		} catch (e) {}
 	}
-	return article as Article;
+	return output;
 }
 
 /**
@@ -45,15 +49,14 @@ function processArticle(article: any): Article {
  *
  * @param articles raw articles from server
  */
-function processArticles(articles: any[]): Article[] {
-	if (!Array.isArray(articles)) return articles;
+function processArticles(articles: ArticleInit[]): Article[] {
 	return articles.map(processArticle);
 }
 
 /**
  * Gets proposed topics url
  */
-export function getPrepTopicsURL(): Promise<string> {
+export function getPrepTopicsURL(): Promise<string | null> {
 	return fetch("https://radio-t.com/site-api/last/1?categories=prep")
 		.then(resp => resp.json())
 		.then(data => {
@@ -65,12 +68,15 @@ export function getPrepTopicsURL(): Promise<string> {
 /**
  * returns next Podcast issue number
  */
-export function getIssueNumber(): Promise<number | null> {
+export function getIssueNumber(): Promise<{
+	number: number;
+	link: string | null;
+} | null> {
 	return retry(() =>
 		fetch("https://radio-t.com/site-api/last/1?categories=podcast,prep")
 	)
 		.then(resp => resp.json())
-		.then(json => {
+		.then((json: { title: string; url: string }[]) => {
 			const passedReg = /^Темы для (\d+)$/i;
 			const upcomingReg = /^Радио-Т (\d+)$/i;
 			const match = json[0].title.match(passedReg);
@@ -161,10 +167,12 @@ const articlesIdSlugMap: Map<string, string> = new Map();
  * Gets article by slug
  */
 export async function getArticle(slug: string): Promise<Article | null> {
-	if (articlesCache.has(slug)) return Promise.resolve(articlesCache.get(slug));
-	const article = await request("/news/slug/" + encodeURIComponent(slug)).then(
-		processArticle
+	if (articlesCache.has(slug)) return Promise.resolve(articlesCache.get(slug) as Article);
+	const articleInit: object = await request(
+		"/news/slug/" + encodeURIComponent(slug)
 	);
+	if (!articleInit.hasOwnProperty("id")) return null;
+	const article = processArticle(articleInit as ArticleInit);
 	articlesCache.set(slug, article);
 	articlesIdSlugMap.set(article.id, article.slug);
 	return article;
@@ -175,10 +183,14 @@ export async function getArticle(slug: string): Promise<Article | null> {
  */
 export async function getArticleById(id: string): Promise<Article | null> {
 	if (articlesIdSlugMap.has(id))
-		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(id)));
-	const article = await request("/news/id/" + encodeURIComponent(id)).then(
-		processArticle
-	);
+		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(id) as string) as Article);
+	const articleInit: object = await request(
+		"/news/id/" + encodeURIComponent(id)
+	).then(processArticle);
+	if (!articleInit.hasOwnProperty("id")) {
+		return null;
+	}
+	const article = processArticle(articleInit as ArticleInit);
 	articlesCache.set(article.slug, article);
 	articlesIdSlugMap.set(article.id, article.slug);
 	return article;

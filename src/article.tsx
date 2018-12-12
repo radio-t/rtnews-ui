@@ -12,6 +12,7 @@ import NotFound from "./notFound";
 import ErrorComponent from "./error";
 import RichEditor from "./richEditor";
 import { addNotification, removeNotification } from "./notifications";
+import { Notification} from "./notificationInterface";
 
 // @ts-ignore
 import SVGInline from "react-svg-inline";
@@ -92,10 +93,15 @@ function ArticleFactory(editable: boolean = false) {
 				 */
 				mode: "view",
 			};
+			this.snippeteditor = null;
+			this.editor = null;
 		}
 		componentDidMount() {
 			getArticle(this.props.slug)
 				.then(article => {
+					if (article === null) {
+						throw new Error("Unknown article");
+					}
 					document.title = article.title + "| Новости Радио-Т";
 					this.setState({ article });
 				})
@@ -114,12 +120,12 @@ function ArticleFactory(editable: boolean = false) {
 		}
 		async edit() {
 			this.setState({
-				previewSnippet: this.state.article.snippet || "",
-				previewContent: this.state.article.content || "",
+				previewSnippet: (this.state.article as ArticleType).snippet || "",
+				previewContent: (this.state.article as ArticleType).content || "",
 				mode: "edit",
 			});
 			await waitFor(() => !!this.snippeteditor, 10000);
-			this.snippeteditor.focus();
+			this.snippeteditor && this.snippeteditor.focus();
 		}
 		cancelEdit() {
 			this.setState({
@@ -130,13 +136,13 @@ function ArticleFactory(editable: boolean = false) {
 		}
 		preview() {
 			this.setState({
-				previewSnippet: this.snippeteditor.getContent(),
-				previewContent: this.editor.getContent(),
+				previewSnippet: (this.snippeteditor as RichEditor).getContent(),
+				previewContent: (this.editor as RichEditor).getContent(),
 				mode: "preview",
 			});
 		}
 		async save() {
-			let notification;
+			let notification: Notification|null = null;
 			try {
 				const snippet = this.snippeteditor
 					? this.snippeteditor.getContent()
@@ -148,12 +154,20 @@ function ArticleFactory(editable: boolean = false) {
 					data: "Сохраняю новость",
 					time: null,
 				});
-				await updateArticle({ ...this.state.article, content, snippet });
+				await updateArticle({
+					...this.state.article,
+					content: content as string,
+					snippet: snippet as string,
+				});
 				articleCache.invalidate();
 				this.setState({
 					previewContent: null,
 					previewSnippet: null,
-					article: { ...this.state.article, snippet, content },
+					article: {
+						...this.state.article,
+						snippet: snippet as string,
+						content: content as string,
+					} as ArticleType,
 					mode: "view",
 				});
 				removeNotification(notification);
@@ -163,7 +177,7 @@ function ArticleFactory(editable: boolean = false) {
 				});
 			} catch (e) {
 				console.error(e);
-				removeNotification(notification);
+				if(notification) removeNotification(notification);
 				addNotification({
 					data: (
 						<span>

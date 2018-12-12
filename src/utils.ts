@@ -63,11 +63,11 @@ export async function waitDOMReady(): Promise<void> {
 	}
 }
 
-export async function retry(
-	fn: Function,
+export async function retry<T>(
+	fn: () => T | Promise<T>,
 	retries: number = 3,
 	retryInterval: number = 0
-) {
+): Promise<T> {
 	for (let i = 0; i < retries; i++) {
 		try {
 			return await fn();
@@ -76,6 +76,7 @@ export async function retry(
 			if (retryInterval) await sleep(retryInterval);
 		}
 	}
+	throw new Error("Error while retry");
 }
 
 /**
@@ -86,7 +87,7 @@ export async function retry(
  */
 export async function waitFor(
 	fn: () => boolean | Promise<boolean>,
-	max?: number | null,
+	max: number | null = null,
 	error?: Error | null
 ) {
 	const timestamp = new Date().getTime();
@@ -101,7 +102,7 @@ export async function waitFor(
 }
 
 export const scrollIntoView = (() => {
-	if ("scrollBehavior" in document.documentElement.style) {
+	if ("scrollBehavior" in document.documentElement!.style) {
 		return (el: HTMLElement, behavior: "smooth" | "auto" = "smooth") =>
 			el.scrollIntoView({ behavior, block: "start" });
 	} else {
@@ -156,14 +157,14 @@ export function debounce(
 	wait: number = 100,
 	immediate: boolean = false
 ): Function {
-	let timeout: number;
-	return function(...args: any): void {
+	let timeout: number|null;
+	return function(this: any, ...args: any): void {
 		const later = () => {
 			timeout = null;
 			if (!immediate) fn.apply(this, args);
 		};
 		const callNow = immediate && !timeout;
-		clearTimeout(timeout);
+		if(timeout) clearTimeout(timeout);
 		timeout = (setTimeout(later, wait) as unknown) as number;
 		if (callNow) fn.apply(this, args);
 	};

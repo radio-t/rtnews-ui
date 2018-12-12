@@ -4,7 +4,7 @@ import { formatDate, scrollIntoView } from "./utils";
 import { postsPrefix, isSafari } from "./settings";
 import { getArticle } from "./api";
 
-import ArticleControls, { ControlID } from "./articleControls";
+import ArticleControls, { ControlID, ChangeID } from "./articleControls";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import Loading from "./loading";
@@ -19,11 +19,16 @@ import { Article } from "./articleInterface";
 
 class ComponentWithVisibility<P, S> extends Component<P, S> {
 	visible: boolean;
-	ref: Element;
+	ref: Element | null;
+	constructor(props: P) {
+		super(props);
+		this.visible = true;
+		this.ref = null;
+	}
 }
 
 interface WithActiveProps {
-	active: boolean;
+	active?: boolean;
 }
 
 /**
@@ -43,7 +48,7 @@ function UpdateOnlyIfVisible<P extends WithActiveProps, S extends object>(
 	const observer = new IntersectionObserver(entries => {
 		entries.forEach(e => {
 			if (refToComponentMap.has(e.target)) {
-				const component = refToComponentMap.get(e.target);
+				const component = refToComponentMap.get(e.target)!;
 				component.visible = e.isIntersecting;
 				component.setState({});
 			}
@@ -51,8 +56,6 @@ function UpdateOnlyIfVisible<P extends WithActiveProps, S extends object>(
 	});
 
 	return class WithActive extends BaseClass {
-		visible: boolean;
-		ref: HTMLElement;
 		shouldComponentUpdate(nextProps: WithActiveProps) {
 			if (nextProps.active !== this.props.active) return true;
 			if (!this.visible) return false;
@@ -64,12 +67,12 @@ function UpdateOnlyIfVisible<P extends WithActiveProps, S extends object>(
 		}
 		componentDidMount() {
 			super.componentDidMount && super.componentDidMount();
-			refToComponentMap.set(this.ref, this);
-			observer.observe(this.ref);
+			refToComponentMap.set(this.ref!, this);
+			observer.observe(this.ref!);
 		}
 		componentWillUnmount() {
 			super.componentWillUnmount && super.componentWillUnmount();
-			observer.unobserve(this.ref);
+			observer.unobserve(this.ref!);
 		}
 		render() {
 			return super.render();
@@ -79,18 +82,13 @@ function UpdateOnlyIfVisible<P extends WithActiveProps, S extends object>(
 
 interface DraggableComponent<P> extends Component<P> {
 	draggable: boolean;
-	initialTouch: Touch;
-	initialTransform: string;
-	clientY: number;
-	dragInterval: number;
+	initialTouch: Touch | null;
+	initialTransform: string | null;
+	clientY: number | null;
+	dragInterval: number | null;
 }
 
-type DraggableProps = {
-	draggable: boolean;
-	article: Article;
-	onChange: Function;
-	detailedExpanded: boolean;
-};
+type DraggableProps = ArticleBriefBasicProps;
 
 type DraggableState = {
 	detailedExpanded?: boolean;
@@ -120,12 +118,20 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 
 	return class extends BaseClass implements DraggableComponent<P> {
 		draggable: boolean;
-		initialTouch: Touch;
-		initialTransform: string;
-		clientY: number;
-		dragInterval: number;
+		initialTouch: Touch | null;
+		initialTransform: string | null;
+		clientY: number | null;
+		dragInterval: number | null;
 		handle?: HTMLElement;
 		ref?: HTMLElement;
+		constructor(props: P) {
+			super(props);
+			this.draggable = false;
+			this.initialTouch = null;
+			this.initialTransform = null;
+			this.clientY = null;
+			this.dragInterval = null;
+		}
 		componentDidMount() {
 			super.componentDidMount && super.componentDidMount();
 			if (!(this.handle && this.ref)) return;
@@ -136,21 +142,30 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 			this.handle.addEventListener("mouseleave", this.onHandleMouseLeave);
 
 			this.onHandleTouchStart = this.onHandleTouchStart.bind(this);
-			this.handle.addEventListener("touchstart", this.onHandleTouchStart);
+			this.handle.addEventListener("touchstart", this.onHandleTouchStart as (
+				e: Event
+			) => void);
 			this.onHandleTouchMove = this.onHandleTouchMove.bind(this);
-			this.handle.addEventListener("touchmove", this.onHandleTouchMove);
+			this.handle.addEventListener("touchmove", this.onHandleTouchMove as (
+				e: Event
+			) => void);
 			this.onHandleTouchEnd = this.onHandleTouchEnd.bind(this);
-			this.handle.addEventListener("touchend", this.onHandleTouchEnd);
+			this.handle.addEventListener("touchend", this.onHandleTouchEnd as (
+				e: Event
+			) => void);
 
 			this.onTouchDrag = this.onTouchDrag.bind(this);
-			this.ref.addEventListener(eventIdentifier, this.onTouchDrag);
+			this.ref.addEventListener(eventIdentifier, this.onTouchDrag as (
+				e: Event
+			) => void);
 			this.onTouchDragLeave = this.onTouchDragLeave.bind(this);
 			this.ref.addEventListener(
 				`${eventIdentifier}Leave`,
 				this.onTouchDragLeave
 			);
 			this.onTouchDragEnd = this.onTouchDragEnd.bind(this);
-			this.ref.addEventListener(`${eventIdentifier}End`, this.onTouchDragEnd);
+			this.ref.addEventListener(`${eventIdentifier}End`, this
+				.onTouchDragEnd as (e: Event) => void);
 
 			this.onDrop = this.onDrop.bind(this);
 			this.ref.addEventListener("drop", this.onDrop);
@@ -168,15 +183,15 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 		componentWillUnmount() {
 			super.componentWillUnmount && super.componentWillUnmount();
 			if (this.ref) {
-				this.ref.removeEventListener(eventIdentifier, this.onTouchDrag);
+				this.ref.removeEventListener(eventIdentifier, this.onTouchDrag as (
+					e: Event
+				) => void);
 				this.ref.removeEventListener(
 					`${eventIdentifier}Leave`,
 					this.onTouchDragLeave
 				);
-				this.ref.removeEventListener(
-					`${eventIdentifier}End`,
-					this.onTouchDragEnd
-				);
+				this.ref.removeEventListener(`${eventIdentifier}End`, this
+					.onTouchDragEnd as (e: Event) => void);
 
 				this.ref.removeEventListener("drop", this.onDrop);
 				this.ref.removeEventListener("drag", this.onDrag);
@@ -187,41 +202,46 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 			}
 
 			if (this.handle) {
-				this.handle.removeEventListener("touchend", this.onHandleTouchEnd);
-				this.handle.removeEventListener("touchmove", this.onHandleTouchMove);
-				this.handle.removeEventListener("touchstart", this.onHandleTouchStart);
+				this.handle.removeEventListener("touchend", this.onHandleTouchEnd as (
+					e: Event
+				) => void);
+				this.handle.removeEventListener("touchmove", this.onHandleTouchMove as (
+					e: Event
+				) => void);
+				this.handle.removeEventListener("touchstart", this
+					.onHandleTouchStart as (e: Event) => void);
 
 				this.handle.removeEventListener("mouseenter", this.onHandleMouseEnter);
 				this.handle.removeEventListener("mouseleave", this.onHandleMouseLeave);
 			}
 		}
 		onHandleMouseEnter() {
-			this.ref.draggable = this.props.draggable;
+			if (this.ref) this.ref.draggable = this.props.draggable! || false;
 		}
 		onHandleMouseLeave() {
-			this.ref.draggable = false;
+			if (this.ref) this.ref.draggable = false;
 		}
 		onTouchDrag(e: TDragEvent) {
-			const rect = this.ref.getBoundingClientRect();
+			const rect = this.ref!.getBoundingClientRect();
 			const ratio = (e.relativeCoords.y / rect.height) * 100;
 			if (ratio < 50) {
-				this.ref.classList.remove("touch-drag-target-bottom");
-				this.ref.classList.add("touch-drag-target-top");
+				this.ref!.classList.remove("touch-drag-target-bottom");
+				this.ref!.classList.add("touch-drag-target-top");
 			} else {
-				this.ref.classList.remove("touch-drag-target-top");
-				this.ref.classList.add("touch-drag-target-bottom");
+				this.ref!.classList.remove("touch-drag-target-top");
+				this.ref!.classList.add("touch-drag-target-bottom");
 			}
 		}
 		onTouchDragLeave() {
-			this.ref.classList.remove("touch-drag-target-top");
-			this.ref.classList.remove("touch-drag-target-bottom");
+			this.ref!.classList.remove("touch-drag-target-top");
+			this.ref!.classList.remove("touch-drag-target-bottom");
 		}
 		onTouchDragEnd(e: TDragEvent) {
-			this.ref.classList.remove("touch-drag-target-top");
-			this.ref.classList.remove("touch-drag-target-bottom");
+			this.ref!.classList.remove("touch-drag-target-top");
+			this.ref!.classList.remove("touch-drag-target-bottom");
 			if (e.data.position === this.props.article.position) return;
 			const append = (() => {
-				const rect = this.ref.getBoundingClientRect();
+				const rect = this.ref!.getBoundingClientRect();
 				const ratio = (e.relativeCoords.y / rect.height) * 100;
 				let append = ratio < 60 ? 1 : 0;
 				if (e.data.position < this.props.article.position) append -= 1;
@@ -240,26 +260,26 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 			if (e.touches.length > 1) return;
 			e.preventDefault();
 
-			this.ref.classList.add("touch-drag-item__start");
-			this.ref.classList.add("touch-drag-item");
-			this.ref.classList.remove("touch-drag-item__start");
+			this.ref!.classList.add("touch-drag-item__start");
+			this.ref!.classList.add("touch-drag-item");
+			this.ref!.classList.remove("touch-drag-item__start");
 			this.initialTouch = e.touches[0];
-			this.initialTransform = this.ref.style.transform;
+			this.initialTransform = this.ref!.style.transform;
 
 			// handle scroll over borders
 			this.clientY = e.touches[0].clientY;
 			this.dragInterval = (setInterval(() => {
-				if (this.clientY <= 80) {
+				if (this.clientY && this.clientY <= 80) {
 					window.scrollBy(0, -((80 - this.clientY) / 2));
-				} else if (this.clientY >= window.innerHeight - 80) {
+				} else if (this.clientY && this.clientY >= window.innerHeight - 80) {
 					window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
 				}
 			}, 30) as unknown) as number;
 		}
 		onHandleTouchMove(e: TDragEvent) {
 			this.clientY = e.touches[0].clientY;
-			const deltaY = e.touches[0].pageY - this.initialTouch.pageY;
-			this.ref.style.transform = `translate(0, ${deltaY}px)`;
+			const deltaY = e.touches[0].pageY - this.initialTouch!.pageY;
+			this.ref!.style.transform = `translate(0, ${deltaY}px)`;
 
 			const targets = document.elementsFromPoint(
 				e.touches[0].clientX,
@@ -277,16 +297,16 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 
 			moveTargets.forEach(x => {
 				if (!x) return;
-				const event = new Event(eventIdentifier, {
+				const event = (new Event(eventIdentifier, {
 					bubbles: false,
 					cancelable: true,
-				}) as TDragEvent;
+				}) as unknown) as TDragEvent;
 				const tRect = x.getBoundingClientRect();
-				(event as any).absoluteCoords = {
+				event.absoluteCoords = {
 					x: e.touches[0].clientX,
 					y: e.touches[0].clientY,
 				};
-				(event as any).relativeCoords = {
+				event.relativeCoords = {
 					x: e.touches[0].clientX - ((tRect as any).x || tRect.left),
 					y: e.touches[0].clientY - ((tRect as any).y || tRect.top),
 				};
@@ -295,12 +315,12 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 		}
 		onHandleTouchEnd(e: TDragEvent) {
 			const article = this.props.article;
-			clearInterval(this.dragInterval);
-			this.ref.classList.remove("touch-drag-item");
+			this.dragInterval && clearInterval(this.dragInterval);
+			this.ref!.classList.remove("touch-drag-item");
 			if (this.initialTransform) {
-				this.ref.style.transform = this.initialTransform;
+				this.ref!.style.transform = this.initialTransform;
 			} else {
-				this.ref.style.transform = "";
+				this.ref!.style.transform = "";
 			}
 
 			const targets = document.elementsFromPoint(
@@ -328,22 +348,22 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 		}
 
 		onDragStart(e: DragEvent) {
-			if (!this.ref.draggable) return;
-			this.ref.classList.add("drop-item");
+			if (!this.ref!.draggable) return;
+			this.ref!.classList.add("drop-item");
 			this.setState({ detailedExpanded: false });
-			e.dataTransfer.setData(
+			e.dataTransfer!.setData(
 				"rtnews/article",
 				JSON.stringify(this.props.article)
 			);
-			e.dataTransfer.setData("rtnews/article-id", this.props.article.id);
+			e.dataTransfer!.setData("rtnews/article-id", this.props.article.id);
 
 			if (isSafari) {
 				this.clientY = e.clientY;
 				this.dragInterval = (setInterval(() => {
-					if (this.clientY <= 80) {
-						window.scrollBy(0, -((80 - this.clientY) / 2));
-					} else if (this.clientY >= window.innerHeight - 80) {
-						window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
+					if (this.clientY! <= 80) {
+						window.scrollBy(0, -((80 - this.clientY!) / 2));
+					} else if (this.clientY! >= window.innerHeight - 80) {
+						window.scrollBy(0, (80 - (window.innerHeight - this.clientY!)) / 2);
 					}
 				}, 30) as unknown) as number;
 			}
@@ -354,13 +374,13 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 			}
 		}
 		onDragOver(e: DragEvent) {
-			if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
+			if (e.dataTransfer!.types.indexOf("rtnews/article") === -1) return;
 			e.preventDefault();
 			if (
-				e.dataTransfer.getData("rtnews/article-id") === this.props.article.id
+				e.dataTransfer!.getData("rtnews/article-id") === this.props.article.id
 			) {
-				this.ref.classList.remove("drop-top");
-				this.ref.classList.remove("drop-bottom");
+				this.ref!.classList.remove("drop-top");
+				this.ref!.classList.remove("drop-bottom");
 				return;
 			}
 			let append = (() => {
@@ -370,31 +390,31 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				return proportion < 60 ? 1 : 0;
 			})();
 			if (append === 1) {
-				this.ref.classList.remove("drop-bottom");
-				this.ref.classList.add("drop-top");
+				this.ref!.classList.remove("drop-bottom");
+				this.ref!.classList.add("drop-top");
 			} else {
-				this.ref.classList.remove("drop-top");
-				this.ref.classList.add("drop-bottom");
+				this.ref!.classList.remove("drop-top");
+				this.ref!.classList.add("drop-bottom");
 			}
 		}
 		onDragLeave() {
-			this.ref.classList.remove("drop-top");
-			this.ref.classList.remove("drop-bottom");
+			this.ref!.classList.remove("drop-top");
+			this.ref!.classList.remove("drop-bottom");
 		}
 		onDragEnd() {
-			clearInterval(this.dragInterval);
-			this.ref.classList.remove("drop-item");
-			this.ref.classList.remove("drop-top");
-			this.ref.classList.remove("drop-bottom");
+			this.dragInterval && clearInterval(this.dragInterval);
+			this.ref!.classList.remove("drop-item");
+			this.ref!.classList.remove("drop-top");
+			this.ref!.classList.remove("drop-bottom");
 		}
 		async onDrop(e: DragEvent) {
-			clearInterval(this.dragInterval);
-			this.ref.classList.remove("drop-item");
-			this.ref.classList.remove("drop-top");
-			this.ref.classList.remove("drop-bottom");
-			if (e.dataTransfer.types.indexOf("rtnews/article") === -1) return;
+			this.dragInterval && clearInterval(this.dragInterval);
+			this.ref!.classList.remove("drop-item");
+			this.ref!.classList.remove("drop-top");
+			this.ref!.classList.remove("drop-bottom");
+			if (e.dataTransfer!.types.indexOf("rtnews/article") === -1) return;
 			e.preventDefault();
-			const data = JSON.parse(e.dataTransfer.getData("rtnews/article"));
+			const data = JSON.parse(e.dataTransfer!.getData("rtnews/article"));
 			if (data.position === this.props.article.position) return;
 			let append = (() => {
 				const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -421,8 +441,8 @@ type ArticleBriefBasicProps = {
 	article: Article;
 	active?: boolean;
 	draggable?: boolean;
-	controls: ControlID[] | null;
-	onChange?: (change: ControlID) => void;
+	controls?: ControlID[] | null;
+	onChange?: (change: ChangeID, data?: any) => Promise<void>;
 	archive?: boolean;
 };
 
@@ -430,7 +450,7 @@ type ArticleBriefBasicState = {
 	articleText: string | null;
 	draggable: boolean;
 	visible: boolean;
-	detailedExpanded: boolean;
+	detailedExpanded?: boolean;
 };
 
 /**
@@ -441,9 +461,9 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 	ArticleBriefBasicState
 > {
 	fetchLock: boolean;
-	ref: HTMLElement;
-	handle: HTMLElement;
-	detailedRef: HTMLSpanElement;
+	ref: HTMLElement | null;
+	handle: HTMLElement | null;
+	detailedRef: HTMLSpanElement | null;
 	draggable: boolean;
 	constructor(props: any) {
 		super(props);
@@ -454,6 +474,10 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 			visible: true,
 		};
 		this.fetchLock = false;
+		this.ref = null;
+		this.handle = null;
+		this.detailedRef = null;
+		this.draggable = true;
 	}
 	fetchArticle() {
 		if (this.fetchLock) return;
@@ -461,7 +485,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 		this.fetchLock = true;
 		getArticle(this.props.article.slug)
 			.then(article => {
-				this.setState({ articleText: article.content });
+				this.setState({ articleText: article!.content! });
 			})
 			.catch(e => {
 				this.setState({
@@ -476,7 +500,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 			<article
 				key={this.props.article.id}
 				ref={ref => (this.ref = ref)}
-				id={this.props.active && "active-article"}
+				id={this.props.active ? "active-article" : undefined}
 				className={
 					"post " +
 					(this.props.active && this.props.active === true ? "post-active" : "")
@@ -485,7 +509,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 				<div
 					className="post__drag-handle"
 					ref={ref => (this.handle = ref)}
-					style={{ display: this.props.draggable ? null : "none" }}
+					style={{ display: this.props.draggable ? undefined : "none" }}
 				/>
 				{this.props.controls && (
 					<ArticleControls
@@ -613,7 +637,8 @@ export const DraggableArticleBrief = Draggable(
 type ArticleSortBasicProps = {
 	active?: boolean;
 	article: Article;
-	onChange: (id: ControlID) => void;
+	onChange?: (id: ChangeID, data?: any) => Promise<void>;
+	draggable?: boolean;
 };
 
 type ArticleSortBasicState = {
@@ -629,8 +654,8 @@ export class ArticleSortBasic extends ComponentWithVisibility<
 	ArticleSortBasicState
 > {
 	controls: () => ControlID[];
-	ref: HTMLDivElement;
-	handle: HTMLDivElement;
+	ref: HTMLDivElement | null;
+	handle: HTMLDivElement | null;
 	constructor(props: any) {
 		super(props);
 		this.state = {
@@ -643,6 +668,8 @@ export class ArticleSortBasic extends ComponentWithVisibility<
 				"archive",
 				"remove",
 			].filter(x => x !== null) as ControlID[];
+		this.ref = null;
+		this.handle = null;
 	}
 	render() {
 		return (

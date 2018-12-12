@@ -13,7 +13,7 @@ type State = {
 };
 
 export default class Select extends PureComponent<Props, State> {
-	ref: HTMLDivElement;
+	ref: HTMLDivElement|null;
 
 	constructor(props: Props) {
 		super(props);
@@ -21,6 +21,7 @@ export default class Select extends PureComponent<Props, State> {
 			expanded: false,
 			selected: props.items.indexOf(props.value),
 		};
+		this.ref = null;
 	}
 	render() {
 		return (
@@ -66,12 +67,12 @@ export default class Select extends PureComponent<Props, State> {
 							e.preventDefault();
 							this.props.onChange &&
 								this.props.onChange(this.props.items[this.state.selected]);
-							this.ref.blur();
+							this.ref!.blur();
 							break;
 						// esc
 						case 27:
 							e.preventDefault();
-							this.ref.blur();
+							this.ref!.blur();
 					}
 				}}
 			>
@@ -88,9 +89,9 @@ export default class Select extends PureComponent<Props, State> {
 									(x === this.props.value ? "select__item--current " : "") +
 									(i === this.state.selected ? "select__item--selected " : "")
 								}
-								aria-selected={x === this.props.value ? true : null}
+								aria-selected={x === this.props.value ? true : undefined}
 								onClick={() => {
-									this.ref.blur();
+									this.ref!.blur();
 									if (x !== this.props.value) {
 										this.props.onChange(x);
 									}

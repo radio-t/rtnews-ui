@@ -12,6 +12,7 @@ import {
 	PostLevel,
 	PostRecentness,
 	Sorting,
+	PostLevelString,
 } from "./settings";
 import {
 	getRecentness,
@@ -37,7 +38,7 @@ import articleCache from "./articleCache";
 import ErrorComponent from "./error";
 import { Notification } from "./notificationInterface";
 import { Article } from "./articleInterface";
-import { ControlID } from "./articleControls";
+import { ControlID, ChangeID } from "./articleControls";
 
 import {
 	ArticleBrief,
@@ -102,7 +103,12 @@ function withAutoUpdate<P extends object, S extends object>(
 		/**
 		 * setInterval id
 		 */
-		updateInterval: number;
+		updateInterval: number | null;
+		constructor(props: P) {
+			super(props);
+			this.updateTimestamp = 0;
+			this.updateInterval = null;
+		}
 
 		componentDidMount() {
 			super.componentDidMount && super.componentDidMount();
@@ -134,7 +140,7 @@ function withAutoUpdate<P extends object, S extends object>(
 
 		componentWillUnmount() {
 			super.componentWillUnmount && super.componentWillUnmount();
-			clearInterval(this.updateInterval);
+			this.updateInterval && clearInterval(this.updateInterval);
 		}
 
 		async update(force: boolean) {
@@ -155,8 +161,6 @@ type BaseListingState = {
 	error: RequestError | null;
 	news: Article[];
 };
-
-type ChangeID = ControlID | "move";
 
 /**
  * Base for listing components
@@ -294,6 +298,7 @@ class BaseListing<
 				break;
 			case "move":
 				const target = first(this.state.news, a => a.id === data.id);
+				if (!target) return;
 				const append = data.from < data.to ? 0.2 : -0.2;
 				this.updateArticle(target, { position: data.to + append });
 				const updated = await moveArticle(data.id, data.to - data.from);
@@ -361,6 +366,13 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 			});
 			await waitFor(() => this.state.loaded, 20000);
 			const url = await getPrepTopicsURL();
+			if (!url) {
+				addNotification({
+					data: "Не могу найти темы слушателей",
+					level: "error",
+				});
+				return;
+			}
 			const number = url.substr(url.length - 4, 3);
 
 			const maxPosition = this.state.news.reduce(
@@ -439,12 +451,12 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 					}}
 					//
 					postLevel={this.state.postLevel}
-					onPostLevelChange={postLevel => {
+					onPostLevelChange={(postLevel: PostLevelString) => {
 						const level = first(postLevels, x => x.title === postLevel);
 						this.setState({
-							postLevel: level,
+							postLevel: level!,
 						});
-						setPostLevel(level);
+						setPostLevel(level!);
 					}}
 					//
 					sort={this.state.sort}
@@ -466,7 +478,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 								onClick={() => {
 									this.setState({ addFormExpanded: true });
 									setTimeout(() => {
-										const el: HTMLInputElement =
+										const el: HTMLInputElement | null =
 											document.querySelector(".add-form__article-url") ||
 											document.querySelector(".add-form__article-manual-link");
 										if (el) el.focus();
@@ -486,7 +498,9 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 						)}
 						<AddArticle
 							{...this.props}
-							style={{ display: this.state.addFormExpanded ? null : "none" }}
+							style={{
+								display: this.state.addFormExpanded ? undefined : "none",
+							}}
 							onAdd={() => {
 								sleep(1000).then(() => {
 									this.update(true);
@@ -511,7 +525,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 						.sort((a, b) => this.state.sort.fn(a, b))
 						.map((x, i) => {
 							const isCurrent = x.id === this.props.activeId;
-							const getControls = () => {
+							const getControls = (): ControlID[] => {
 								const isNotFirst = sortIsDefault && i !== 0;
 								return [
 									!isCurrent ? "make-current" : null,
@@ -519,7 +533,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 									x.geek ? "make-ungeek" : "make-geek",
 									"archive",
 									"remove",
-								].filter(x => x !== null);
+								].filter(x => x !== null) as ControlID[];
 							};
 							return this.props.isAdmin ? (
 								<DraggableArticleBrief
@@ -756,7 +770,6 @@ export class Sorter extends BaseListing<SorterProps, SorterState> {
 							onChange={(id: ChangeID, data: any) =>
 								this.onArticleChange(article, id, data)
 							}
-							draggable={true}
 						/>
 					))}
 			</div>

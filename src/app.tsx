@@ -24,7 +24,7 @@ import { Article, EditableArticle } from "./article";
 import Feeds from "./feeds";
 import LoginForm from "./login";
 import NotFound from "./notFound";
-import {Notifications} from "./notifications";
+import { Notifications } from "./notifications";
 import { Notification } from "./notificationInterface";
 
 import { listingRef } from "./symbols";
@@ -42,7 +42,11 @@ type AppProps = {
 };
 
 export default class App extends Component<AppProps> {
-	router: Router;
+	router: Router | null;
+	constructor(props: AppProps) {
+		super(props);
+		this.router = null;
+	}
 	render() {
 		return (
 			<Router ref={(router: Router) => (this.router = router)}>
@@ -121,7 +125,7 @@ export default class App extends Component<AppProps> {
 											}
 										>
 											<EditableArticle
-												slug={(props.match.params as any).slug}
+												slug={(props.match!.params as any).slug}
 											/>
 										</ScrollContext>
 									) : (
@@ -131,7 +135,7 @@ export default class App extends Component<AppProps> {
 												!!cur.location.key
 											}
 										>
-											<Article slug={(props.match.params as any).slug} />
+											<Article slug={(props.match!.params as any).slug} />
 										</ScrollContext>
 									)
 								}

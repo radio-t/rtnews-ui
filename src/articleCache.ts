@@ -53,10 +53,10 @@ const ArticleCache: {
 	): Promise<Article[]> => {
 		const timestamp = new Date().getTime();
 		if (!force && cache.has(label)) {
-			const v = cache.get(label);
+			const v = cache.get(label)!;
 			if (
 				timestamp - v.timestamp <
-				Math.max(60000 * newsCacheValidInterval - 500, 0)
+				Math.max(60000 * newsCacheValidInterval! - 500, 0)
 			) {
 				return v.data;
 			}

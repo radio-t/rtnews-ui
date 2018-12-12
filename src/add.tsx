@@ -22,8 +22,8 @@ type State = {
 };
 
 export default class AddArticleForm extends Component<Props, State> {
-	autoref: HTMLInputElement;
-	manualref: HTMLInputElement;
+	autoref: HTMLInputElement | null;
+	manualref: HTMLInputElement | null;
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -36,6 +36,8 @@ export default class AddArticleForm extends Component<Props, State> {
 		};
 		this.onDragover = this.onDragover.bind(this);
 		this.onDrop = this.onDrop.bind(this);
+		this.autoref = null;
+		this.manualref = null;
 	}
 	bookmarklet(): string {
 		const hrefFunc = function() {
@@ -109,7 +111,7 @@ export default class AddArticleForm extends Component<Props, State> {
 					s.height = "0";
 
 					w.setTimeout(function() {
-						i.parentNode.removeChild(i);
+						i.parentNode && i.parentNode.removeChild(i);
 					}, 300);
 				}, 500);
 			}
@@ -257,18 +259,19 @@ export default class AddArticleForm extends Component<Props, State> {
 	onSwitch() {
 		this.setState({ manual: !this.state.manual });
 		waitFor(() => !!(this.autoref || this.manualref)).then(() => {
-			(this.autoref || this.manualref).focus();
+			((this.autoref || this.manualref) as HTMLInputElement).focus();
 		});
 	}
 	onDragover(e: DragEvent) {
-		if (e.dataTransfer.types.indexOf("text/plain") !== -1) {
+		if (e.dataTransfer && e.dataTransfer.types.indexOf("text/plain") !== -1) {
 			e.dataTransfer.dropEffect = "copy";
 			e.preventDefault();
 		}
 	}
 	async onDrop(e: DragEvent) {
-		if (e.dataTransfer.types.indexOf("text/plain") === -1) return;
-		const data = e.dataTransfer.getData("text/plain");
+		if (e.dataTransfer && e.dataTransfer.types.indexOf("text/plain") === -1)
+			return;
+		const data = (e.dataTransfer as DataTransfer).getData("text/plain");
 		const isLink = /^https?:\/\/.*/.test(data);
 		if (!isLink) return;
 		const url = new URL(data);
@@ -298,7 +301,7 @@ export default class AddArticleForm extends Component<Props, State> {
 		document.body.addEventListener("dragover", this.onDragover, false);
 		document.body.addEventListener("drop", this.onDrop, false);
 		setTimeout(() => {
-			(this.autoref || this.manualref).focus();
+			((this.autoref || this.manualref) as HTMLInputElement).focus();
 		}, 500);
 	}
 	componentWillUnmount() {

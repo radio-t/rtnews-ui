@@ -6,6 +6,7 @@ import {
 	Sorting,
 	postLevels,
 	PostLevel,
+	PostLevelString,
 	sortings,
 } from "./settings";
 import Select from "./select";
@@ -15,7 +16,7 @@ type Props = {
 	includeFilters?: boolean;
 	className?: string;
 	postLevel: PostLevel;
-	onPostLevelChange: (label: string) => void;
+	onPostLevelChange: (label: PostLevelString) => void;
 	onRecentnessChange: (value: PostRecentness) => void;
 	sortings?: Sorting[];
 	sort: Sorting;
@@ -51,8 +52,8 @@ export default class ListingActions extends Component<Props> {
 						<Select
 							items={postLevels.map(x => x.title)}
 							value={this.props.postLevel.title}
-							onChange={e =>
-								this.props.onPostLevelChange && this.props.onPostLevelChange(e)
+							onChange={(e) =>
+								this.props.onPostLevelChange && this.props.onPostLevelChange(e as PostLevelString)
 							}
 							className={`listing-actions__news-type-select ${
 								this.props.postLevel.title !== postLevels[0].title

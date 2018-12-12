@@ -65,8 +65,10 @@ const now = new Date().getTime();
 const day = 1000 * 60 * 60 * 24;
 const month = day * 30;
 
+export type PostRecentnessString = "Все" | "Свежие";
+
 export interface PostRecentness {
-	title: string;
+	title: PostRecentnessString;
 	fn(x: Article, i: number, isgeek?: boolean): boolean;
 }
 
@@ -80,7 +82,7 @@ export const postRecentness: PostRecentness[] = [
 	{
 		title: "Свежие",
 		fn(x, _, isgeek = true) {
-			const interval = now - (x.parsedats as Date).getTime();
+			const interval = now - x.parsedats;
 			if (isgeek && x.geek && interval < 3 * month) {
 				return true;
 			} else if (interval < 21 * day) {
@@ -91,8 +93,10 @@ export const postRecentness: PostRecentness[] = [
 	},
 ];
 
+export type PostLevelString = "Все" | "Обычные" | "Гиковские";
+
 export interface PostLevel {
-	title: string;
+	title: PostLevelString;
 	fn(x: any, i: number): boolean;
 	isgeek?: boolean;
 }

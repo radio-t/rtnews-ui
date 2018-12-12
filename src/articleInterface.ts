@@ -1,22 +1,14 @@
-export type Article = {
+export type ArticleInit = {
 	active: boolean;
 	/**
 	 * activation timestamp
 	 */
 	activets: string;
-	/**
-	 * activets converted to Date
-	 */
-	parsedactivets: Date;
 	archived: boolean;
 	/**
 	 *  added timestamp
 	 */
 	ats: string;
-	/**
-	 * ats converted to Date
-	 */
-	parsedats: Date;
 	author: string;
 	/**
 	 * number of comments
@@ -59,9 +51,20 @@ export type Article = {
 	 * original article's timestamp
 	 */
 	ts: string;
-	/**
-	 * ts converted to Date
-	 */
-	parsedts: Date;
 	votes: number;
+};
+
+export type Article = ArticleInit & {
+	/**
+	 * activets converted to timestamp
+	 */
+	parsedactivets: number;
+	/**
+	 * ats converted to timestamp
+	 */
+	parsedats: number;
+	/**
+	 * ts converted to timestamp
+	 */
+	parsedts: number;
 };

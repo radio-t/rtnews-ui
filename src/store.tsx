@@ -3,7 +3,10 @@ import { createStore } from "redux";
 import { ThemeType } from "./themeInterface";
 
 export interface State {
-	issueNumber: number | null;
+	issueNumber: {
+		number: number;
+		link: string | null;
+	} | null;
 	isAdmin: boolean;
 	notifications: any[];
 	activeId: string | null;
@@ -70,18 +73,18 @@ export function setTheme(theme: ThemeType, immediate: boolean = false) {
 	setState({ theme });
 
 	if (immediate) {
-		document.documentElement.dataset.theme = theme;
+		document.documentElement!.dataset.theme = theme;
 		return;
 	}
 
 	++themeCounter;
-	document.documentElement.classList.add("switch-transition");
+	document.documentElement!.classList.add("switch-transition");
 	setTimeout(() => {
-		document.documentElement.dataset.theme = theme;
+		document.documentElement!.dataset.theme = theme;
 		setTimeout(() => {
 			--themeCounter;
 			if (themeCounter < 1)
-				document.documentElement.classList.remove("switch-transition");
+				document.documentElement!.classList.remove("switch-transition");
 		}, 1500);
 	}, 10);
 }

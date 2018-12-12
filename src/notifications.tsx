@@ -66,7 +66,7 @@ function createNotification(
 		notification
 	);
 	//inject key into react component to avoid misrendering
-	(notification.data as JSX.Element).key = notification.id;
+	(notification.data as JSX.Element).key = notification.id || null;
 	return notification as Notification;
 }
 

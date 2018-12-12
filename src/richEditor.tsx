@@ -20,7 +20,7 @@ type State = {
 
 export default class RichEditor extends PureComponent<Props, State> {
 	editor?: HTMLDivElement;
-	quill: Quill;
+	quill?: Quill;
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -66,7 +66,7 @@ export default class RichEditor extends PureComponent<Props, State> {
 
 		waitFor(() => Quill !== null).then(() => {
 			if (this.props.rich) {
-				this.quill = new Quill(this.editor, {
+				this.quill = new Quill!(this.editor!, {
 					theme: "snow",
 					placeholder: this.props.placeholder || "",
 					modules: {
@@ -82,7 +82,7 @@ export default class RichEditor extends PureComponent<Props, State> {
 					},
 				});
 			} else {
-				this.quill = new Quill(this.editor, {
+				this.quill = new Quill!(this.editor!, {
 					theme: "snow",
 					placeholder: this.props.placeholder || "",
 					modules: {
@@ -95,14 +95,14 @@ export default class RichEditor extends PureComponent<Props, State> {
 	}
 	getContent(): string {
 		if (!this.props.rich)
-			return this.quill.root.innerHTML
+			return this.quill!.root.innerHTML
 				.replace(/(<br\/?>|<\/p><p>)/gi, " ")
 				.replace(/(<([^>]+)>)/gi, "");
-		return this.quill.root.innerHTML;
+		return this.quill!.root.innerHTML;
 	}
 	focus(): void {
 		setTimeout(() => {
-			this.quill.root.focus();
+			this.quill!.root.focus();
 		}, 100);
 	}
 	render() {
@@ -117,7 +117,7 @@ export default class RichEditor extends PureComponent<Props, State> {
 			>
 				<div
 					className="editor"
-					ref={ref => (this.editor = ref)}
+					ref={ref => (this.editor = ref || undefined)}
 					dangerouslySetInnerHTML={{ __html: this.props.content }}
 				/>
 			</div>

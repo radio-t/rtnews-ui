@@ -9,6 +9,7 @@
 			"noImplicitAny": true,
 			"noUnusedLocals": true,
 			"noUnusedParameters": true,
+			"strict": true,
 			"baseUrl": "./",
 			"paths": {
 				"*" : ["@types/*"]
