@@ -1,6 +1,6 @@
 import { Component, MouseEvent } from "react";
 
-import { logout, update, startShow, setTheme as saveTheme } from "./api";
+import { logout, startShow, setTheme as saveTheme } from "./api";
 import { setState, setTheme as commitTheme } from "./store";
 import { addNotification } from "./notifications";
 import { postsPrefix } from "./settings";
@@ -205,24 +205,9 @@ export default class Head extends Component<Props, State> {
 			</div>
 		);
 	}
-	logout() {
+	protected logout() {
 		logout();
 		setState({ isAdmin: false });
-	}
-	async update() {
-		update()
-			.then(() => {
-				addNotification({
-					data: <b>База обновлена</b>,
-				});
-			})
-			.catch(e => {
-				console.error(e);
-				addNotification({
-					data: <b>Не могу обновить базу</b>,
-					level: "error",
-				});
-			});
 	}
 	poehali() {
 		if (!confirm("Таки поехали?")) return;

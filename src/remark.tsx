@@ -9,18 +9,18 @@ type Props = {
 };
 
 export default class Remark extends Component<Props> {
-	ref?: HTMLDivElement;
-	receiveMessages?: (
+	protected ref?: HTMLDivElement;
+	protected receiveMessages?: (
 		event: Event & {
 			data?: any;
 		}
 	) => void;
-	postHashToIframe?: (
+	protected postHashToIframe?: (
 		event: Event & {
 			newURL: string;
 		}
 	) => void;
-	postClickOutsideToIframe?: (event: MouseEvent) => void;
+	protected postClickOutsideToIframe?: (event: MouseEvent) => void;
 	constructor(props: Props) {
 		super(props);
 	}

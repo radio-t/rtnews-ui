@@ -10,7 +10,7 @@ type State = {
 };
 
 export default class Loading extends Component<Props, State> {
-	interval?: number;
+	protected interval?: number;
 	constructor(props: Props) {
 		super(props);
 		this.state = {

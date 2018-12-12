@@ -26,7 +26,7 @@ type State = {
 };
 
 export default class FeedsForm extends PureComponent<Props, State> {
-	input?: HTMLInputElement;
+	protected input?: HTMLInputElement;
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -113,7 +113,7 @@ export default class FeedsForm extends PureComponent<Props, State> {
 			</div>
 		);
 	}
-	async removeFeed(feed: Feed): Promise<void> {
+	protected async removeFeed(feed: Feed): Promise<void> {
 		if (confirm(`Удалить ${feed.feedlink}?`)) {
 			this.setState({ posting: true });
 			try {
@@ -127,7 +127,7 @@ export default class FeedsForm extends PureComponent<Props, State> {
 			}
 		}
 	}
-	async onSubmit(e: FormEvent): Promise<void> {
+	protected async onSubmit(e: FormEvent): Promise<void> {
 		e.preventDefault();
 		this.setState({ posting: true });
 		try {

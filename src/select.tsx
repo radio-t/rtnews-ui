@@ -13,7 +13,7 @@ type State = {
 };
 
 export default class Select extends PureComponent<Props, State> {
-	ref: HTMLDivElement | null;
+	protected ref: HTMLDivElement | null;
 
 	constructor(props: Props) {
 		super(props);

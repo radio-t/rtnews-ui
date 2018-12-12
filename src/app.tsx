@@ -42,7 +42,7 @@ type AppProps = {
 };
 
 export default class App extends Component<AppProps> {
-	router: Router | null;
+	protected router: Router | null;
 	constructor(props: AppProps) {
 		super(props);
 		this.router = null;

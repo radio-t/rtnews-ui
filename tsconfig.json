@@ -11,6 +11,8 @@
 			"noUnusedParameters": true,
 			"strict": true,
 			"baseUrl": "./",
+			"alwaysStrict": true,
+			"forceConsistentCasingInFileNames": true,
 			"paths": {
 				"*" : ["@types/*"]
 			}

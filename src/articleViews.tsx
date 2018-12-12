@@ -19,7 +19,7 @@ import { Article } from "./articleInterface";
 
 class ComponentWithVisibility<P, S> extends Component<P, S> {
 	visible: boolean;
-	ref: Element | null;
+	protected ref: Element | null;
 	constructor(props: P) {
 		super(props);
 		this.visible = true;
@@ -122,8 +122,8 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 		initialTransform: string | null;
 		clientY: number | null;
 		dragInterval: number | null;
-		handle?: HTMLElement;
-		ref?: HTMLElement;
+		protected handle?: HTMLElement;
+		protected ref?: HTMLElement;
 		constructor(props: P) {
 			super(props);
 			this.draggable = false;
@@ -215,13 +215,13 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.handle.removeEventListener("mouseleave", this.onHandleMouseLeave);
 			}
 		}
-		onHandleMouseEnter() {
+		protected onHandleMouseEnter() {
 			if (this.ref) this.ref.draggable = this.props.draggable! || false;
 		}
-		onHandleMouseLeave() {
+		protected onHandleMouseLeave() {
 			if (this.ref) this.ref.draggable = false;
 		}
-		onTouchDrag(e: TDragEvent) {
+		protected onTouchDrag(e: TDragEvent) {
 			const rect = this.ref!.getBoundingClientRect();
 			const ratio = (e.relativeCoords.y / rect.height) * 100;
 			if (ratio < 50) {
@@ -232,11 +232,11 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.ref!.classList.add("touch-drag-target-bottom");
 			}
 		}
-		onTouchDragLeave() {
+		protected onTouchDragLeave() {
 			this.ref!.classList.remove("touch-drag-target-top");
 			this.ref!.classList.remove("touch-drag-target-bottom");
 		}
-		onTouchDragEnd(e: TDragEvent) {
+		protected onTouchDragEnd(e: TDragEvent) {
 			this.ref!.classList.remove("touch-drag-target-top");
 			this.ref!.classList.remove("touch-drag-target-bottom");
 			if (e.data.position === this.props.article.position) return;
@@ -256,7 +256,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				});
 		}
 
-		onHandleTouchStart(e: TDragEvent) {
+		protected onHandleTouchStart(e: TDragEvent) {
 			if (e.touches.length > 1) return;
 			e.preventDefault();
 
@@ -276,7 +276,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				}
 			}, 30) as unknown) as number;
 		}
-		onHandleTouchMove(e: TDragEvent) {
+		protected onHandleTouchMove(e: TDragEvent) {
 			this.clientY = e.touches[0].clientY;
 			const deltaY = e.touches[0].pageY - this.initialTouch!.pageY;
 			this.ref!.style.transform = `translate(0, ${deltaY}px)`;
@@ -313,7 +313,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				x.dispatchEvent(event);
 			});
 		}
-		onHandleTouchEnd(e: TDragEvent) {
+		protected onHandleTouchEnd(e: TDragEvent) {
 			const article = this.props.article;
 			this.dragInterval && clearInterval(this.dragInterval);
 			this.ref!.classList.remove("touch-drag-item");
@@ -347,7 +347,7 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 			});
 		}
 
-		onDragStart(e: DragEvent) {
+		protected onDragStart(e: DragEvent) {
 			if (!this.ref!.draggable) return;
 			this.ref!.classList.add("drop-item");
 			this.setState({ detailedExpanded: false });
@@ -368,12 +368,12 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				}, 30) as unknown) as number;
 			}
 		}
-		onDrag(e: DragEvent) {
+		protected onDrag(e: DragEvent) {
 			if (isSafari) {
 				this.clientY = e.clientY;
 			}
 		}
-		onDragOver(e: DragEvent) {
+		protected onDragOver(e: DragEvent) {
 			if (e.dataTransfer!.types.indexOf("rtnews/article") === -1) return;
 			e.preventDefault();
 			if (
@@ -397,17 +397,17 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 				this.ref!.classList.add("drop-bottom");
 			}
 		}
-		onDragLeave() {
+		protected onDragLeave() {
 			this.ref!.classList.remove("drop-top");
 			this.ref!.classList.remove("drop-bottom");
 		}
-		onDragEnd() {
+		protected onDragEnd() {
 			this.dragInterval && clearInterval(this.dragInterval);
 			this.ref!.classList.remove("drop-item");
 			this.ref!.classList.remove("drop-top");
 			this.ref!.classList.remove("drop-bottom");
 		}
-		async onDrop(e: DragEvent) {
+		protected async onDrop(e: DragEvent) {
 			this.dragInterval && clearInterval(this.dragInterval);
 			this.ref!.classList.remove("drop-item");
 			this.ref!.classList.remove("drop-top");
@@ -461,10 +461,10 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 	ArticleBriefBasicState
 > {
 	fetchLock: boolean;
-	ref: HTMLElement | null;
-	handle: HTMLElement | null;
-	detailedRef: HTMLSpanElement | null;
-	draggable: boolean;
+	protected ref: HTMLElement | null;
+	protected handle: HTMLElement | null;
+	protected detailedRef: HTMLSpanElement | null;
+	protected draggable: boolean;
 	constructor(props: any) {
 		super(props);
 		this.state = {
@@ -479,7 +479,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 		this.detailedRef = null;
 		this.draggable = true;
 	}
-	fetchArticle() {
+	protected fetchArticle() {
 		if (this.fetchLock) return;
 		if (this.state.articleText !== null) return;
 		this.fetchLock = true;
@@ -653,9 +653,9 @@ export class ArticleSortBasic extends ComponentWithVisibility<
 	ArticleSortBasicProps,
 	ArticleSortBasicState
 > {
-	controls: () => ControlID[];
-	ref: HTMLDivElement | null;
-	handle: HTMLDivElement | null;
+	protected controls: () => ControlID[];
+	protected ref: HTMLDivElement | null;
+	protected handle: HTMLDivElement | null;
 	constructor(props: any) {
 		super(props);
 		this.state = {

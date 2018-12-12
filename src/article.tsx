@@ -79,8 +79,8 @@ type State = {
 
 function ArticleFactory(editable: boolean = false) {
 	return class Article extends PureComponent<Props, State> {
-		snippeteditor: RichEditor | null;
-		editor: RichEditor | null;
+		protected snippeteditor: RichEditor | null;
+		protected editor: RichEditor | null;
 		constructor(props: Props) {
 			super(props);
 			this.state = {
@@ -118,7 +118,7 @@ function ArticleFactory(editable: boolean = false) {
 				}
 			}, 200);
 		}
-		async edit() {
+		protected async edit() {
 			this.setState({
 				previewSnippet: (this.state.article as ArticleType).snippet || "",
 				previewContent: (this.state.article as ArticleType).content || "",
@@ -127,21 +127,21 @@ function ArticleFactory(editable: boolean = false) {
 			await waitFor(() => !!this.snippeteditor, 10000);
 			this.snippeteditor && this.snippeteditor.focus();
 		}
-		cancelEdit() {
+		protected cancelEdit() {
 			this.setState({
 				previewContent: null,
 				previewSnippet: null,
 				mode: "view",
 			});
 		}
-		preview() {
+		protected preview() {
 			this.setState({
 				previewSnippet: (this.snippeteditor as RichEditor).getContent(),
 				previewContent: (this.editor as RichEditor).getContent(),
 				mode: "preview",
 			});
 		}
-		async save() {
+		protected async save() {
 			let notification: Notification|null = null;
 			try {
 				const snippet = this.snippeteditor

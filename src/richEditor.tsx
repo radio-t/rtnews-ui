@@ -19,8 +19,8 @@ type State = {
 };
 
 export default class RichEditor extends PureComponent<Props, State> {
-	editor?: HTMLDivElement;
-	quill?: Quill;
+	protected editor?: HTMLDivElement;
+	protected quill?: Quill;
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -95,9 +95,10 @@ export default class RichEditor extends PureComponent<Props, State> {
 	}
 	getContent(): string {
 		if (!this.props.rich)
-			return this.quill!.root.innerHTML
-				.replace(/(<br\/?>|<\/p><p>)/gi, " ")
-				.replace(/(<([^>]+)>)/gi, "");
+			return this.quill!.root.innerHTML.replace(
+				/(<br\/?>|<\/p><p>)/gi,
+				" "
+			).replace(/(<([^>]+)>)/gi, "");
 		return this.quill!.root.innerHTML;
 	}
 	focus(): void {

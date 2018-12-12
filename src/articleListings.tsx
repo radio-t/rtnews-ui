@@ -100,11 +100,11 @@ function withAutoUpdate<P extends object, S extends object>(
 	if (updateInterval === null) return BaseClass;
 
 	return class extends BaseClass {
-		updateTimestamp: number;
+		protected updateTimestamp: number;
 		/**
 		 * setInterval id
 		 */
-		updateInterval: number | null;
+		protected updateInterval: number | null;
 		constructor(props: P) {
 			super(props);
 			this.updateTimestamp = 0;

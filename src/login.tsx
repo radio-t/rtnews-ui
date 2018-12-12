@@ -76,7 +76,7 @@ export default class LoginForm extends Component<Props, State> {
 			</form>
 		);
 	}
-	async onSubmit(e: FormEvent) {
+	protected async onSubmit(e: FormEvent) {
 		e.preventDefault();
 		const loginAttempt = await login(
 			this.state.user,

@@ -22,8 +22,8 @@ type State = {
 };
 
 export default class AddArticleForm extends Component<Props, State> {
-	autoref: HTMLInputElement | null;
-	manualref: HTMLInputElement | null;
+	private autoref: HTMLInputElement | null;
+	private manualref: HTMLInputElement | null;
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -256,19 +256,19 @@ export default class AddArticleForm extends Component<Props, State> {
 			</form>
 		);
 	}
-	onSwitch() {
+	protected onSwitch() {
 		this.setState({ manual: !this.state.manual });
 		waitFor(() => !!(this.autoref || this.manualref)).then(() => {
 			((this.autoref || this.manualref) as HTMLInputElement).focus();
 		});
 	}
-	onDragover(e: DragEvent) {
+	protected onDragover(e: DragEvent) {
 		if (e.dataTransfer && e.dataTransfer.types.indexOf("text/plain") !== -1) {
 			e.dataTransfer.dropEffect = "copy";
 			e.preventDefault();
 		}
 	}
-	async onDrop(e: DragEvent) {
+	protected async onDrop(e: DragEvent) {
 		if (e.dataTransfer && e.dataTransfer.types.indexOf("text/plain") === -1)
 			return;
 		const data = (e.dataTransfer as DataTransfer).getData("text/plain");
@@ -308,7 +308,7 @@ export default class AddArticleForm extends Component<Props, State> {
 		document.body.removeEventListener("dragover", this.onDragover, false);
 		document.body.removeEventListener("drop", this.onDrop, false);
 	}
-	async onSubmit() {
+	protected async onSubmit() {
 		this.setState({ posting: true });
 		const url = this.state.manualLink;
 		try {
