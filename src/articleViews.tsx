@@ -1,7 +1,13 @@
 import { Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils";
-import { postsPrefix, isSafari, activeArticleID } from "./settings";
+import {
+	postsPrefix,
+	isSafari,
+	activeArticleID,
+	prepTopicsReg,
+	remark,
+} from "./settings";
 import { getArticleBySlug } from "./api";
 
 import ArticleControls, { ControlID, ChangeID } from "./articleControls";
@@ -16,6 +22,7 @@ import CommentsIcon from "./static/svg/i-comment.svg";
 // @ts-ignore
 import GearIcon from "./static/svg/gear.svg";
 import { Article } from "./articleInterface";
+import Remark from "./remark";
 
 class ComponentWithVisibility<P, S> extends Component<P, S> {
 	visible: boolean;
@@ -603,10 +610,21 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 							</div>
 						) : (
 							<div className="post__full-content" key="fulltext">
-								<div
-									className="article-content post__full-content-content"
-									dangerouslySetInnerHTML={{ __html: this.state.articleText }}
-								/>
+								{prepTopicsReg.test(this.props.article.origlink) ? (
+									<div className="article-content post__full-content-content">
+										<Remark
+											baseurl={remark.baseurl}
+											site_id="radiot"
+											id="to-comments"
+											url={this.props.article.origlink}
+										/>
+									</div>
+								) : (
+									<div
+										className="article-content post__full-content-content"
+										dangerouslySetInnerHTML={{ __html: this.state.articleText }}
+									/>
+								)}
 								<div
 									className="post__full-content-hide"
 									onClick={() => {

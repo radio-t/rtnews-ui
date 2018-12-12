@@ -3,7 +3,7 @@ import { PureComponent } from "react";
 import { formatDate, scrollIntoView, waitFor } from "./utils";
 import { getArticleBySlug, updateArticle } from "./api";
 import articleCache from "./articleCache";
-import { remark } from "./settings";
+import { remark, prepTopicsReg } from "./settings";
 import { Article as ArticleType } from "./articleInterface";
 
 import Remark from "./remark";
@@ -12,17 +12,12 @@ import NotFound from "./notFound";
 import ErrorComponent from "./error";
 import RichEditor from "./richEditor";
 import { addNotification, removeNotification } from "./notifications";
-import { Notification} from "./notificationInterface";
+import { Notification } from "./notificationInterface";
 
 // @ts-ignore
 import SVGInline from "react-svg-inline";
 // @ts-ignore
 import GearIcon from "./static/svg/gear.svg";
-
-/**
- * Matches if article origlink matches to listeners proposed topics url
- */
-const prepTopicsReg = /^https?:\/\/radio-t.com\/p\/\d{4}\/\d{2}\/\d{2}\/prep-\d+\/?$/i;
 
 function ArticleHeader({ article }: { article: ArticleType }) {
 	return (
@@ -88,9 +83,6 @@ function ArticleFactory(editable: boolean = false) {
 				error: null,
 				previewSnippet: null,
 				previewContent: null,
-				/**
-				 * view|edit|preview
-				 */
 				mode: "view",
 			};
 			this.snippeteditor = null;
@@ -142,7 +134,7 @@ function ArticleFactory(editable: boolean = false) {
 			});
 		}
 		protected async save() {
-			let notification: Notification|null = null;
+			let notification: Notification | null = null;
 			try {
 				const snippet = this.snippeteditor
 					? this.snippeteditor.getContent()
@@ -177,7 +169,7 @@ function ArticleFactory(editable: boolean = false) {
 				});
 			} catch (e) {
 				console.error(e);
-				if(notification) removeNotification(notification);
+				if (notification) removeNotification(notification);
 				addNotification({
 					data: (
 						<span>
