@@ -41,14 +41,18 @@ export async function animate(
 	interval: number = 1000,
 	immediate: boolean = true
 ): Promise<void> {
-	if (immediate) fn();
+	let stopped = false;
+	const stop = () => {
+		stopped = true;
+	};
+	if (immediate) fn(stop);
 	let t = 0;
 	let runner = async (timestamp = 0) => {
 		if (timestamp - interval > t) {
-			await fn();
+			await fn(stop);
 			t = timestamp;
 		}
-		requestAnimationFrame(runner);
+		if (!stopped) requestAnimationFrame(runner);
 	};
 	requestAnimationFrame(runner);
 }
@@ -88,7 +92,8 @@ export async function retry<T>(
 export async function waitFor(
 	fn: () => boolean | Promise<boolean>,
 	max: number | null = null,
-	error: Error | null = null
+	error: Error | null = null,
+	interval: number = 100
 ) {
 	const timestamp = new Date().getTime();
 	while (true) {
@@ -97,7 +102,7 @@ export async function waitFor(
 			const delta = new Date().getTime();
 			if (delta - timestamp > max) throw error || new Error("Time passed");
 		}
-		await sleep(100);
+		await sleep(interval);
 	}
 }
 
@@ -156,9 +161,9 @@ export function debounce(
 	fn: Function,
 	wait: number = 100,
 	immediate: boolean = false
-): Function {
+): (this: any, ...args: any[]) => void {
 	let timeout: number | null;
-	return function(this: any, ...args: any): void {
+	return function(this: any, ...args: any[]): void {
 		const later = () => {
 			timeout = null;
 			if (!immediate) fn.apply(this, args);
