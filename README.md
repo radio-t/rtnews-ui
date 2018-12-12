@@ -46,6 +46,8 @@ npm install && ./node_modules/.bin/webpack --mode "development"
 
 * basic news ops
  * `POST /api/v1/news` - add article
+ * `POST /api/v1/news/manual` - add or upsert article with data in body
+ * `POST /api/v1/news/blocking` - add article synchronously (similar to `/api/v1/news`), with article data in response
  * `GET /api/v1/news` - get all news, except deleted. Strps "content" field
  * `GET /api/v1/news/id/:id` - get full article by id, including "content"
  * `GET /api/v1/news/last/:count` - get last articles
@@ -110,8 +112,7 @@ npm install && ./node_modules/.bin/webpack --mode "development"
     "snippet": "At GitHub we place an emphasis on stability, availability, and performance. A large component of ensuring we excel in these areas is deploying services on bare-metal hardware. This allows us to&hellip;",
     "title": "GitHub's Metal Cloud - GitHub Engineering",
     "ts": "2015-12-05T05:17:21Z",
-    "votes": 0,
-    "origlink": "http://githubengineering.com/githubs-metal-cloud/"
+    "votes": 0
 }
 ```
 

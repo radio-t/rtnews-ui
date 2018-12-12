@@ -1,41 +1,70 @@
-import { Component } from "react";
+import { Component, MouseEvent } from "react";
 
-import {
-	logout,
-	update,
-	startShow,
-	setAutoScroll,
-	setTheme as saveTheme,
-} from "./api.js";
-import {
-	store,
-	setState,
-	addNotification,
-	setTheme as commitTheme,
-} from "./store.jsx";
-import { postsPrefix } from "./settings.js";
+import { logout, startShow, setTheme as saveTheme } from "./api";
+import { setState, setTheme as commitTheme } from "./store";
+import { addNotification } from "./notifications";
+import { postsPrefix } from "./settings";
 
 import { Link, NavLink, Route } from "react-router-dom";
-import LinkToCurrent from "./linkToCurrent.jsx";
-import { sleep, scrollIntoView } from "./utils.js";
+import LinkToCurrent from "./linkToCurrent";
+import { sleep, scrollIntoView, waitFor } from "./utils";
+import { listingRef } from "./symbols";
 
+// @ts-ignore
 import SVGInline from "react-svg-inline";
+// @ts-ignore
 import MoonIcon from "./static/svg/moon.svg";
+// @ts-ignore
 import SunIcon from "./static/svg/sun.svg";
+import { ThemeType } from "./themeInterface";
 
-const setTheme = v => {
+const setTheme = (v: ThemeType) => {
 	commitTheme(v);
 	saveTheme(v);
 };
 
-export default class Head extends Component {
+function ThemeSwitchButton({ theme }: { theme: ThemeType }) {
+	return (
+		<button
+			onClick={() => setTheme(theme === "day" ? "night" : "day")}
+			title={
+				theme === "day" ? "Поставить ночную тему" : "Поставить дневную тему"
+			}
+			className="inline-button navigation__item navigation__theme-switcher"
+		>
+			<SVGInline
+				svg={theme === "day" ? MoonIcon : SunIcon}
+				className="icon navigation__theme-switcher-icon"
+			/>
+		</button>
+	);
+}
+
+interface History {
+	push: (location: string) => void;
+}
+
+type Props = {
+	issueNumber: {
+		link?: string;
+		number: number;
+	} | null;
+	isAdmin: boolean;
+	activeId: string | null;
+	theme: ThemeType;
+	history: History;
+};
+
+type State = {};
+
+export default class Head extends Component<Props, State> {
 	render() {
 		return (
 			<div className="header wrapper page__header">
 				<h1 className="title header__title">
-					Новости для <span class="no-break">Радио-Т</span>
+					Новости для <span className="no-break">Радио-Т</span>
 					{this.props.issueNumber && (
-						<span class="header__issue-number">
+						<span className="header__issue-number">
 							{this.props.issueNumber.link ? (
 								<a href={this.props.issueNumber.link} title="Темы слушателей">
 									{this.props.issueNumber.number}
@@ -56,7 +85,7 @@ export default class Head extends Component {
 							<span
 								role="button"
 								className="pseudo navigation__item-link"
-								onClick={e => this.logout()}
+								onClick={() => this.logout()}
 							>
 								Выйти
 							</span>
@@ -90,40 +119,27 @@ export default class Head extends Component {
 							Архив
 						</NavLink>
 					</li>
-					{this.props.isAdmin && (
+					{this.props.isAdmin && [
 						<li className="navigation__item navigation__item_admin">
 							<NavLink
 								to="/sort/"
 								exact={true}
 								className="link navigation__item-link"
+								title="Сортировать Темы"
 							>
-								Сортировать&nbsp;темы
+								Сортировать
 							</NavLink>
-						</li>
-					)}
-					{this.props.isAdmin && (
+						</li>,
 						<li className="navigation__item navigation__item_admin">
 							<NavLink
 								to="/feeds/"
 								exact={true}
 								className="link navigation__item-link"
+								title="Управление фидами"
 							>
-								Управление фидами
+								Фиды
 							</NavLink>
-						</li>
-					)}
-					{this.props.isAdmin && (
-						<li className="navigation__item navigation__item_admin">
-							<span
-								role="button"
-								className="pseudo link navigation__item-link"
-								onClick={() => this.update()}
-							>
-								Обновить базу
-							</span>
-						</li>
-					)}
-					{this.props.isAdmin && (
+						</li>,
 						<li className="navigation__item navigation__item_admin">
 							<span
 								role="button"
@@ -132,33 +148,20 @@ export default class Head extends Component {
 							>
 								Поехали!
 							</span>
-						</li>
-					)}
-					{this.props.isAdmin && this.props.theme === "day" && (
-						<span
-							onClick={() => setTheme("night")}
-							title="Поставить ночную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={MoonIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</span>
-					)}
-					{this.props.isAdmin && this.props.theme === "night" && (
-						<span
-							onClick={() => setTheme("day")}
-							title="Поставить дневную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={SunIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</span>
-					)}
-					{this.props.isAdmin && <div className="navigation__separator" />}
+						</li>,
+						<li className="navigation__item navigation__item_admin">
+							<span
+								role="button"
+								className="pseudo navigation__item-link"
+								onClick={() => this.startPrepTopics()}
+								title="Начать темы слушателей"
+							>
+								Темы слушателей
+							</span>
+						</li>,
+						<ThemeSwitchButton theme={this.props.theme} />,
+						<div className="navigation__separator" />,
+					]}
 					{this.props.activeId !== null && (
 						<li className="navigation__item navigation__item_to-current">
 							<span>
@@ -175,8 +178,8 @@ export default class Head extends Component {
 							<li className="navigation__item navigation__item_to-comments">
 								<Link
 									to="#to-comments"
-									onClick={e => {
-										e.preventDefault();
+									onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+										event.preventDefault();
 										const el = document.getElementById("to-comments");
 										if (!el) {
 											console.error("Comments node not found");
@@ -194,74 +197,55 @@ export default class Head extends Component {
 							</li>
 						)}
 					/>
-					{!this.props.isAdmin && this.props.theme === "day" && (
-						<button
-							onClick={() => setTheme("night")}
-							title="Поставить ночную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={MoonIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</button>
-					)}
-					{!this.props.isAdmin && this.props.theme === "night" && (
-						<button
-							onClick={() => setTheme("day")}
-							title="Поставить дневную тему"
-							className="inline-button navigation__item navigation__theme-switcher"
-						>
-							<SVGInline
-								svg={SunIcon}
-								className="icon navigation__theme-switcher-icon"
-							/>
-						</button>
+					{!this.props.isAdmin && (
+						<ThemeSwitchButton theme={this.props.theme} />
 					)}
 				</ul>
 				<hr />
 			</div>
 		);
 	}
-	logout() {
+	protected logout() {
 		logout();
 		setState({ isAdmin: false });
 	}
-	async update() {
-		update()
+	poehali() {
+		if (!confirm("Таки поехали?")) return;
+
+		addNotification({
+			data: "Стартую",
+		});
+		startShow()
 			.then(() => {
 				addNotification({
-					data: <b>База обновлена</b>,
+					data: <b>Шоу началось</b>,
 				});
 			})
 			.catch(e => {
 				console.error(e);
 				addNotification({
-					data: <b>Не могу обновить базу</b>,
+					data: <b>Ошибка при старте шоу</b>,
 					level: "error",
 				});
 			});
 	}
-	toggleAutoScroll() {
-		const val = !store.getState().autoScroll;
-		setState({ autoScroll: val });
-		setAutoScroll(val);
-	}
-	poehali() {
-		if (confirm("Таки поехали?")) {
-			startShow()
-				.then(() => {
-					addNotification({
-						data: <b>Шоу началось</b>,
-					});
-				})
-				.catch(e => {
-					console.error(e);
-					addNotification({
-						data: <b>Ошибка при старте шоу</b>,
-						level: "error",
-					});
-				});
+	async startPrepTopics() {
+		if (!confirm("Таки темы слушателей?")) return;
+
+		try {
+			if (!(window as any)[listingRef]) this.props.history.push("/");
+			await waitFor(
+				() => (window as any)[listingRef],
+				15000,
+				new Error(`Can't navigate to "/"`)
+			);
+			(window as any)[listingRef].startPrepTopics();
+		} catch (e) {
+			console.error(e);
+			addNotification({
+				data: "Произошла ошибка при активации тем слушателей",
+				level: "error",
+			});
 		}
 	}
 }

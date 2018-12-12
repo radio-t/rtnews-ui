@@ -3,13 +3,18 @@
  */
 
 import { Component } from "react";
-import { sleep, first, requestIdleCallback } from "./utils.js";
+import { sleep, first, requestIdleCallback, retry, waitFor } from "./utils";
 import {
 	postRecentness,
 	postLevels,
 	sortings,
 	newsAutoUpdateInterval,
-} from "./settings.js";
+	PostLevel,
+	PostRecentness,
+	Sorting,
+	PostLevelString,
+	activeArticleID,
+} from "./settings";
 import {
 	getRecentness,
 	setRecentness,
@@ -25,38 +30,54 @@ import {
 	removeArticle,
 	restoreArticle,
 	moveArticle,
-} from "./api.js";
-import { setState, addNotification, removeNotification } from "./store.jsx";
-import articleCache from "./articleCache.js";
-import Error from "./error.jsx";
+	getPrepTopicsURL,
+	addArticle,
+} from "./api";
+import { setState } from "./store";
+import { addNotification, removeNotification } from "./notifications";
+import articleCache from "./articleCache";
+import ErrorComponent from "./error";
+import { Notification } from "./notificationInterface";
+import { Article } from "./articleInterface";
+import { ControlID, ChangeID } from "./articleControls";
 
 import {
 	ArticleBrief,
 	DraggableArticleBrief,
 	ArticleSort,
-} from "./articleViews.jsx";
-import ListingActions from "./listingActions.jsx";
+} from "./articleViews";
+import ListingActions from "./listingActions";
 import { Redirect } from "react-router-dom";
-import AddArticle from "./add.jsx";
-import Loading from "./loading.jsx";
+import AddArticle from "./add";
+import Loading from "./loading";
 
 /**
  * Special symbol which denotes that
  * article should be deleted in
  * BaseListing.onArticleChange
  */
-export const REMOVE_CHANGE = Symbol();
+const REMOVE_CHANGE = Symbol();
+
+type RequestError = {
+	status?: number;
+	statusText?: string;
+	message: string;
+};
 
 /**
  * fuction which shows notification, fires function
  * and upon completition removes notification
  */
-async function en(message, fn, context = null) {
+async function en<T>(
+	message: string | Partial<Notification>,
+	fn: () => Promise<T>,
+	context: any | null = null
+): Promise<T> {
 	const notification = addNotification({
 		data: message,
 		time: 30000,
 		context,
-	});
+	} as Partial<Notification>);
 	try {
 		const o = await fn();
 		return o;
@@ -67,23 +88,43 @@ async function en(message, fn, context = null) {
 	}
 }
 
-function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
-	if (updateInterval === null) return Component;
+class Updatable<P, S> extends Component<P, S> {
+	// @ts-ignore
+	async update(force: boolean = false): Promise<void> {}
+}
 
-	return class extends Component {
+function withAutoUpdate<P extends object, S extends object>(
+	BaseClass: new (props: P) => Updatable<P, S>,
+	updateInterval: number | null = newsAutoUpdateInterval
+) {
+	if (updateInterval === null) return BaseClass;
+
+	return class extends BaseClass {
+		protected updateTimestamp: number;
+		/**
+		 * setInterval id
+		 */
+		protected updateInterval: number | null;
+		constructor(props: P) {
+			super(props);
+			this.updateTimestamp = 0;
+			this.updateInterval = null;
+		}
+
 		componentDidMount() {
 			super.componentDidMount && super.componentDidMount();
 
 			this.updateTimestamp = new Date().getTime();
 
-			this.updateInterval = setInterval(async () => {
+			this.updateInterval = (setInterval(async () => {
 				let stamp = new Date().getTime();
 				if (stamp - this.updateTimestamp > updateInterval * 60000) {
 					await new Promise(resolve => {
 						requestIdleCallback(
 							() => {
-								this.update()
-									.then(resolve)
+								super
+									.update()
+									.then(() => resolve())
 									.catch(e => {
 										console.error(e);
 										resolve();
@@ -95,42 +136,57 @@ function withAutoUpdate(Component, updateInterval = newsAutoUpdateInterval) {
 						);
 					});
 				}
-			}, 30000);
+			}, 30000) as unknown) as number;
 		}
+
 		componentWillUnmount() {
 			super.componentWillUnmount && super.componentWillUnmount();
-			clearInterval(this.updateInterval);
+			this.updateInterval && clearInterval(this.updateInterval);
 		}
-		async update(...args) {
-			const o = await super.update(...args);
+
+		async update(force: boolean) {
+			const o = super.update(force);
 			this.updateTimestamp = new Date().getTime();
 			return o;
 		}
 	};
 }
 
+type BaseListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type BaseListingState = {
+	loaded: boolean;
+	error: RequestError | null;
+	news: Article[];
+};
+
 /**
  * Base for listing components
  *
  * Provides onChange handlers such as
  * "make geek", "make first" etc...
- *
- * Provides news autoupdate
  */
-class BaseListing extends Component {
+class BaseListing<
+	P extends BaseListingProps,
+	S extends BaseListingState
+> extends Component<P, S> {
+	dataProvider?: (force: boolean) => Promise<Article[]>;
 	/**
 	 *
 	 * Provides articles autoupdate
 	 */
-	constructor(props) {
-		super(props);
+	constructor(props: BaseListingProps) {
+		super(props as any);
 
 		this.updateArticle = this.updateArticle.bind(this);
 		this.onArticleChange = this.onArticleChange.bind(this);
-		this.dataProvider = () => [];
 	}
 	async update(force = false) {
 		try {
+			if (!this.dataProvider) return;
 			const news = await this.dataProvider(force);
 			this.setState({ news, loaded: true });
 		} catch (e) {
@@ -144,9 +200,12 @@ class BaseListing extends Component {
 			}
 		}
 	}
-	updateArticle(article, change) {
+	updateArticle(
+		article: Article,
+		change: Partial<Article> | typeof REMOVE_CHANGE
+	): Article | null {
 		const articleIndex = this.state.news.indexOf(article);
-		if (articleIndex === -1) return;
+		if (articleIndex === -1) return null;
 		if (change === REMOVE_CHANGE) {
 			this.setState({
 				news: [
@@ -154,7 +213,7 @@ class BaseListing extends Component {
 					...this.state.news.slice(articleIndex + 1),
 				],
 			});
-			return;
+			return null;
 		}
 		const storeArticle = this.state.news[articleIndex];
 		const updatedArticle = { ...storeArticle, ...change };
@@ -167,11 +226,14 @@ class BaseListing extends Component {
 		});
 		return updatedArticle;
 	}
-	async onArticleChange(article, change, data = null) {
+	async onArticleChange(article: Article, change: ChangeID, data: any = null) {
 		switch (change) {
 			case "make-first":
 				{
-					const max = Math.max(...this.state.news.map(x => x.position));
+					const max = this.state.news.reduce(
+						(c, x) => Math.max(c, x.position),
+						0
+					);
 					this.updateArticle(article, { position: max + 1 });
 					const updated = await en(
 						"делаю тему первой",
@@ -191,7 +253,7 @@ class BaseListing extends Component {
 				await en(
 					"активирую",
 					async () => await activateArticle(article.id),
-					"active-article"
+					activeArticleID
 				);
 				this.update && (await this.update(true));
 				articleCache.invalidate("common");
@@ -240,6 +302,7 @@ class BaseListing extends Component {
 				break;
 			case "move":
 				const target = first(this.state.news, a => a.id === data.id);
+				if (!target) return;
 				const append = data.from < data.to ? 0.2 : -0.2;
 				this.updateArticle(target, { position: data.to + append });
 				const updated = await moveArticle(data.id, data.to - data.from);
@@ -258,14 +321,29 @@ class BaseListing extends Component {
 	}
 }
 
-const BaseListingWithAutoUpdate = withAutoUpdate(BaseListing);
+type ListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type ListingState = {
+	loaded: boolean;
+	error: RequestError | null;
+	news: Article[];
+
+	postRecentness: PostRecentness;
+	postLevel: PostLevel;
+	sort: Sorting;
+	addFormExpanded: boolean;
+};
 
 /**
  * Listing for main "/" route
  */
-export class Listing extends BaseListingWithAutoUpdate {
-	constructor(props) {
+export class Listing extends BaseListing<ListingProps, ListingState> {
+	constructor(props: ListingProps) {
 		super(props);
+
 		this.state = {
 			postRecentness: getRecentness(),
 			postLevel: getPostLevel(),
@@ -285,10 +363,72 @@ export class Listing extends BaseListingWithAutoUpdate {
 		super.componentWillMount && super.componentWillMount();
 		this.update();
 	}
+	async startPrepTopics() {
+		try {
+			addNotification({
+				data: "Начинаю темы слушателей",
+			});
+			await waitFor(() => this.state.loaded, 20000);
+			const url = await getPrepTopicsURL();
+			if (!url) {
+				addNotification({
+					data: "Не могу найти темы слушателей",
+					level: "error",
+				});
+				return;
+			}
+			const number = url.substr(url.length - 4, 3);
+
+			const maxPosition = this.state.news.reduce(
+				(n, a) => Math.max(n, a.position),
+				0
+			);
+
+			await addArticle(
+				url,
+				`Темы слушателей ${number}`,
+				"",
+				`<a href="${url}">Темы слушателей</a>`,
+				maxPosition + 1
+			);
+
+			const article =
+				first(this.state.news, a => a.origlink === url) ||
+				(await retry(
+					async () => {
+						await this.update(true);
+						const article = first(
+							this.state.news,
+							article => article.origlink === url
+						);
+						if (!article) throw new Error("Can't find prep article");
+						return article;
+					},
+					10,
+					1000
+				));
+			this.onArticleChange(article, "make-current");
+		} catch (e) {
+			console.error(e);
+			switch (e.message) {
+				case "Can't find prep article":
+					addNotification({
+						data: "Не могу найти тему слушателей в списке",
+						level: "error",
+					});
+					break;
+				default:
+					addNotification({
+						data: "Произошла ошибка при активации тем слушателей",
+						level: "error",
+					});
+			}
+		}
+	}
 	render() {
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -312,18 +452,18 @@ export class Listing extends BaseListingWithAutoUpdate {
 					className={this.props.isAdmin ? "listing-actions-all" : ""}
 					//
 					postRecentness={this.state.postRecentness}
-					onRecentnessChange={postRecentness => {
+					onRecentnessChange={(postRecentness: PostRecentness) => {
 						this.setState({ postRecentness });
 						setRecentness(postRecentness);
 					}}
 					//
 					postLevel={this.state.postLevel}
-					onPostLevelChange={postLevel => {
+					onPostLevelChange={(postLevel: PostLevelString) => {
 						const level = first(postLevels, x => x.title === postLevel);
 						this.setState({
-							postLevel: level,
+							postLevel: level!,
 						});
-						setPostLevel(level);
+						setPostLevel(level!);
 					}}
 					//
 					sort={this.state.sort}
@@ -345,7 +485,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 								onClick={() => {
 									this.setState({ addFormExpanded: true });
 									setTimeout(() => {
-										const el =
+										const el: HTMLInputElement | null =
 											document.querySelector(".add-form__article-url") ||
 											document.querySelector(".add-form__article-manual-link");
 										if (el) el.focus();
@@ -365,11 +505,20 @@ export class Listing extends BaseListingWithAutoUpdate {
 						)}
 						<AddArticle
 							{...this.props}
-							style={{ display: this.state.addFormExpanded ? null : "none" }}
-							onAdd={() => {
-								sleep(1000).then(() => {
-									this.update(true);
-								});
+							style={{
+								display: this.state.addFormExpanded ? "" : "none",
+							}}
+							onAdd={async url => {
+								retry(async () => {
+									await sleep(2000);
+									await this.update(true);
+									const article = first(
+										this.state.news,
+										a => a.origlink === url
+									);
+									if (article === null)
+										throw new Error("Added article is not found");
+								}, 5);
 							}}
 						/>
 					</div>
@@ -390,7 +539,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 						.sort((a, b) => this.state.sort.fn(a, b))
 						.map((x, i) => {
 							const isCurrent = x.id === this.props.activeId;
-							const getControls = () => {
+							const getControls = (): ControlID[] => {
 								const isNotFirst = sortIsDefault && i !== 0;
 								return [
 									!isCurrent ? "make-current" : null,
@@ -398,7 +547,7 @@ export class Listing extends BaseListingWithAutoUpdate {
 									x.geek ? "make-ungeek" : "make-geek",
 									"archive",
 									"remove",
-								].filter(x => x !== null);
+								].filter(x => x !== null) as ControlID[];
 							};
 							return this.props.isAdmin ? (
 								<DraggableArticleBrief
@@ -408,7 +557,9 @@ export class Listing extends BaseListingWithAutoUpdate {
 									controls={this.props.isAdmin ? getControls() : null}
 									active={isCurrent}
 									draggable={sortIsDefault}
-									onChange={(id, data) => this.onArticleChange(x, id, data)}
+									onChange={(change: ChangeID, data: any) =>
+										this.onArticleChange(x, change, data)
+									}
 								/>
 							) : (
 								<ArticleBrief
@@ -417,7 +568,9 @@ export class Listing extends BaseListingWithAutoUpdate {
 									archive={false}
 									controls={this.props.isAdmin ? getControls() : null}
 									active={isCurrent}
-									onChange={(id, data) => this.onArticleChange(x, id, data)}
+									onChange={(change: ChangeID, data: any) =>
+										this.onArticleChange(x, change, data)
+									}
 								/>
 							);
 						})}
@@ -427,11 +580,27 @@ export class Listing extends BaseListingWithAutoUpdate {
 	}
 }
 
+export const ListingWithAutoUpdate = withAutoUpdate(Listing);
+
+type ArchiveListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type ArchiveListingState = {
+	news: Article[];
+	loaded: boolean;
+	error: RequestError | null;
+};
+
 /**
  * Listing for archive "/arhive/"
  */
-export class ArchiveListing extends BaseListingWithAutoUpdate {
-	constructor(props) {
+export class ArchiveListing extends BaseListing<
+	ArchiveListingProps,
+	ArchiveListingState
+> {
+	constructor(props: ArchiveListingProps) {
 		super(props);
 		this.state = {
 			news: [],
@@ -451,7 +620,7 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 	render() {
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -469,7 +638,9 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 						article={x}
 						archive={true}
 						controls={this.props.isAdmin ? ["remove"] : null}
-						onChange={(id, data) => this.onArticleChange(x, id, data)}
+						onChange={(id: ChangeID, data: any) =>
+							this.onArticleChange(x, id, data)
+						}
 					/>
 				))}
 			</div>
@@ -477,11 +648,27 @@ export class ArchiveListing extends BaseListingWithAutoUpdate {
 	}
 }
 
+export const ArchiveListingWithAutoUpdate = withAutoUpdate(ArchiveListing);
+
+type DeletedListingProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type DeletedListingState = {
+	news: Article[];
+	loaded: boolean;
+	error: RequestError | null;
+};
+
 /**
  * Listing for deleted articles "/deleted/"
  */
-export class DeletedListing extends BaseListingWithAutoUpdate {
-	constructor(props) {
+export class DeletedListing extends BaseListing<
+	DeletedListingProps,
+	DeletedListingState
+> {
+	constructor(props: DeletedListingProps) {
 		super(props);
 		this.state = {
 			news: [],
@@ -506,7 +693,7 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -523,7 +710,9 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 						key={x.id}
 						article={x}
 						controls={this.props.isAdmin ? ["restore"] : []}
-						onChange={(id, data) => this.onArticleChange(x, id, data)}
+						onChange={(id: ChangeID, data: any) =>
+							this.onArticleChange(x, id, data)
+						}
 					/>
 				))}
 			</div>
@@ -531,11 +720,24 @@ export class DeletedListing extends BaseListingWithAutoUpdate {
 	}
 }
 
+export const DeletedListingWithAutoUpdate = withAutoUpdate(DeletedListing);
+
+type SorterProps = {
+	activeId: string | null;
+	isAdmin?: boolean;
+};
+
+type SorterState = {
+	news: Article[];
+	loaded: boolean;
+	error: RequestError | null;
+};
+
 /**
  * Listing for sorting view "/sort/"
  */
-export class Sorter extends BaseListingWithAutoUpdate {
-	constructor(props) {
+export class Sorter extends BaseListing<SorterProps, SorterState> {
+	constructor(props: SorterProps) {
 		super(props);
 		this.state = {
 			news: [],
@@ -556,7 +758,7 @@ export class Sorter extends BaseListingWithAutoUpdate {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -579,7 +781,9 @@ export class Sorter extends BaseListingWithAutoUpdate {
 							article={article}
 							key={article.id}
 							active={this.props.activeId === article.id}
-							onChange={(id, data) => this.onArticleChange(article, id, data)}
+							onChange={(id: ChangeID, data: any) =>
+								this.onArticleChange(article, id, data)
+							}
 							draggable={true}
 						/>
 					))}
@@ -587,3 +791,5 @@ export class Sorter extends BaseListingWithAutoUpdate {
 		);
 	}
 }
+
+export const SorterWithAutoUpdate = withAutoUpdate(Sorter);

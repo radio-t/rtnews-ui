@@ -43,6 +43,28 @@ module.exports = (a, args) => {
 					},
 				},
 				{
+					test: /\.ts$/,
+					exclude: /node_modules/,
+					use: [
+						{
+							loader: "babel-loader",
+							options: {
+								plugins: ["@babel/plugin-syntax-dynamic-import"],
+								presets: [
+									[
+										"@babel/preset-env",
+										{
+											useBuiltIns: "usage",
+											modules: false,
+										},
+									],
+								],
+							},
+						},
+						"ts-loader",
+					],
+				},
+				{
 					test: /\.jsx$/,
 					exclude: /node_modules/,
 					use: {
@@ -70,6 +92,38 @@ module.exports = (a, args) => {
 							],
 						},
 					},
+				},
+				{
+					test: /\.tsx$/,
+					exclude: /node_modules/,
+					use: [
+						{
+							loader: "babel-loader",
+							options: {
+								plugins: ["@babel/plugin-syntax-dynamic-import"],
+								presets: [
+									[
+										"@babel/preset-env",
+										{
+											useBuiltIns: "usage",
+											modules: false,
+											targets: {
+												ie: "11",
+											},
+										},
+									],
+									[
+										"@babel/preset-react",
+										{
+											pragma: "createElement",
+											pragmaFrag: '"div"',
+										},
+									],
+								],
+							},
+						},
+						"ts-loader",
+					],
 				},
 				{
 					test: /\.css$/,
@@ -142,6 +196,7 @@ module.exports = (a, args) => {
 				react: "preact-compat",
 				"react-dom": "preact-compat",
 			},
+			extensions: [".tsx", ".ts", ".jsx", ".js"],
 		},
 		optimization: {
 			minimize: !(args.hasOwnProperty("mode") && args.mode === "development"),

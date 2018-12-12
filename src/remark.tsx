@@ -1,19 +1,41 @@
 import { Component } from "react";
 
-export default class Remark extends Component {
-	constructor(props) {
+type Props = {
+	baseurl?: string;
+	site_id: string;
+	url?: string;
+	id?: string;
+	className?: string;
+};
+
+export default class Remark extends Component<Props> {
+	protected ref?: HTMLDivElement;
+	protected receiveMessages?: (
+		event: Event & {
+			data?: any;
+		}
+	) => void;
+	protected postHashToIframe?: (
+		event: Event & {
+			newURL: string;
+		}
+	) => void;
+	protected postClickOutsideToIframe?: (event: MouseEvent) => void;
+	constructor(props: Props) {
 		super(props);
 	}
 	render() {
-		return <div ref={ref => (this.ref = ref)} id="remark42" {...this.props} />;
+		return <div ref={ref => (this.ref = ref!)} id="remark42" {...this.props} />;
 	}
 	componentDidMount() {
 		const COMMENT_NODE_CLASSNAME_PREFIX = "remark42__comment-";
 
-		const BASE_URL = this.props.baseurl || "https://remark42.radio-t.com";
-
-		const remark_config = {
-			baseurl: this.props.baseurl,
+		const remark_config: {
+			baseurl: string;
+			site_id: string;
+			url?: string;
+		} = {
+			baseurl: this.props.baseurl || "https://remark42.radio-t.com",
 			site_id: this.props.site_id,
 		};
 
@@ -29,13 +51,15 @@ export default class Remark extends Component {
 		const query = Object.keys(remark_config)
 			.map(
 				key =>
-					`${encodeURIComponent(key)}=${encodeURIComponent(remark_config[key])}`
+					`${encodeURIComponent(key)}=${encodeURIComponent(
+						(remark_config as any)[key]
+					)}`
 			)
 			.join("&");
 
-		node.innerHTML = `
+		node!.innerHTML = `
     <iframe
-      src="${BASE_URL}/web/iframe.html?${query}"
+      src="${remark_config.baseurl}/web/iframe.html?${query}"
       width="100%"
       frameborder="0"
       allowtransparency="true"
@@ -48,7 +72,7 @@ export default class Remark extends Component {
     ></iframe>
   `;
 
-		const iframe = node.getElementsByTagName("iframe")[0];
+		const iframe = node!.getElementsByTagName("iframe")[0];
 
 		this.receiveMessages = function(event) {
 			try {
@@ -89,7 +113,7 @@ export default class Remark extends Component {
 		};
 
 		this.postClickOutsideToIframe = function(e) {
-			if (!iframe.contains(e.target)) {
+			if (!iframe.contains(e.target as HTMLElement)) {
 				iframe.contentWindow &&
 					iframe.contentWindow.postMessage(
 						JSON.stringify({ clickOutside: true }),
@@ -104,13 +128,27 @@ export default class Remark extends Component {
 		setTimeout(this.postHashToIframe, 1000);
 
 		const remarkRootId = "remark-km423lmfdslkm34";
-		const userInfo = {
+		const userInfo: {
+			node: HTMLElement | null;
+			back: HTMLElement | null;
+			closeEl: HTMLElement | null;
+			iframe: HTMLElement | null;
+			style: HTMLElement | null;
+			init: (user: any) => void;
+			close: () => void;
+			delay: number | null;
+			events: string[];
+			animationStop: any;
+			onAnimationClose: () => void;
+			remove: () => void;
+			onKeyDown: (e: KeyboardEvent) => void;
+		} = {
 			node: null,
 			back: null,
 			closeEl: null,
 			iframe: null,
 			style: null,
-			init(user) {
+			init(user: any) {
 				this.animationStop();
 				if (!this.style) {
 					this.style = document.createElement("style");
@@ -188,7 +226,7 @@ export default class Remark extends Component {
 						""}&isDefaultPicture=${user.isDefaultPicture || 0}`;
 				this.node.innerHTML = `
       <iframe
-        src="${BASE_URL}/web/iframe.html?${queryUserInfo}"
+        src="${remark_config.baseurl}/web/iframe.html?${queryUserInfo}"
         width="100%"
         height="100%"
         frameborder="0"
@@ -206,9 +244,9 @@ export default class Remark extends Component {
 				document.body.appendChild(this.node);
 				document.addEventListener("keydown", this.onKeyDown);
 				setTimeout(() => {
-					this.back.setAttribute("data-animation", "");
-					this.node.setAttribute("data-animation", "");
-					this.iframe.focus();
+					this.back!.setAttribute("data-animation", "");
+					this.node!.setAttribute("data-animation", "");
+					this.iframe!.focus();
 				}, 400);
 			},
 			close() {
@@ -230,9 +268,12 @@ export default class Remark extends Component {
 				if (!this.node) {
 					return;
 				}
-				this.delay = setTimeout(this.animationStop, 1000);
-				this.events.forEach(event =>
-					el.addEventListener(event, this.animationStop, false)
+				this.delay = (setTimeout(
+					this.animationStop,
+					1000
+				) as unknown) as number;
+				this.events.forEach((event: string) =>
+					el!.addEventListener(event, this.animationStop, false)
 				);
 			},
 			onKeyDown(e) {
@@ -251,7 +292,7 @@ export default class Remark extends Component {
 					t.delay = null;
 				}
 				t.events.forEach(event =>
-					t.node.removeEventListener(event, t.animationStop, false)
+					t.node!.removeEventListener(event, t.animationStop, false)
 				);
 				return t.remove();
 			},
@@ -264,8 +305,8 @@ export default class Remark extends Component {
 		};
 	}
 	componentWillUnmount() {
-		window.removeEventListener("message", this.receiveMessages);
-		window.removeEventListener("hashchange", this.postHashToIframe);
-		document.removeEventListener("click", this.postClickOutsideToIframe);
+		window.removeEventListener("message", this.receiveMessages!);
+		window.removeEventListener("hashchange", this.postHashToIframe!);
+		document.removeEventListener("click", this.postClickOutsideToIframe!);
 	}
 }

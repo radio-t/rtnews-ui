@@ -1,4 +1,7 @@
+import { Article } from "./articleInterface";
+
 // via webpack define plugin
+declare var APIROOT: string;
 export const apiRoot = APIROOT;
 
 export const postsPrefix = "/post";
@@ -13,7 +16,7 @@ export const remark = {
  *
  * null if off
  */
-export const newsAutoUpdateInterval = 10;
+export const newsAutoUpdateInterval: number | null = 10;
 
 /**
  * news cache interval in minutes. Used between
@@ -21,7 +24,14 @@ export const newsAutoUpdateInterval = 10;
  *
  * null if off
  */
-export const newsCacheValidInterval = 5;
+export const newsCacheValidInterval: number | null = 5;
+
+export const activeArticleID = "active-article";
+
+/**
+ * Matches if article origlink matches to listeners proposed topics url
+ */
+export const prepTopicsReg = /^https?:\/\/radio-t.com\/p\/\d{4}\/\d{2}\/\d{2}\/prep-\d+\/?$/i;
 
 /**
  * needs for situation when dragging something
@@ -29,7 +39,12 @@ export const newsCacheValidInterval = 5;
  */
 export const isSafari = window.navigator.userAgent.indexOf("Safari") !== -1;
 
-export const sortings = [
+export interface Sorting {
+	title: string;
+	fn(a: Article, b: Article): number;
+}
+
+export const sortings: Sorting[] = [
 	{
 		title: "По приоритету",
 		fn(a, b) {
@@ -53,20 +68,27 @@ export const sortings = [
 	},
 ];
 
-const now = new Date();
+const now = new Date().getTime();
 const day = 1000 * 60 * 60 * 24;
 const month = day * 30;
 
-export const postRecentness = [
+export type PostRecentnessString = "Все" | "Свежие";
+
+export interface PostRecentness {
+	title: PostRecentnessString;
+	fn(x: Article, i: number, isgeek?: boolean): boolean;
+}
+
+export const postRecentness: PostRecentness[] = [
 	{
 		title: "Все",
-		fn(x, i) {
+		fn() {
 			return true;
 		},
 	},
 	{
 		title: "Свежие",
-		fn(x, i, isgeek = true) {
+		fn(x, _, isgeek = true) {
 			const interval = now - x.parsedats;
 			if (isgeek && x.geek && interval < 3 * month) {
 				return true;
@@ -78,22 +100,30 @@ export const postRecentness = [
 	},
 ];
 
-export const postLevels = [
+export type PostLevelString = "Все" | "Обычные" | "Гиковские";
+
+export interface PostLevel {
+	title: PostLevelString;
+	fn(x: any, i: number): boolean;
+	isgeek?: boolean;
+}
+
+export const postLevels: PostLevel[] = [
 	{
 		title: "Все",
-		fn(x, i) {
+		fn() {
 			return true;
 		},
 	},
 	{
 		title: "Обычные",
-		fn(x, i) {
+		fn(x, _) {
 			return !x.geek;
 		},
 	},
 	{
 		title: "Гиковские",
-		fn(x, i) {
+		fn(x, _) {
 			return x.geek;
 		},
 		isgeek: true,

@@ -1,4 +1,20 @@
-const controls = {
+export type ControlID =
+	| "make-current"
+	| "make-geek"
+	| "make-ungeek"
+	| "make-first"
+	| "archive"
+	| "remove"
+	| "restore";
+
+type ControlData = {
+	title: string;
+	id: string;
+};
+
+export type ChangeID = ControlID | "move";
+
+export const controls: { [P in ControlID]: ControlData } = {
 	"make-current": {
 		title: "Сделать текущей",
 		id: "make-current",
@@ -25,10 +41,17 @@ const controls = {
 	},
 	restore: {
 		title: "Восстановить",
+		id: "restore",
 	},
 };
 
-export default function ArticleControls(props) {
+type Props = {
+	controls: ControlID[];
+	onChange?: (id: ControlID) => void;
+	className?: string;
+};
+
+export default function ArticleControls(props: Props) {
 	return (
 		<div className={"post-controls " + props.className ? props.className : ""}>
 			{props.controls.map(c => (

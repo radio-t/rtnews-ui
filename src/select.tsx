@@ -1,12 +1,27 @@
 import { PureComponent } from "react";
 
-export default class Select extends PureComponent {
-	constructor(props) {
+type Props = {
+	className?: string;
+	items: string[];
+	value: string;
+	onChange: (change: string) => void;
+};
+
+type State = {
+	expanded: boolean;
+	selected: number;
+};
+
+export default class Select extends PureComponent<Props, State> {
+	protected ref: HTMLDivElement | null;
+
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			expanded: false,
 			selected: props.items.indexOf(props.value),
 		};
+		this.ref = null;
 	}
 	render() {
 		return (
@@ -15,14 +30,14 @@ export default class Select extends PureComponent {
 				className={
 					"select " + (this.props.className ? this.props.className : "")
 				}
-				tabIndex="0"
-				onFocus={e =>
+				tabIndex={0}
+				onFocus={() =>
 					this.setState({
 						expanded: true,
 						selected: this.props.items.indexOf(this.props.value),
 					})
 				}
-				onBlur={e =>
+				onBlur={() =>
 					this.setState({
 						expanded: false,
 					})
@@ -52,21 +67,21 @@ export default class Select extends PureComponent {
 							e.preventDefault();
 							this.props.onChange &&
 								this.props.onChange(this.props.items[this.state.selected]);
-							this.ref.blur();
+							this.ref!.blur();
 							break;
 						// esc
 						case 27:
 							e.preventDefault();
-							this.ref.blur();
+							this.ref!.blur();
 					}
 				}}
 			>
-				<div class="select__current">
+				<div className="select__current">
 					<span className="select__current-value">{this.props.value}</span>
 				</div>
 				{this.state.expanded && (
-					<ul class="select__items" role="listbox">
-						{this.props.items.map((x, i) => (
+					<ul className="select__items" role="listbox">
+						{this.props.items.map((x: string, i: number) => (
 							<li
 								role="option"
 								className={
@@ -74,9 +89,9 @@ export default class Select extends PureComponent {
 									(x === this.props.value ? "select__item--current " : "") +
 									(i === this.state.selected ? "select__item--selected " : "")
 								}
-								aria-selected={x === this.props.value ? true : null}
-								onClick={e => {
-									this.ref.blur();
+								aria-selected={x === this.props.value ? true : false}
+								onClick={() => {
+									this.ref!.blur();
 									if (x !== this.props.value) {
 										this.props.onChange(x);
 									}

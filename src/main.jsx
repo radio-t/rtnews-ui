@@ -1,164 +1,87 @@
+import "./declarations";
 import "./style.scss";
 import "intersection-observer";
 import "whatwg-fetch";
-import "./ganalitics.js";
+import "./ganalitics";
 
-import { Component } from "react";
-
-import { postsPrefix } from "./settings.js";
 import { render } from "react-dom";
+import { store, setState, setTheme } from "./store";
 import {
-	store,
-	setState,
-	setTheme,
 	addNotification,
 	removeNotificationsWithContext,
-} from "./store.jsx";
+} from "./notifications";
 import {
 	getActiveArticle,
-	pollActiveArticle,
-	getAutoScroll,
+	pollActiveArticle as apiPollActiveArticle,
 	loginViaStorage,
 	getTheme,
-	getArticleById,
+	getArticle,
 	getIssueNumber,
-} from "./api.js";
-import { waitDOMReady, sleep, scrollIntoView } from "./utils.js";
-
-import Head from "./head.jsx";
-import {
-	BrowserRouter as Router,
-	Route,
-	Switch,
-	Redirect,
-} from "react-router-dom";
-import { ScrollContext } from "react-router-scroll-4";
+} from "./api";
+import { waitDOMReady, sleep } from "./utils";
 import { Provider, connect } from "react-redux";
-import AddArticle from "./add.jsx";
-import {
-	Listing,
-	ArchiveListing,
-	DeletedListing,
-	Sorter,
-} from "./articleListings.jsx";
-import { Article, EditableArticle } from "./article.jsx";
-import Feeds from "./feeds.jsx";
-import LoginForm from "./login.jsx";
-import NotFound from "./notFound.jsx";
-import Notifications from "./notifications.jsx";
-import LinkToCurrent from "./linkToCurrent.jsx";
 
-import { listingRef } from "./symbols.js";
+import App from "./app";
+import LinkToCurrent from "./linkToCurrent";
+import { activeArticleID } from "./settings";
 
-class App extends Component {
-	render() {
-		return (
-			<Router>
-				<div className="page">
-					<Head {...this.props} />
-					<div class="content page__content">
-						<Switch>
-							<Route
-								path="/"
-								exact={true}
-								render={() => (
-									<ScrollContext scrollKey="main">
-										<Listing
-											{...this.props}
-											ref={ref => (window[listingRef] = ref)}
+function pollActiveArticle() {
+	getActiveArticle()
+		.catch(() => null)
+		.then(async activeId => {
+			setState({ activeId });
+			await waitDOMReady();
+			while (true) {
+				try {
+					const activeId = await apiPollActiveArticle();
+					if (activeId === store.getState().activeId) {
+						removeNotificationsWithContext(activeArticleID);
+						addNotification({
+							data: <b>Тема активирована</b>,
+							time: 3000,
+						});
+						continue;
+					}
+					setState({ activeId });
+					setTimeout(async () => {
+						sleep(700).then(() => {
+							document.title = "* Тема обновлена | Новости Радио-Т";
+						});
+						const article = await getArticle(activeId);
+
+						if (article && article.hasOwnProperty("title")) {
+							removeNotificationsWithContext(activeArticleID);
+							addNotification(remove => ({
+								data: (
+									<span>
+										Тема обновлена:
+										<br />
+										<LinkToCurrent
+											title={`“${article.title}”`}
+											onClick={() => remove()}
 										/>
-									</ScrollContext>
-								)}
-							/>
-							<Route
-								path="/admin/"
-								exact={true}
-								render={() => <Redirect to="/login/" />}
-							/>
-							<Route
-								path="/deleted/"
-								exact={true}
-								render={() => (
-									<ScrollContext>
-										<DeletedListing {...this.props} />
-									</ScrollContext>
-								)}
-							/>
-							<Route
-								path="/archive/"
-								exact={true}
-								render={() => (
-									<ScrollContext>
-										<ArchiveListing {...this.props} />
-									</ScrollContext>
-								)}
-							/>
-							<Route
-								path="/add/"
-								exact={true}
-								render={() => {
-									document.title = "Добавить новость | Новости Радио-Т";
-									return <AddArticle {...this.props} />;
-								}}
-							/>
-							<Route
-								path="/feeds/"
-								exact={true}
-								render={() => <Feeds {...this.props} />}
-							/>
-							<Route
-								path="/sort/"
-								render={() => (
-									<ScrollContext>
-										<Sorter {...this.props} />
-									</ScrollContext>
-								)}
-							/>
-							<Route
-								path={`${postsPrefix}/:slug`}
-								render={props =>
-									this.props.isAdmin ? (
-										<ScrollContext
-											scrollKey="post"
-											shouldUpdateScroll={(_, cur) => !!cur.location.key}
-										>
-											<EditableArticle slug={props.match.params.slug} />
-										</ScrollContext>
-									) : (
-										<ScrollContext
-											scrollKey="post"
-											shouldUpdateScroll={(_, cur) => !!cur.location.key}
-										>
-											<Article slug={props.match.params.slug} />
-										</ScrollContext>
-									)
-								}
-							/>
-							<Route path="/login/" exact={true} render={() => <LoginForm />} />
-							<Route component={NotFound} />
-						</Switch>
-					</div>
-					<div className="footer page__footer">
-						<hr />
-						<a href="http://radio-t.com/">Radio-T</a>,{" "}
-						{new Date().getFullYear()}
-						<br />
-						<span class="footer__buildtime">built on {BUILDTIME}</span>
-					</div>
-					<Notifications
-						className="page__notifications"
-						notifications={this.props.notifications}
-					/>
-				</div>
-			</Router>
-		);
-	}
+									</span>
+								),
+								time: null,
+								context: activeArticleID,
+							}));
+						}
+					}, 0);
+				} catch {
+					console.error("Error while setting active article");
+				}
+			}
+		});
 }
 
 async function main() {
-	const theme = getTheme();
-	document.documentElement.dataset.theme = theme;
-	setTheme(theme, true);
+	try {
+		const theme = getTheme();
+		document.documentElement.dataset.theme = theme;
+		setTheme(theme, true);
+	} catch (e) {
+		console.error(e);
+	}
 
 	const CApp = connect(state => {
 		return state;
@@ -167,8 +90,6 @@ async function main() {
 	await loginViaStorage().then(isAdmin => {
 		setState({ isAdmin });
 	});
-
-	setState({ autoScroll: getAutoScroll() });
 
 	getIssueNumber().then(issueNumber => {
 		if (issueNumber) {
@@ -183,56 +104,7 @@ async function main() {
 		document.querySelector(".app")
 	);
 
-	getActiveArticle().then(async activeId => {
-		setState({ activeId });
-		await waitDOMReady();
-		while (true) {
-			try {
-				const activeId = await pollActiveArticle();
-				if (activeId === store.getState().activeId) {
-					removeNotificationsWithContext("active-article");
-					addNotification({
-						data: <b>Тема активирована</b>,
-						time: 3000,
-					});
-					continue;
-				}
-				setState({ activeId });
-				setImmediate(async () => {
-					if (store.getState().autoScroll) {
-						setTimeout(() => {
-							const el = document.querySelector(".post-active");
-							if (el) scrollIntoView(el);
-						}, 500);
-					}
-					sleep(700).then(() => {
-						document.title = "* Тема обновлена | Новости Радио-Т";
-					});
-					const article = await getArticleById(activeId);
-
-					if (article && article.hasOwnProperty("title")) {
-						removeNotificationsWithContext("active-article");
-						addNotification(remove => ({
-							data: (
-								<span>
-									Тема обновлена:
-									<br />
-									<LinkToCurrent
-										title={`“${article.title}”`}
-										onClick={() => remove()}
-									/>
-								</span>
-							),
-							time: null,
-							context: "active-article",
-						}));
-					}
-				});
-			} catch (e) {
-				await sleep(60000);
-			}
-		}
-	});
+	pollActiveArticle();
 }
 
 main().catch(e => console.error(e));

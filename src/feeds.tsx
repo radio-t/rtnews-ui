@@ -1,14 +1,33 @@
-import { PureComponent } from "react";
+import { PureComponent, FormEvent } from "react";
 
-import { getFeeds, addFeed, removeFeed } from "./api.js";
-import { formatDate, sleep, waitFor } from "./utils.js";
+import { getFeeds, addFeed, removeFeed } from "./api";
+import { formatDate, sleep, waitFor } from "./utils";
 import { Redirect } from "react-router-dom";
 
-import Loading from "./loading.jsx";
-import Error from "./error.jsx";
+import { Feed } from "./feedInterface";
 
-export default class FeedsForm extends PureComponent {
-	constructor(props) {
+import Loading from "./loading";
+import ErrorComponent from "./error";
+
+type Props = {
+	isAdmin: boolean;
+};
+
+type State = {
+	feeds: Feed[];
+	loaded: boolean;
+	posting: boolean;
+	feedurl: string;
+	error: {
+		status?: number;
+		statusText?: string;
+		message?: string;
+	} | null;
+};
+
+export default class FeedsForm extends PureComponent<Props, State> {
+	protected input?: HTMLInputElement;
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			feeds: [],
@@ -29,15 +48,15 @@ export default class FeedsForm extends PureComponent {
 		document.title = "Управление фидами | Новости Радио-Т";
 	}
 	componentDidMount() {
-		waitFor(() => this.input, 10000).then(() => {
-			this.input.focus();
+		waitFor(() => !!this.input, 10000).then(() => {
+			this.input!.focus();
 		});
 	}
 	render() {
 		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
-				<Error
+				<ErrorComponent
 					code={this.state.error.status || 500}
 					message={
 						this.state.error.statusText ||
@@ -81,7 +100,7 @@ export default class FeedsForm extends PureComponent {
 						placeholder="Добавить фид"
 						value={this.state.feedurl}
 						onChange={e => this.setState({ feedurl: e.target.value })}
-						ref={ref => (this.input = ref)}
+						ref={ref => (this.input = ref!)}
 					/>
 					<input
 						className="feeds__add-submit"
@@ -94,7 +113,7 @@ export default class FeedsForm extends PureComponent {
 			</div>
 		);
 	}
-	async removeFeed(feed) {
+	protected async removeFeed(feed: Feed): Promise<void> {
 		if (confirm(`Удалить ${feed.feedlink}?`)) {
 			this.setState({ posting: true });
 			try {
@@ -108,7 +127,7 @@ export default class FeedsForm extends PureComponent {
 			}
 		}
 	}
-	async onSubmit(e) {
+	protected async onSubmit(e: FormEvent): Promise<void> {
 		e.preventDefault();
 		this.setState({ posting: true });
 		try {

@@ -1,14 +1,21 @@
-import { newsCacheValidInterval } from "./settings.js";
-import { getNews, getArchiveNews, getDeletedNews } from "./api.js";
+import { newsCacheValidInterval } from "./settings";
+import { getNews, getArchiveNews, getDeletedNews } from "./api";
+import { Article } from "./articleInterface";
+
+type CacheLabel = "common" | "archive" | "deleted";
 
 /**
  * Article cache which stores articles
  * imlements smooth back/forward history navigation
  */
-export default (() => {
+
+const ArticleCache: {
+	get: (label?: CacheLabel, force?: boolean) => Promise<Article[]>;
+	invalidate: (label?: CacheLabel) => void;
+} = (() => {
 	if (newsCacheValidInterval === null) {
 		return {
-			async get(label) {
+			async get(label: CacheLabel = "common"): Promise<Article[]> {
 				let data;
 				switch (label) {
 					case "common":
@@ -29,22 +36,32 @@ export default (() => {
 		};
 	}
 
-	const cache = new Map();
+	const cache: Map<
+		CacheLabel,
+		{
+			data: Article[];
+			timestamp: number;
+		}
+	> = new Map();
+
 	/**
 	 * label options are: common, arrhive, deleted
 	 */
-	const get = async (label = "common", force = false) => {
+	const get = async (
+		label: CacheLabel = "common",
+		force: boolean = false
+	): Promise<Article[]> => {
 		const timestamp = new Date().getTime();
 		if (!force && cache.has(label)) {
-			const v = cache.get(label);
+			const v = cache.get(label)!;
 			if (
 				timestamp - v.timestamp <
-				Math.max(60000 * newsCacheValidInterval - 500, 0)
+				Math.max(60000 * newsCacheValidInterval! - 500, 0)
 			) {
 				return v.data;
 			}
 		}
-		let data;
+		let data: Article[];
 		switch (label) {
 			case "common":
 				data = await getNews();
@@ -65,7 +82,7 @@ export default (() => {
 		return data;
 	};
 
-	const invalidate = (label = null) => {
+	const invalidate = (label: CacheLabel | null = null) => {
 		if (label === null) {
 			cache.clear();
 			return;
@@ -74,3 +91,5 @@ export default (() => {
 	};
 	return { get, invalidate };
 })();
+
+export default ArticleCache;

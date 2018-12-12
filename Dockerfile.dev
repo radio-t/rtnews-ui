@@ -1,16 +1,16 @@
-FROM node:10-alpine AS rtnews_deps
+FROM node:10-alpine AS deps
 COPY ./package.json ./package-lock.json /app/
 RUN \
 	cd /app && \
 	npm ci --loglevel error
 
 
-FROM node:10-alpine as rtnews_base
+FROM node:10-alpine as base
 RUN apk add --update --no-cache make
 
 
-FROM rtnews_base
-COPY --from=rtnews_deps /app /app
+FROM base
+COPY --from=deps /app /app
 EXPOSE 9000
 WORKDIR /app
 ENTRYPOINT ["/bin/ash"]

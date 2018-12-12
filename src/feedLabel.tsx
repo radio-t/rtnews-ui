@@ -1,4 +1,9 @@
-export default function FeedLabel(props) {
+type Props = {
+	feed: string;
+	className?: string;
+};
+
+export default function FeedLabel(props: Props) {
 	if (props.feed.length === 0) return null;
 	if (props.feed === "manual") return null;
 	try {

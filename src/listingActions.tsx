@@ -1,9 +1,29 @@
 import { Component } from "react";
 
-import { postRecentness, postLevels, sortings } from "./settings.js";
-import Select from "./select.jsx";
+import {
+	postRecentness,
+	PostRecentness,
+	Sorting,
+	postLevels,
+	PostLevel,
+	PostLevelString,
+	sortings,
+} from "./settings";
+import Select from "./select";
 
-export default class ListingActions extends Component {
+type Props = {
+	postRecentness?: PostRecentness;
+	includeFilters?: boolean;
+	className?: string;
+	postLevel: PostLevel;
+	onPostLevelChange: (label: PostLevelString) => void;
+	onRecentnessChange: (value: PostRecentness) => void;
+	sortings?: Sorting[];
+	sort: Sorting;
+	onSortingChange: (sort: Sorting) => void;
+};
+
+export default class ListingActions extends Component<Props> {
 	render() {
 		return (
 			<div className={"listing-actions " + (this.props.className || "")}>
@@ -17,7 +37,7 @@ export default class ListingActions extends Component {
 										? "listing-actions__news-recent-button-active"
 										: "")
 								}
-								onMouseDown={e => {
+								onMouseDown={() => {
 									const val =
 										this.props.postRecentness === postRecentness[0]
 											? postRecentness[1]
@@ -32,8 +52,8 @@ export default class ListingActions extends Component {
 						<Select
 							items={postLevels.map(x => x.title)}
 							value={this.props.postLevel.title}
-							onChange={e =>
-								this.props.onPostLevelChange && this.props.onPostLevelChange(e)
+							onChange={(e) =>
+								this.props.onPostLevelChange && this.props.onPostLevelChange(e as PostLevelString)
 							}
 							className={`listing-actions__news-type-select ${
 								this.props.postLevel.title !== postLevels[0].title
@@ -56,12 +76,12 @@ export default class ListingActions extends Component {
 								>
 									<label
 										className="sortings-list__item-content sortings-list__current-item-content"
-										tabIndex="0"
+										tabIndex={0}
 									>
 										<input
 											type="radio"
 											className="sortings-list__item-input"
-											checked="true"
+											checked={true}
 											name="post-sortings"
 											value={x.title}
 										/>
@@ -72,14 +92,14 @@ export default class ListingActions extends Component {
 								<li
 									role="button"
 									className="sortings-list__item"
-									onMouseDown={e =>
+									onMouseDown={() =>
 										this.props.onSortingChange && this.props.onSortingChange(x)
 									}
 									key={x.title}
 								>
 									<label
 										className="sortings-list__item-content"
-										tabIndex="0"
+										tabIndex={0}
 										onKeyPress={e => {
 											if (e.keyCode === 13) {
 												e.preventDefault();

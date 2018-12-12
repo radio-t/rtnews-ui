@@ -1,13 +1,30 @@
-import { Component } from "react";
+import { Component, CSSProperties } from "react";
 
 import { Redirect } from "react-router-dom";
-import { addArticle } from "./api.js";
-import { addNotification } from "./store.jsx";
-import { apiRoot } from "./settings.js";
-import { waitFor } from "./utils.js";
+import { addArticle } from "./api";
+import { addNotification } from "./notifications";
+import { apiRoot } from "./settings";
+import { waitFor } from "./utils";
 
-export default class AddArticleForm extends Component {
-	constructor(props) {
+type Props = {
+	isAdmin?: boolean;
+	style?: CSSProperties;
+	onAdd?: (url: string) => void;
+};
+
+type State = {
+	manual: boolean;
+	autolink: string;
+	manualLink: string;
+	manualTitle: string;
+	manualText: string;
+	posting: boolean;
+};
+
+export default class AddArticleForm extends Component<Props, State> {
+	private autoref: HTMLInputElement | null;
+	private manualref: HTMLInputElement | null;
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			manual: false,
@@ -19,8 +36,10 @@ export default class AddArticleForm extends Component {
 		};
 		this.onDragover = this.onDragover.bind(this);
 		this.onDrop = this.onDrop.bind(this);
+		this.autoref = null;
+		this.manualref = null;
 	}
-	bookmarklet() {
+	bookmarklet(): string {
 		const hrefFunc = function() {
 			var w = window,
 				d = document,
@@ -32,7 +51,7 @@ export default class AddArticleForm extends Component {
 			s.left = "0";
 			s.right = "0";
 			s.top = "0";
-			s.zIndex = 16777271;
+			s.zIndex = "16777271";
 			s.height = "0";
 			s.width = "100%";
 			s.overflow = "hidden";
@@ -82,7 +101,7 @@ export default class AddArticleForm extends Component {
 					});
 			}, 500);
 
-			function e(t) {
+			function e(t: string) {
 				s.color = "#d00";
 				i.textContent = t;
 			}
@@ -92,7 +111,7 @@ export default class AddArticleForm extends Component {
 					s.height = "0";
 
 					w.setTimeout(function() {
-						i.parentNode.removeChild(i);
+						i.parentNode && i.parentNode.removeChild(i);
 					}, 300);
 				}, 500);
 			}
@@ -237,21 +256,22 @@ export default class AddArticleForm extends Component {
 			</form>
 		);
 	}
-	onSwitch() {
+	protected onSwitch() {
 		this.setState({ manual: !this.state.manual });
-		waitFor(() => this.autoref || this.manualref).then(() => {
-			(this.autoref || this.manualref).focus();
+		waitFor(() => !!(this.autoref || this.manualref)).then(() => {
+			((this.autoref || this.manualref) as HTMLInputElement).focus();
 		});
 	}
-	onDragover(e) {
-		if (e.dataTransfer.types.indexOf("text/plain") !== -1) {
+	protected onDragover(e: DragEvent) {
+		if (e.dataTransfer && e.dataTransfer.types.indexOf("text/plain") !== -1) {
 			e.dataTransfer.dropEffect = "copy";
 			e.preventDefault();
 		}
 	}
-	async onDrop(e) {
-		if (e.dataTransfer.types.indexOf("text/plain") === -1) return;
-		const data = e.dataTransfer.getData("text/plain");
+	protected async onDrop(e: DragEvent) {
+		if (e.dataTransfer && e.dataTransfer.types.indexOf("text/plain") === -1)
+			return;
+		const data = (e.dataTransfer as DataTransfer).getData("text/plain");
 		const isLink = /^https?:\/\/.*/.test(data);
 		if (!isLink) return;
 		const url = new URL(data);
@@ -265,7 +285,7 @@ export default class AddArticleForm extends Component {
 				data: <b>Новость добавлена</b>,
 				time: 7000,
 			});
-			this.props.onAdd && this.props.onAdd();
+			this.props.onAdd && this.props.onAdd(url.href);
 		} catch (e) {
 			console.error(e);
 			addNotification({
@@ -281,34 +301,37 @@ export default class AddArticleForm extends Component {
 		document.body.addEventListener("dragover", this.onDragover, false);
 		document.body.addEventListener("drop", this.onDrop, false);
 		setTimeout(() => {
-			(this.autoref || this.manualref).focus();
+			((this.autoref || this.manualref) as HTMLInputElement).focus();
 		}, 500);
 	}
 	componentWillUnmount() {
 		document.body.removeEventListener("dragover", this.onDragover, false);
 		document.body.removeEventListener("drop", this.onDrop, false);
 	}
-	async onSubmit() {
+	protected async onSubmit() {
 		this.setState({ posting: true });
+		const url = this.state.manualLink;
 		try {
 			if (!this.state.manual) {
 				await addArticle(this.state.autolink);
-				this.state.autolink = "";
+				this.setState({ autolink: "" });
 			} else {
 				await addArticle(
 					this.state.manualLink,
 					this.state.manualTitle,
 					this.state.manualText
 				);
-				this.state.manualLink = "";
-				this.state.manualTitle = "";
-				this.state.manualText = "";
+				this.setState({
+					manualLink: "",
+					manualTitle: "",
+					manualText: "",
+				});
 			}
 			addNotification({
 				data: <b>Новость добавлена</b>,
 				time: 7000,
 			});
-			this.props.onAdd && this.props.onAdd();
+			this.props.onAdd && this.props.onAdd(url);
 		} catch (e) {
 			console.error(e);
 			addNotification({
