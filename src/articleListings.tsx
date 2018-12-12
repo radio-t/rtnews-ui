@@ -13,6 +13,7 @@ import {
 	PostRecentness,
 	Sorting,
 	PostLevelString,
+	activeArticleID,
 } from "./settings";
 import {
 	getRecentness,
@@ -249,7 +250,7 @@ class BaseListing<
 				await en(
 					"активирую",
 					async () => await activateArticle(article.id),
-					"active-article"
+					activeArticleID
 				);
 				this.update && (await this.update(true));
 				articleCache.invalidate("common");
@@ -502,12 +503,19 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 						<AddArticle
 							{...this.props}
 							style={{
-								display: this.state.addFormExpanded ? undefined : "none",
+								display: this.state.addFormExpanded ? "" : "none",
 							}}
-							onAdd={() => {
-								sleep(1000).then(() => {
-									this.update(true);
-								});
+							onAdd={async url => {
+								retry(async () => {
+									await sleep(2000);
+									await this.update(true);
+									const article = first(
+										this.state.news,
+										a => a.origlink === url
+									);
+									if (article === null)
+										throw new Error("Added article is not found");
+								}, 5);
 							}}
 						/>
 					</div>

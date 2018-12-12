@@ -13,7 +13,7 @@ type State = {
 };
 
 export default class Select extends PureComponent<Props, State> {
-	ref: HTMLDivElement|null;
+	ref: HTMLDivElement | null;
 
 	constructor(props: Props) {
 		super(props);
@@ -89,7 +89,7 @@ export default class Select extends PureComponent<Props, State> {
 									(x === this.props.value ? "select__item--current " : "") +
 									(i === this.state.selected ? "select__item--selected " : "")
 								}
-								aria-selected={x === this.props.value ? true : undefined}
+								aria-selected={x === this.props.value ? true : false}
 								onClick={() => {
 									this.ref!.blur();
 									if (x !== this.props.value) {

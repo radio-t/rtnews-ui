@@ -167,7 +167,8 @@ const articlesIdSlugMap: Map<string, string> = new Map();
  * Gets article by slug
  */
 export async function getArticle(slug: string): Promise<Article | null> {
-	if (articlesCache.has(slug)) return Promise.resolve(articlesCache.get(slug) as Article);
+	if (articlesCache.has(slug))
+		return Promise.resolve(articlesCache.get(slug) as Article);
 	const articleInit: object = await request(
 		"/news/slug/" + encodeURIComponent(slug)
 	);
@@ -183,7 +184,9 @@ export async function getArticle(slug: string): Promise<Article | null> {
  */
 export async function getArticleById(id: string): Promise<Article | null> {
 	if (articlesIdSlugMap.has(id))
-		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(id) as string) as Article);
+		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(
+			id
+		) as string) as Article);
 	const articleInit: object = await request(
 		"/news/id/" + encodeURIComponent(id)
 	).then(processArticle);
@@ -197,7 +200,7 @@ export async function getArticleById(id: string): Promise<Article | null> {
 }
 
 /**
- * Gets active article id
+ * @return active article id
  */
 export function getActiveArticle(): Promise<string> {
 	return request(`/news/active/id`)
@@ -208,7 +211,7 @@ export function getActiveArticle(): Promise<string> {
 /**
  * Polls server for active article change
  *
- * @param [ms] polling Interval. default: 295
+ * @param ms polling timeout. default: 295
  */
 export async function pollActiveArticle(ms: number = 295): Promise<string> {
 	while (true) {
@@ -284,13 +287,6 @@ export function updateArticle(updated: Partial<Article>): Promise<null> {
 	});
 }
 
-export function moveArticle(
-	id: string,
-	offset: number
-): Promise<{ [id: string]: number }> {
-	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
-}
-
 export function archiveArticle(id: string): Promise<null> {
 	return request(`/news/archive/${id}`, { method: "PUT" });
 }
@@ -305,6 +301,13 @@ export function removeArticle(id: string): Promise<null> {
 
 export function restoreArticle(id: string): Promise<null> {
 	return request(`/news/undelete/${id}`, { method: "PUT" });
+}
+
+export function moveArticle(
+	id: string,
+	offset: number
+): Promise<{ [id: string]: number }> {
+	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
 }
 
 /**
@@ -401,42 +404,34 @@ export function setTheme(value: ThemeType): void {
 	localStorage.setItem("theme", value);
 }
 
-export function login(user: string, password: string): Promise<boolean> {
+function loginViaHeader(header: string): Promise<boolean> {
 	const headers = new Headers();
-	const auth = btoa(user + ":" + password);
-	headers.append("Authorization", "Basic " + auth);
+	headers.append("Authorization", "Basic " + header);
 	return fetch(apiRoot + "/news/reload", {
 		method: "PUT",
 		headers: headers,
 		credentials: "omit",
 		mode: "cors",
-	}).then(response => {
-		if (response.status === 200) {
-			localStorage.setItem("rt-news.auth", auth);
-			return true;
-		}
-		return false;
+	})
+		.then(response => {
+			if (response.status === 200) return true;
+			return false;
+		})
+		.catch(() => false);
+}
+
+export function login(user: string, password: string): Promise<boolean> {
+	const auth = btoa(user + ":" + password);
+	return loginViaHeader(auth).then(result => {
+		if (result) localStorage.setItem("rt-news.auth", auth);
+		return result;
 	});
 }
 
 export function loginViaStorage(): Promise<boolean> {
 	if (!localStorage.getItem("rt-news.auth")) return Promise.resolve(false);
-	const headers = new Headers();
-	const auth = localStorage.getItem("rt-news.auth");
-	headers.append("Authorization", "Basic " + auth);
-	return retry(
-		() =>
-			fetch(apiRoot + "/news/reload", {
-				method: "PUT",
-				headers: headers,
-				credentials: "omit",
-				mode: "cors",
-			}),
-		3,
-		1000
-	)
-		.then(response => response.status === 200)
-		.catch(() => false);
+	const auth = localStorage.getItem("rt-news.auth")!;
+	return retry(() => loginViaHeader(auth), 3, 1000);
 }
 
 export function logout(): void {

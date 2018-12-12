@@ -26,6 +26,8 @@ export const newsAutoUpdateInterval: number | null = 10;
  */
 export const newsCacheValidInterval: number | null = 5;
 
+export const activeArticleID = "active-article";
+
 /**
  * needs for situation when dragging something
  * near window border, so have add scroll manually

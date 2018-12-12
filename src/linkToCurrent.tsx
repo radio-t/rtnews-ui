@@ -1,6 +1,7 @@
 import { MouseEvent } from "react";
 
 import { addNotification, removeNotification } from "./notifications";
+import { activeArticleID } from "./settings";
 import { listingRef } from "./symbols";
 import { sleep, waitFor, scrollIntoView } from "./utils";
 import { Listing } from "./articleListings";
@@ -8,7 +9,6 @@ import { Listing } from "./articleListings";
 import { Link } from "react-router-dom";
 
 const defaultTitle = "Новости для Радио-Т";
-const activeArticleID = "active-article";
 
 const onMissingArticle = async () => {
 	await waitFor(async () => (window as any)[listingRef]);

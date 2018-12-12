@@ -49,12 +49,10 @@ export default class App extends Component<AppProps> {
 	}
 	render() {
 		return (
-			<Router ref={(router: Router) => (this.router = router)}>
+			<Router ref={router => (this.router = router)}>
 				<div className="page">
 					<Route
-						render={({ history }: RouteComponentProps) => (
-							<Head {...this.props} history={history} />
-						)}
+						render={({ history }) => <Head {...this.props} history={history} />}
 					/>
 					<div className="content page__content">
 						<Switch>

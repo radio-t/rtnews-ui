@@ -9,7 +9,7 @@ import { waitFor } from "./utils";
 type Props = {
 	isAdmin?: boolean;
 	style?: CSSProperties;
-	onAdd?: () => void;
+	onAdd?: (url: string) => void;
 };
 
 type State = {
@@ -285,7 +285,7 @@ export default class AddArticleForm extends Component<Props, State> {
 				data: <b>Новость добавлена</b>,
 				time: 7000,
 			});
-			this.props.onAdd && this.props.onAdd();
+			this.props.onAdd && this.props.onAdd(url.href);
 		} catch (e) {
 			console.error(e);
 			addNotification({
@@ -310,6 +310,7 @@ export default class AddArticleForm extends Component<Props, State> {
 	}
 	async onSubmit() {
 		this.setState({ posting: true });
+		const url = this.state.manualLink;
 		try {
 			if (!this.state.manual) {
 				await addArticle(this.state.autolink);
@@ -330,7 +331,7 @@ export default class AddArticleForm extends Component<Props, State> {
 				data: <b>Новость добавлена</b>,
 				time: 7000,
 			});
-			this.props.onAdd && this.props.onAdd();
+			this.props.onAdd && this.props.onAdd(url);
 		} catch (e) {
 			console.error(e);
 			addNotification({

@@ -23,6 +23,7 @@ import { Provider, connect } from "react-redux";
 
 import App from "./app";
 import LinkToCurrent from "./linkToCurrent";
+import { activeArticleID } from "./settings";
 
 function pollActiveArticle() {
 	getActiveArticle()
@@ -34,7 +35,7 @@ function pollActiveArticle() {
 				try {
 					const activeId = await apiPollActiveArticle();
 					if (activeId === store.getState().activeId) {
-						removeNotificationsWithContext("active-article");
+						removeNotificationsWithContext(activeArticleID);
 						addNotification({
 							data: <b>Тема активирована</b>,
 							time: 3000,
@@ -49,7 +50,7 @@ function pollActiveArticle() {
 						const article = await getArticleById(activeId);
 
 						if (article && article.hasOwnProperty("title")) {
-							removeNotificationsWithContext("active-article");
+							removeNotificationsWithContext(activeArticleID);
 							addNotification(remove => ({
 								data: (
 									<span>
@@ -62,7 +63,7 @@ function pollActiveArticle() {
 									</span>
 								),
 								time: null,
-								context: "active-article",
+								context: activeArticleID,
 							}));
 						}
 					}, 0);

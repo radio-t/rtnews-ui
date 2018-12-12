@@ -1,7 +1,7 @@
 import { Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils";
-import { postsPrefix, isSafari } from "./settings";
+import { postsPrefix, isSafari, activeArticleID } from "./settings";
 import { getArticle } from "./api";
 
 import ArticleControls, { ControlID, ChangeID } from "./articleControls";
@@ -500,7 +500,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 			<article
 				key={this.props.article.id}
 				ref={ref => (this.ref = ref)}
-				id={this.props.active ? "active-article" : undefined}
+				id={this.props.active ? activeArticleID : undefined}
 				className={
 					"post " +
 					(this.props.active && this.props.active === true ? "post-active" : "")
@@ -509,7 +509,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 				<div
 					className="post__drag-handle"
 					ref={ref => (this.handle = ref)}
-					style={{ display: this.props.draggable ? undefined : "none" }}
+					style={{ display: this.props.draggable ? "" : "none" }}
 				/>
 				{this.props.controls && (
 					<ArticleControls
