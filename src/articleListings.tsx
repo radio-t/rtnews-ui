@@ -784,6 +784,7 @@ export class Sorter extends BaseListing<SorterProps, SorterState> {
 							onChange={(id: ChangeID, data: any) =>
 								this.onArticleChange(article, id, data)
 							}
+							draggable={true}
 						/>
 					))}
 			</div>
