@@ -149,10 +149,7 @@ export default class App extends Component<AppProps> {
 						<br />
 						<span className="footer__buildtime">built on {BUILDTIME}</span>
 					</div>
-					<Notifications
-						className="page__notifications"
-						notifications={this.props.notifications}
-					/>
+					<Notifications className="page__notifications" />
 				</div>
 			</Router>
 		);
