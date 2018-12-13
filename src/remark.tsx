@@ -243,7 +243,7 @@ export default class Remark extends Component<Props> {
 				document.body.appendChild(this.back);
 				document.body.appendChild(this.node);
 				document.addEventListener("keydown", this.onKeyDown);
-				setTimeout(() => {
+				window.setTimeout(() => {
 					this.back!.setAttribute("data-animation", "");
 					this.node!.setAttribute("data-animation", "");
 					this.iframe!.focus();
@@ -268,10 +268,7 @@ export default class Remark extends Component<Props> {
 				if (!this.node) {
 					return;
 				}
-				this.delay = (setTimeout(
-					this.animationStop,
-					1000
-				) as unknown) as number;
+				this.delay = window.setTimeout(this.animationStop, 1000);
 				this.events.forEach((event: string) =>
 					el!.addEventListener(event, this.animationStop, false)
 				);

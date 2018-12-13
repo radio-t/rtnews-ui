@@ -89,7 +89,7 @@ export default class LoginForm extends Component<Props, State> {
 			this.setState(state => {
 				return { denied: state.denied + 1 };
 			});
-			setTimeout(() => {
+			window.setTimeout(() => {
 				this.setState(state => {
 					const d = state.denied - 1;
 					return { denied: d < 0 ? 0 : d };

@@ -82,7 +82,7 @@ async function en<T>(
 		const o = await fn();
 		return o;
 	} finally {
-		setTimeout(() => {
+		window.setTimeout(() => {
 			removeNotification(notification);
 		}, 500);
 	}
@@ -116,7 +116,7 @@ function withAutoUpdate<P extends object, S extends object>(
 
 			this.updateTimestamp = new Date().getTime();
 
-			this.updateInterval = (setInterval(async () => {
+			this.updateInterval = window.setInterval(async () => {
 				let stamp = new Date().getTime();
 				if (stamp - this.updateTimestamp > updateInterval * 60000) {
 					await new Promise(resolve => {
@@ -136,7 +136,7 @@ function withAutoUpdate<P extends object, S extends object>(
 						);
 					});
 				}
-			}, 30000) as unknown) as number;
+			}, 30000);
 		}
 
 		componentWillUnmount() {
@@ -484,7 +484,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 								className="pseudo add-form-overlay__control"
 								onClick={() => {
 									this.setState({ addFormExpanded: true });
-									setTimeout(() => {
+									window.setTimeout(() => {
 										const el: HTMLInputElement | null =
 											document.querySelector(".add-form__article-url") ||
 											document.querySelector(".add-form__article-manual-link");

@@ -79,9 +79,9 @@ export function setTheme(theme: ThemeType, immediate: boolean = false) {
 
 	++themeCounter;
 	document.documentElement!.classList.add("switch-transition");
-	setTimeout(() => {
+	window.setTimeout(() => {
 		document.documentElement!.dataset.theme = theme;
-		setTimeout(() => {
+		window.setTimeout(() => {
 			--themeCounter;
 			if (themeCounter < 1)
 				document.documentElement!.classList.remove("switch-transition");

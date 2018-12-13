@@ -275,13 +275,13 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 
 			// handle scroll over borders
 			this.clientY = e.touches[0].clientY;
-			this.dragInterval = (setInterval(() => {
+			this.dragInterval = window.setInterval(() => {
 				if (this.clientY && this.clientY <= 80) {
 					window.scrollBy(0, -((80 - this.clientY) / 2));
 				} else if (this.clientY && this.clientY >= window.innerHeight - 80) {
 					window.scrollBy(0, (80 - (window.innerHeight - this.clientY)) / 2);
 				}
-			}, 30) as unknown) as number;
+			}, 30);
 		}
 		protected onHandleTouchMove(e: TDragEvent) {
 			this.clientY = e.touches[0].clientY;
@@ -366,13 +366,13 @@ function Draggable<P extends DraggableProps, S extends DraggableState>(
 
 			if (isSafari) {
 				this.clientY = e.clientY;
-				this.dragInterval = (setInterval(() => {
+				this.dragInterval = window.setInterval(() => {
 					if (this.clientY! <= 80) {
 						window.scrollBy(0, -((80 - this.clientY!) / 2));
 					} else if (this.clientY! >= window.innerHeight - 80) {
 						window.scrollBy(0, (80 - (window.innerHeight - this.clientY!)) / 2);
 					}
-				}, 30) as unknown) as number;
+				}, 30);
 			}
 		}
 		protected onDrag(e: DragEvent) {
@@ -573,7 +573,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 							className="post__comments-link"
 							to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
 							scroll={(el: HTMLElement) => {
-								setTimeout(() => {
+								window.setTimeout(() => {
 									scrollIntoView(el);
 								}, 500);
 							}}

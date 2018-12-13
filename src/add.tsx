@@ -300,7 +300,7 @@ export default class AddArticleForm extends Component<Props, State> {
 	componentWillMount() {
 		document.body.addEventListener("dragover", this.onDragover, false);
 		document.body.addEventListener("drop", this.onDrop, false);
-		setTimeout(() => {
+		window.setTimeout(() => {
 			((this.autoref || this.manualref) as HTMLInputElement).focus();
 		}, 500);
 	}

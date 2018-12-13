@@ -101,7 +101,7 @@ function ArticleFactory(editable: boolean = false) {
 					this.setState({ error });
 				});
 
-			setTimeout(() => {
+			window.setTimeout(() => {
 				const hash = window.location.hash;
 				if (hash === "") return;
 				const el = document.getElementById(hash.substr(1));

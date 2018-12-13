@@ -43,7 +43,7 @@ function pollActiveArticle() {
 						continue;
 					}
 					setState({ activeId });
-					setTimeout(async () => {
+					window.setTimeout(async () => {
 						sleep(700).then(() => {
 							document.title = "* Тема обновлена | Новости Радио-Т";
 						});

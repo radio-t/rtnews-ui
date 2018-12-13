@@ -16,14 +16,14 @@ export default class Loading extends Component<Props, State> {
 		this.state = {
 			numberOfDots: (props.numberOfDots || 3) - 1,
 		};
-		this.interval = (setInterval(() => {
+		this.interval = window.setInterval(() => {
 			this.setState(state => {
 				return {
 					numberOfDots:
 						(state.numberOfDots + 1) % (this.props.numberOfDots || 3),
 				};
 			});
-		}, 500) as unknown) as number;
+		}, 500);
 	}
 	render() {
 		return (

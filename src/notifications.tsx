@@ -92,7 +92,7 @@ export function addNotification(
 		notification,
 	});
 	if (notification.time) {
-		setTimeout(() => {
+		window.setTimeout(() => {
 			store.dispatch({
 				type: "removeNotification",
 				notification: notification as Partial<Notification>,

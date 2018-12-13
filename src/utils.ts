@@ -33,7 +33,7 @@ export function oneOf<T>(subject: T, ...objects: [T]): boolean {
 }
 
 export function sleep(n: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, n));
+	return new Promise(resolve => window.setTimeout(resolve, n));
 }
 
 export async function animate(
@@ -170,7 +170,7 @@ export function debounce(
 		};
 		const callNow = immediate && !timeout;
 		if (timeout) clearTimeout(timeout);
-		timeout = (setTimeout(later, wait) as unknown) as number;
+		timeout = window.setTimeout(later, wait);
 		if (callNow) fn.apply(this, args);
 	};
 }
