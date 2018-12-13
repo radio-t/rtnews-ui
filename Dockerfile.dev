@@ -1,11 +1,11 @@
-FROM node:10-alpine AS deps
+FROM node:11-alpine AS deps
 COPY ./package.json ./package-lock.json /app/
 RUN \
 	cd /app && \
 	npm ci --loglevel error
 
 
-FROM node:10-alpine as base
+FROM node:11-alpine as base
 RUN apk add --update --no-cache make
 
 
