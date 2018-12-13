@@ -28,7 +28,7 @@ export interface StateAction {
 
 export interface NotificationAction {
 	type: "addNotification" | "removeNotification";
-	notification: Partial<Notification>;
+	notification: Notification;
 }
 
 const rootReducer = (

@@ -1,5 +1,5 @@
 import { setState, store } from "./store";
-import { Notification } from "./notificationInterface";
+import { Notification, NotificationInit } from "./notificationInterface";
 
 type Props = {
 	notifications: Notification[];
@@ -39,43 +39,49 @@ export function Notifications(props: Props) {
 
 let notificationId: number = 0;
 
-type DeferredNotification = (remove: () => void) => Partial<Notification>;
+type DeferredNotification = (remove: () => void) => NotificationInit;
 
 function createNotification(
-	notification: string | Partial<Notification>
+	notification: string | NotificationInit
 ): Notification {
+	let result: Notification;
 	if (typeof notification === "string") {
-		notification = {
+		result = {
 			data: <span dangerouslySetInnerHTML={{ __html: notification }} />,
 			time: 3000,
 			level: "default",
-		};
+		} as Notification;
 	} else if (typeof notification.data === "string") {
-		notification.data = (
-			<span dangerouslySetInnerHTML={{ __html: notification.data }} />
-		);
+		result = {
+			...notification,
+			data: <span dangerouslySetInnerHTML={{ __html: notification.data }} />,
+		} as Notification;
+	} else {
+		result = { ...notification } as Notification;
 	}
-	notification.id = notificationId++;
-	notification = Object.assign(
+	result.id = notificationId++;
+	Object.assign(
+		result,
 		{
 			context: null,
 			level: "default",
 			time: 3000,
 			closable: true,
 		},
-		notification
+		result
 	);
 	//inject key into react component to avoid misrendering
-	(notification.data as JSX.Element).key = notification.id || null;
-	return notification as Notification;
+	(result.data as any).key = result.id;
+	return result;
 }
 
 export function addNotification(
-	notification: DeferredNotification | string | Partial<Notification>
+	notification: DeferredNotification | string | NotificationInit
 ): Notification {
+	let result: Notification;
 	if (typeof notification === "function") {
 		// fuckery with indirection
-		const n = {};
+		const n = {} as Notification;
 		const remover = () => {
 			store.dispatch({
 				type: "removeNotification",
@@ -83,23 +89,23 @@ export function addNotification(
 			});
 		};
 		Object.assign(n, createNotification(notification(remover)));
-		notification = n;
+		result = n;
 	} else {
-		notification = createNotification(notification);
+		result = createNotification(notification);
 	}
 	store.dispatch({
 		type: "addNotification",
-		notification,
+		notification: result,
 	});
-	if (notification.time) {
+	if (result.time) {
 		window.setTimeout(() => {
 			store.dispatch({
 				type: "removeNotification",
-				notification: notification as Partial<Notification>,
+				notification: result,
 			});
-		}, notification.time);
+		}, result.time);
 	}
-	return notification as Notification;
+	return result;
 }
 
 export function removeNotification(notification: Notification): void {

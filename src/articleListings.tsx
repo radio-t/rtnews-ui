@@ -37,7 +37,6 @@ import { setState } from "./store";
 import { addNotification, removeNotification } from "./notifications";
 import articleCache from "./articleCache";
 import ErrorComponent from "./error";
-import { Notification } from "./notificationInterface";
 import { Article } from "./articleInterface";
 import { ControlID, ChangeID } from "./articleControls";
 
@@ -69,7 +68,7 @@ type RequestError = {
  * and upon completition removes notification
  */
 async function en<T>(
-	message: string | Partial<Notification>,
+	message: string | JSX.Element,
 	fn: () => Promise<T>,
 	context: any | null = null
 ): Promise<T> {
@@ -77,7 +76,7 @@ async function en<T>(
 		data: message,
 		time: 30000,
 		context,
-	} as Partial<Notification>);
+	});
 	try {
 		const o = await fn();
 		return o;
