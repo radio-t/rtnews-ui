@@ -91,7 +91,7 @@ export function addNotification(
 		type: "addNotification",
 		notification,
 	});
-	if (notification.time !== null) {
+	if (notification.time) {
 		setTimeout(() => {
 			store.dispatch({
 				type: "removeNotification",
