@@ -178,7 +178,7 @@ export async function getArticle(id: string): Promise<Article | null> {
 		) as string) as Article);
 	const articleInit: object = await request(
 		"/news/id/" + encodeURIComponent(id)
-	).then(processArticle);
+	);
 	if (!articleInit.hasOwnProperty("id")) {
 		return null;
 	}
