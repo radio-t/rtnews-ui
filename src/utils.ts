@@ -6,7 +6,7 @@ export function first<T>(arr: T[], fn: (item: T) => boolean): T | null {
 }
 
 export function firstIndex<T>(
-	arr: [T],
+	arr: T[],
 	fn: (item: T) => boolean
 ): number | null {
 	for (let i = 0; i < arr.length; i++) {
@@ -25,7 +25,7 @@ export function formatDate(date: Date): string {
 	return day + "." + month + "." + year + " в&nbsp;" + hours + ":" + mins;
 }
 
-export function oneOf<T>(subject: T, ...objects: [T]): boolean {
+export function oneOf<T>(subject: T, ...objects: T[]): boolean {
 	for (let obj of objects) {
 		if (subject === obj) return true;
 	}
@@ -36,25 +36,28 @@ export function sleep(n: number): Promise<void> {
 	return new Promise(resolve => window.setTimeout(resolve, n));
 }
 
-export async function animate(
+export function animate(
 	fn: Function,
 	interval: number = 1000,
 	immediate: boolean = true
 ): Promise<void> {
-	let stopped = false;
-	const stop = () => {
-		stopped = true;
-	};
-	if (immediate) fn(stop);
-	let t = 0;
-	let runner = async (timestamp = 0) => {
-		if (timestamp - interval > t) {
-			await fn(stop);
-			t = timestamp;
-		}
-		if (!stopped) requestAnimationFrame(runner);
-	};
-	requestAnimationFrame(runner);
+	return new Promise(resolve => {
+		let stopped = false;
+		const stop = () => {
+			stopped = true;
+		};
+		if (immediate) fn(stop);
+		let t = 0;
+		let runner = async (timestamp = 0) => {
+			if (timestamp - interval > t) {
+				await fn(stop);
+				t = timestamp;
+			}
+			if (!stopped) requestAnimationFrame(runner);
+			else resolve();
+		};
+		requestAnimationFrame(runner);
+	});
 }
 
 /**

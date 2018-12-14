@@ -21,7 +21,7 @@ import GearIcon from "./static/svg/gear.svg";
 
 function ArticleHeader({ article }: { article: ArticleType }) {
 	return (
-		<>
+		<div>
 			<h3 className="title article__title">
 				{article.geek && (
 					<SVGInline
@@ -50,7 +50,7 @@ function ArticleHeader({ article }: { article: ArticleType }) {
 					}}
 				/>
 			</div>
-		</>
+		</div>
 	);
 }
 

@@ -445,7 +445,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 			this.state.sort === sortings[0];
 
 		return (
-			<>
+			<div>
 				<ListingActions
 					includeFilters={true}
 					className={this.props.isAdmin ? "listing-actions-all" : ""}
@@ -574,7 +574,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 							);
 						})}
 				</div>
-			</>
+			</div>
 		);
 	}
 }

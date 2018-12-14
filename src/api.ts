@@ -58,7 +58,12 @@ function processArticles(articles: ArticleInit[]): Article[] {
  */
 export function getPrepTopicsURL(): Promise<string | null> {
 	return fetch("https://radio-t.com/site-api/last/1?categories=prep")
-		.then(resp => resp.json())
+		.then(resp => {
+			if (resp.status >= 400) {
+				return new Error(resp.statusText);
+			}
+			return resp.json();
+		})
 		.then(data => {
 			if (data.length < 1) return null;
 			return data[0].url || null;
