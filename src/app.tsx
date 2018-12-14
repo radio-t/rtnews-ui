@@ -27,7 +27,7 @@ import NotFound from "./notFound";
 import { Notifications } from "./notifications";
 import { Notification } from "./notificationInterface";
 
-import { listingRef } from "./symbols";
+import { listingRef } from "./references";
 import { ThemeType } from "./themeInterface";
 
 type AppProps = {

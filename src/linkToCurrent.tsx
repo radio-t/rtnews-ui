@@ -2,21 +2,20 @@ import { MouseEvent } from "react";
 
 import { addNotification, removeNotification } from "./notifications";
 import { activeArticleID } from "./settings";
-import { listingRef } from "./symbols";
+import { getListingInstance } from "./references";
 import { sleep, waitFor, scrollIntoView } from "./utils";
-import { Listing } from "./articleListings";
 
 import { Link } from "react-router-dom";
 
 const defaultTitle = "Новости для Радио-Т";
 
 const onMissingArticle = async () => {
-	await waitFor(async () => (window as any)[listingRef]);
+	await waitFor(async () => !!getListingInstance());
 	const notification = addNotification({
 		data: "Обновляю список",
 		time: 10000,
 	});
-	const listing = (window as any)[listingRef] as Listing;
+	const listing = getListingInstance()!;
 	listing.update(true);
 	await waitFor(async () => listing.state.loaded);
 	await waitFor(async () => !!document.getElementById(activeArticleID), 5000);
@@ -62,9 +61,7 @@ export default function LinkToCurrent(props: Props) {
 				if (window.location.pathname === "/") e.preventDefault();
 				props.onClick && props.onClick((e as unknown) as Event);
 				await waitFor(
-					() =>
-						(window as any)[listingRef] &&
-						(window as any)[listingRef].state.loaded
+					() => !!getListingInstance() && getListingInstance()!.state.loaded
 				);
 				await waitFor(() => !!document.getElementById(activeArticleID), 500)
 					.then(() => {

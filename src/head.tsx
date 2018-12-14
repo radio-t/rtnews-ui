@@ -8,7 +8,7 @@ import { postsPrefix } from "./settings";
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
 import { sleep, scrollIntoView, waitFor } from "./utils";
-import { listingRef } from "./symbols";
+import { getListingInstance } from "./references";
 
 // @ts-ignore
 import SVGInline from "react-svg-inline";
@@ -233,13 +233,13 @@ export default class Head extends Component<Props, State> {
 		if (!confirm("Таки темы слушателей?")) return;
 
 		try {
-			if (!(window as any)[listingRef]) this.props.history.push("/");
+			if (!getListingInstance()) this.props.history.push("/");
 			await waitFor(
-				() => (window as any)[listingRef],
+				() => !!getListingInstance(),
 				15000,
 				new Error(`Can't navigate to "/"`)
 			);
-			(window as any)[listingRef].startPrepTopics();
+			getListingInstance()!.startPrepTopics();
 		} catch (e) {
 			console.error(e);
 			addNotification({
