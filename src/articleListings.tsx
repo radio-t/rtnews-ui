@@ -114,10 +114,12 @@ function withAutoUpdate<P extends object, S extends object>(
 			super.componentDidMount && super.componentDidMount();
 
 			this.updateTimestamp = new Date().getTime();
+			const updateIntevalInMS = updateInterval * 60000;
+			const maxinterval = Math.max(30000, updateIntevalInMS);
 
 			this.updateInterval = window.setInterval(async () => {
 				let stamp = new Date().getTime();
-				if (stamp - this.updateTimestamp > updateInterval * 60000) {
+				if (stamp - this.updateTimestamp > updateIntevalInMS) {
 					await new Promise(resolve => {
 						requestIdleCallback(
 							() => {
@@ -130,12 +132,12 @@ function withAutoUpdate<P extends object, S extends object>(
 									});
 							},
 							{
-								timeout: 30000,
+								timeout: maxinterval,
 							}
 						);
 					});
 				}
-			}, 30000);
+			}, maxinterval);
 		}
 
 		componentWillUnmount() {
@@ -144,9 +146,8 @@ function withAutoUpdate<P extends object, S extends object>(
 		}
 
 		async update(force: boolean) {
-			const o = super.update(force);
+			await super.update(force);
 			this.updateTimestamp = new Date().getTime();
-			return o;
 		}
 	};
 }
