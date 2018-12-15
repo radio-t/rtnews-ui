@@ -105,9 +105,7 @@ function ArticleFactory(editable: boolean = false) {
 				const hash = window.location.hash;
 				if (hash === "") return;
 				const el = document.getElementById(hash.substr(1));
-				if (el) {
-					scrollIntoView(el);
-				}
+				if (el) scrollIntoView(el);
 			}, 200);
 		}
 		protected async edit() {
