@@ -94,7 +94,7 @@ function ArticleFactory(editable: boolean = false) {
 					if (article === null) {
 						throw new Error("Unknown article");
 					}
-					document.title = article.title + "| Новости Радио-Т";
+					document.title = article.title + " | Новости Радио-Т";
 					this.setState({ article });
 				})
 				.catch(error => {
