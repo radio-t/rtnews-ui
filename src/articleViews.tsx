@@ -629,7 +629,7 @@ class ArticleBriefBasic extends ComponentWithVisibility<
 									className="post__full-content-hide"
 									onClick={() => {
 										if (this.ref) {
-											const rect = this.ref.getBoundingClientRect();
+											const rect = this.detailedRef!.getBoundingClientRect();
 											if (((rect as any).y || rect.top) < 0)
 												scrollIntoView(this.ref);
 										}
