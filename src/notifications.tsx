@@ -100,13 +100,15 @@ function createNotification(
 	result.id = notificationId++;
 	Object.assign(
 		result,
-		{
-			context: null,
-			level: "default",
-			time: 3000,
-			closable: true,
-		},
-		result
+		Object.assign(
+			{
+				context: null,
+				level: "default",
+				time: 3000,
+				closable: true,
+			},
+			result
+		)
 	);
 	//inject key into react component to avoid misrendering
 	(result.data as any).key = result.id;
