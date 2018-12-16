@@ -32,6 +32,10 @@ export function oneOf<T>(subject: T, ...objects: T[]): boolean {
 	return false;
 }
 
+/**
+ *
+ * @param n sleep duration in ms
+ */
 export function sleep(n: number): Promise<void> {
 	return new Promise(resolve => window.setTimeout(resolve, n));
 }
