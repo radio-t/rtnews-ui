@@ -46,7 +46,6 @@ import {
 	ArticleSort,
 } from "./articleViews";
 import ListingActions from "./listingActions";
-import { Redirect } from "react-router-dom";
 import AddArticle from "./add";
 import Loading from "./loading";
 
@@ -152,7 +151,7 @@ function withAutoUpdate<P extends object, S extends object>(
 }
 
 type BaseListingProps = {
-	activeId: string | null;
+	activeId?: string | null;
 	isAdmin?: boolean;
 };
 
@@ -449,7 +448,6 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 				<ListingActions
 					includeFilters={true}
 					className={this.props.isAdmin ? "listing-actions-all" : ""}
-					//
 					postRecentness={this.state.postRecentness}
 					onRecentnessChange={(postRecentness: PostRecentness) => {
 						this.setState({ postRecentness });
@@ -553,7 +551,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 									key={x.id}
 									article={x}
 									archive={false}
-									controls={this.props.isAdmin ? getControls() : null}
+									controls={getControls()}
 									active={isCurrent}
 									draggable={sortIsDefault}
 									onChange={(change: ChangeID, data: any) =>
@@ -565,7 +563,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 									key={x.id}
 									article={x}
 									archive={false}
-									controls={this.props.isAdmin ? getControls() : null}
+									controls={null}
 									active={isCurrent}
 									onChange={(change: ChangeID, data: any) =>
 										this.onArticleChange(x, change, data)
@@ -582,7 +580,6 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 export const ListingWithAutoUpdate = withAutoUpdate(Listing);
 
 type ArchiveListingProps = {
-	activeId: string | null;
 	isAdmin?: boolean;
 };
 
@@ -649,10 +646,7 @@ export class ArchiveListing extends BaseListing<
 
 export const ArchiveListingWithAutoUpdate = withAutoUpdate(ArchiveListing);
 
-type DeletedListingProps = {
-	activeId: string | null;
-	isAdmin?: boolean;
-};
+type DeletedListingProps = {};
 
 type DeletedListingState = {
 	news: Article[];
@@ -689,7 +683,6 @@ export class DeletedListing extends BaseListing<
 		this.update();
 	}
 	render() {
-		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
 				<ErrorComponent
@@ -708,7 +701,7 @@ export class DeletedListing extends BaseListing<
 					<ArticleBrief
 						key={x.id}
 						article={x}
-						controls={this.props.isAdmin ? ["restore"] : []}
+						controls={["restore"]}
 						onChange={(id: ChangeID, data: any) =>
 							this.onArticleChange(x, id, data)
 						}
@@ -723,7 +716,6 @@ export const DeletedListingWithAutoUpdate = withAutoUpdate(DeletedListing);
 
 type SorterProps = {
 	activeId: string | null;
-	isAdmin?: boolean;
 };
 
 type SorterState = {
@@ -754,7 +746,6 @@ export class Sorter extends BaseListing<SorterProps, SorterState> {
 		this.update();
 	}
 	render() {
-		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
 				<ErrorComponent

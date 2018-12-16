@@ -1,13 +1,11 @@
 import { Component, CSSProperties } from "react";
 
-import { Redirect } from "react-router-dom";
 import { addArticle } from "./api";
 import { addNotification } from "./notifications";
 import { apiRoot } from "./settings";
 import { waitFor } from "./utils";
 
 type Props = {
-	isAdmin?: boolean;
 	style?: CSSProperties;
 	onAdd?: (url: string) => void;
 };
@@ -126,7 +124,6 @@ export default class AddArticleForm extends Component<Props, State> {
 		return "javascript:(" + encodeURIComponent(href) + ")();";
 	}
 	render() {
-		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (!this.state.manual)
 			return (
 				<form

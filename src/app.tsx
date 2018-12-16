@@ -62,7 +62,8 @@ export default class App extends Component<AppProps> {
 								render={() => (
 									<ScrollContext scrollKey="main">
 										<ListingWithAutoUpdate
-											{...this.props}
+											isAdmin={this.props.isAdmin}
+											activeId={this.props.activeId}
 											ref={ref => ((window as any)[listingRef] = ref)}
 										/>
 									</ScrollContext>
@@ -76,18 +77,22 @@ export default class App extends Component<AppProps> {
 							<Route
 								path="/deleted/"
 								exact={true}
-								render={() => (
-									<ScrollContext>
-										<DeletedListingWithAutoUpdate {...this.props} />
-									</ScrollContext>
-								)}
+								render={() =>
+									this.props.isAdmin ? (
+										<ScrollContext>
+											<DeletedListingWithAutoUpdate />
+										</ScrollContext>
+									) : (
+										<Redirect to="/login/" />
+									)
+								}
 							/>
 							<Route
 								path="/archive/"
 								exact={true}
 								render={() => (
 									<ScrollContext>
-										<ArchiveListingWithAutoUpdate {...this.props} />
+										<ArchiveListingWithAutoUpdate />
 									</ScrollContext>
 								)}
 							/>
@@ -95,22 +100,29 @@ export default class App extends Component<AppProps> {
 								path="/add/"
 								exact={true}
 								render={() => {
+									if (!this.props.isAdmin) return <Redirect to="/login/" />;
 									document.title = "Добавить новость | Новости Радио-Т";
-									return <AddArticle {...this.props} />;
+									return <AddArticle />;
 								}}
 							/>
 							<Route
 								path="/feeds/"
 								exact={true}
-								render={() => <Feeds {...this.props} />}
+								render={() =>
+									this.props.isAdmin ? <Feeds /> : <Redirect to="/login/" />
+								}
 							/>
 							<Route
 								path="/sort/"
-								render={() => (
-									<ScrollContext>
-										<SorterWithAutoUpdate {...this.props} />
-									</ScrollContext>
-								)}
+								render={() =>
+									this.props.isAdmin ? (
+										<ScrollContext>
+											<SorterWithAutoUpdate activeId={this.props.activeId} />
+										</ScrollContext>
+									) : (
+										<Redirect to="/login/" />
+									)
+								}
 							/>
 							<Route
 								path={`${postsPrefix}/:slug`}

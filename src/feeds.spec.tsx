@@ -26,7 +26,7 @@ describe("Feeds", () => {
 		);
 		const host = mount(
 			<div>
-				<Feeds isAdmin={true} />
+				<Feeds />
 			</div>
 		);
 		await sleep(100);
