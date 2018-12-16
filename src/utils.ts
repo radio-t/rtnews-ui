@@ -189,3 +189,42 @@ export const requestIdleCallback: (
 		return 0;
 	};
 })();
+
+export function padStart(
+	input: string | number,
+	length: number,
+	filler: string = " "
+): string {
+	const strInput = input.toString();
+	if (strInput.length >= length) return strInput;
+	const appendix = new Array(length - strInput.length).fill(filler).join("");
+	return appendix + strInput;
+}
+
+/**
+ * Converts date to string interopable with server "2018-12-31T12:50:34.000000000+01:00"
+ *
+ * @param date
+ * @param offset offset in minutes
+ */
+export function toServerTime(date: Date, offset: number = 6 * 60): string {
+	const iso = new Date(date.getTime() - offset * 60000)
+		.toISOString()
+		.slice(0, -1);
+	const hourOffset = Math.floor(offset / 60);
+	const minutesOffset = offset - hourOffset * 60;
+	const formatDate = `${iso}000000${hourOffset < 0 ? "+" : "-"}${padStart(
+		Math.abs(hourOffset),
+		2,
+		"0"
+	)}:${padStart(minutesOffset, 2, "0")}`;
+	return formatDate;
+}
+
+/**
+ *
+ * @param time string in interop format "2018-12-31T12:50:34.000000000+01:00"
+ */
+export function fromServerTime(time: string): Date {
+	return new Date(time);
+}

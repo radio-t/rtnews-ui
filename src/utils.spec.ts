@@ -1,4 +1,13 @@
-import { first, firstIndex, formatDate, oneOf, animate } from "./utils";
+import {
+	first,
+	firstIndex,
+	formatDate,
+	oneOf,
+	animate,
+	padStart,
+	toServerTime,
+	fromServerTime,
+} from "./utils";
 
 describe("first", () => {
 	test("ok", () => {
@@ -46,5 +55,40 @@ describe("animate", () => {
 		await animate(fn, 10, true);
 		expect(fn).toBeCalledTimes(5);
 		jest.useRealTimers();
+	});
+});
+
+describe("padStart", () => {
+	test("ok", async () => {
+		expect(padStart(12, 4, "0")).toBe("0012");
+		expect(padStart("hello", 10)).toBe("     hello");
+	});
+});
+
+describe("toServerTime", () => {
+	test("ok", async () => {
+		const subjects: [Date, string][] = [
+			[new Date("2018-01-01 06:05:04"), "2018-01-01T00:05:04.000000000-06:00"],
+			[
+				new Date("1964-12-30 03:04:01.128"),
+				"1964-12-29T21:04:01.128000000-06:00",
+			],
+			[
+				new Date("2018-12-16 01:00:00.5678"),
+				"2018-12-15T19:00:00.567000000-06:00",
+			],
+		];
+		for (const [date, result] of subjects) {
+			expect(toServerTime(date)).toBe(result);
+		}
+	});
+});
+
+describe("fromServerTime", () => {
+	test("ok", async () => {
+		const date = fromServerTime("2018-12-15T19:00:00.567000000-06:00");
+		expect(date.getFullYear()).toBe(2018);
+		expect(date.getUTCDate()).toBe(16);
+		expect(date.getUTCHours()).toBe(1);
 	});
 });
