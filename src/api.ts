@@ -7,7 +7,7 @@ import {
 	PostLevel,
 	Sorting,
 } from "./settings";
-import { first, retry, sleep } from "./utils";
+import { first, retry, sleep, toServerTime, fromServerTime } from "./utils";
 import { ArticleInit, Article } from "./articleInterface";
 import { Feed } from "./feedInterface";
 import { ThemeType } from "./themeInterface";
@@ -376,6 +376,21 @@ export function removeFeed(id: string): Promise<null> {
 
 export function startShow(): Promise<null> {
 	return request("/show/start", { method: "PUT" }) as Promise<null>;
+}
+
+export function getShowStartTime(): Promise<Date | null> {
+	return (request("/show/start") as Promise<{ started?: string }>)
+		.then(obj => {
+			return obj.started ? fromServerTime(obj.started) : null;
+		})
+		.catch(e => {
+			console.error(e);
+			return null;
+		});
+}
+
+export function setShowStartTime(date: Date): Promise<void> {
+	return request(`/show/start/${toServerTime(date)}`) as Promise<void>;
 }
 
 export function getRecentness(): PostRecentness {
