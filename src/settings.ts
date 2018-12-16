@@ -1,3 +1,4 @@
+import { NOW, DAY, MONTH, MINUTE } from "./constants";
 import { Article } from "./articleInterface";
 
 // via webpack define plugin
@@ -10,6 +11,11 @@ export const remark = {
 	baseurl: "https://remark42.radio-t.com",
 	site_id: "rtnews",
 };
+
+/**
+ * now in ms
+ */
+const now = NOW.getTime();
 
 /**
  * news update interval in minutes
@@ -32,6 +38,36 @@ export const activeArticleID = "active-article";
  * defines max show duration in ms, six hours
  */
 export const maxShowDuration = 1000 * 60 * 60 * 6;
+
+/**
+ * Definas start date of next show
+ */
+export const showStartTime: Date = (() => {
+	const d = new Date("2018-12-16");
+	const dow = d.getUTCDay();
+	switch (dow) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			d.setUTCDate(d.getUTCDate() + (5 - dow));
+			break;
+		case 5:
+			break;
+		case 6:
+			d.setUTCDate(d.getUTCDate() + 6);
+			break;
+	}
+	d.setUTCHours(20, 0, 0, 0);
+	return d;
+})();
+
+/**
+ * Defines interval from showStartTime when
+ * if show wasn't started notification should appear
+ */
+export const showStartTimeInterval = MINUTE * 40;
 
 /**
  * Matches if article origlink matches to listeners proposed topics url
@@ -73,10 +109,6 @@ export const sortings: Sorting[] = [
 	},
 ];
 
-const now = new Date().getTime();
-const day = 1000 * 60 * 60 * 24;
-const month = day * 30;
-
 export type PostRecentnessString = "Все" | "Свежие";
 
 export interface PostRecentness {
@@ -95,9 +127,9 @@ export const postRecentness: PostRecentness[] = [
 		title: "Свежие",
 		fn(x, _, isgeek = true) {
 			const interval = now - x.parsedats;
-			if (isgeek && x.geek && interval < 3 * month) {
+			if (isgeek && x.geek && interval < 3 * MONTH) {
 				return true;
-			} else if (interval < 21 * day) {
+			} else if (interval < 21 * DAY) {
 				return true;
 			}
 			return false;

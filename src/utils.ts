@@ -1,16 +1,3 @@
-/**
- * ms to second
- */
-export const SECOND = 1000;
-/**
- * ms to minute
- */
-export const MINUTE = SECOND * 60;
-/**
- * ms to hout
- */
-export const HOUR = MINUTE * 60;
-
 export function first<T>(arr: T[], fn: (item: T) => boolean): T | null {
 	for (let item of arr) {
 		if (fn(item)) return item;
