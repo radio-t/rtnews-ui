@@ -29,6 +29,11 @@ export const newsCacheValidInterval: number | null = 5;
 export const activeArticleID = "active-article";
 
 /**
+ * defines max show duration in ms, six hours
+ */
+export const maxShowDuration = 1000 * 60 * 60 * 6;
+
+/**
  * Matches if article origlink matches to listeners proposed topics url
  */
 export const prepTopicsReg = /^https?:\/\/radio-t.com\/p\/\d{4}\/\d{2}\/\d{2}\/prep-\d+\/?$/i;

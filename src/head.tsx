@@ -1,12 +1,18 @@
 import { Component, MouseEvent } from "react";
 
-import { logout, startShow, setTheme as saveTheme } from "./api";
+import {
+	logout,
+	startShow,
+	setTheme as saveTheme,
+	getShowStartTime,
+} from "./api";
 import { setState, setTheme as commitTheme } from "./store";
 import { addNotification } from "./notifications";
-import { postsPrefix } from "./settings";
+import { postsPrefix, maxShowDuration } from "./settings";
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
+import TimeFrom from "./timefrom";
 import { sleep, scrollIntoView, waitFor } from "./utils";
 import { getListingInstance } from "./references";
 
@@ -55,9 +61,22 @@ type Props = {
 	history: History;
 };
 
-type State = {};
+type State = {
+	showStartTime?: Date | null;
+};
 
 export default class Head extends Component<Props, State> {
+	async componentDidMount() {
+		const showStartTime = await getShowStartTime();
+		if (
+			showStartTime &&
+			new Date().getTime() - showStartTime.getTime() < maxShowDuration
+		) {
+			this.setState({
+				showStartTime: showStartTime,
+			});
+		}
+	}
 	render() {
 		return (
 			<div className="header wrapper page__header">
@@ -73,6 +92,12 @@ export default class Head extends Component<Props, State> {
 								this.props.issueNumber.number
 							)}
 						</span>
+					)}
+					{this.props.isAdmin && this.state.showStartTime && (
+						<TimeFrom
+							className="header__show-start-counter"
+							from={this.state.showStartTime}
+						/>
 					)}
 				</h1>
 				<ul
