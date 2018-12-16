@@ -390,7 +390,9 @@ export function getShowStartTime(): Promise<Date | null> {
 }
 
 export function setShowStartTime(date: Date): Promise<void> {
-	return request(`/show/start/${toServerTime(date)}`) as Promise<void>;
+	return request(`/show/start/${toServerTime(date)}`, {
+		method: "POST",
+	}) as Promise<void>;
 }
 
 export function getRecentness(): PostRecentness {
