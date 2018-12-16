@@ -67,7 +67,7 @@ export const showStartTime: Date = (() => {
  * Defines interval from showStartTime when
  * if show wasn't started notification should appear
  */
-export const showStartTimeInterval = MINUTE * 40;
+export const showStartTimeDeadline = MINUTE * 15;
 
 /**
  * Matches if article origlink matches to listeners proposed topics url

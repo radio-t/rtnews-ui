@@ -7,8 +7,14 @@ import {
 	getShowStartTime,
 } from "./api";
 import { setState, setTheme as commitTheme } from "./store";
-import { addNotification } from "./notifications";
-import { postsPrefix, maxShowDuration } from "./settings";
+import { addNotification, removeNotification } from "./notifications";
+import { Notification } from "./notificationInterface";
+import {
+	postsPrefix,
+	maxShowDuration,
+	showStartTime,
+	showStartTimeDeadline,
+} from "./settings";
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
@@ -65,16 +71,62 @@ type State = {
 	showStartTime?: Date | null;
 };
 
+// Returns null if show duration over max duration
+async function getShowStartTimeWithMaxDuration(): Promise<Date | null> {
+	const showServerStartTime = await getShowStartTime();
+	if (!showServerStartTime) return null;
+	const durationIsLegit: boolean = Boolean(
+		new Date().getTime() - showServerStartTime.getTime() < maxShowDuration
+	);
+	return durationIsLegit ? showServerStartTime : null;
+}
+
 export default class Head extends Component<Props, State> {
 	async componentDidMount() {
-		const showStartTime = await getShowStartTime();
-		if (
-			showStartTime &&
-			new Date().getTime() - showStartTime.getTime() < maxShowDuration
-		) {
-			this.setState({
-				showStartTime: showStartTime,
-			});
+		this.setState({
+			showStartTime: await getShowStartTimeWithMaxDuration(),
+		});
+
+		// start show start time polling
+		if (new Date().getUTCDay() === showStartTime.getUTCDay()) {
+			Promise.resolve()
+				.then(async () => {
+					let notification: Notification | null = null;
+					while (!this.state.showStartTime) {
+						const startTime = await getShowStartTimeWithMaxDuration();
+						if (startTime) {
+							this.setState({ showStartTime: showStartTime });
+							break;
+						}
+						if (
+							new Date().getTime() >=
+							showStartTime.getTime() + showStartTimeDeadline
+						) {
+							notification = addNotification(remove => ({
+								data: (
+									<span>
+										Может{" "}
+										<span
+											className="pseudo"
+											onClick={async () => {
+												await this.poehali();
+												remove();
+											}}
+										>
+											поехали?
+										</span>
+									</span>
+								),
+								closable: false,
+							}));
+							break;
+						} else {
+							await sleep(60000);
+						}
+					}
+					if (notification) removeNotification(notification);
+				})
+				.catch(e => console.error(e));
 		}
 	}
 	render() {
@@ -241,10 +293,11 @@ export default class Head extends Component<Props, State> {
 			data: "Стартую",
 		});
 		startShow()
-			.then(() => {
+			.then(async () => {
 				addNotification({
 					data: <b>Шоу началось</b>,
 				});
+				this.setState({ showStartTime: await getShowStartTime() });
 			})
 			.catch(e => {
 				console.error(e);
