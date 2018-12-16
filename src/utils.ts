@@ -1,3 +1,16 @@
+/**
+ * ms to second
+ */
+export const SECOND = 1000;
+/**
+ * ms to minute
+ */
+export const MINUTE = SECOND * 60;
+/**
+ * ms to hout
+ */
+export const HOUR = MINUTE * 60;
+
 export function first<T>(arr: T[], fn: (item: T) => boolean): T | null {
 	for (let item of arr) {
 		if (fn(item)) return item;
@@ -37,7 +50,7 @@ export function sleep(n: number): Promise<void> {
 }
 
 export function animate(
-	fn: Function,
+	fn: (stop: () => void, timestamp: number) => void,
 	interval: number = 1000,
 	immediate: boolean = true
 ): Promise<void> {
@@ -46,11 +59,11 @@ export function animate(
 		const stop = () => {
 			stopped = true;
 		};
-		if (immediate) fn(stop);
-		let t = 0;
-		let runner = async (timestamp = 0) => {
+		let t = performance.now();
+		if (immediate) fn(stop, t);
+		let runner = async (timestamp = t) => {
 			if (timestamp - interval > t) {
-				await fn(stop);
+				await fn(stop, timestamp);
 				t = timestamp;
 			}
 			if (!stopped) requestAnimationFrame(runner);
@@ -227,4 +240,16 @@ export function toServerTime(date: Date, offset: number = 6 * 60): string {
  */
 export function fromServerTime(time: string): Date {
 	return new Date(time);
+}
+
+export function intervalToString(interval: number): string {
+	const secinterval = interval / 1000;
+	const hours = Math.floor(secinterval / 3600);
+	const minutes = Math.floor((secinterval % 3600) / 60);
+	const seconds = Math.floor(secinterval % 60);
+	return `${padStart(hours, 2, "0")}:${padStart(minutes, 2, "0")}:${padStart(
+		seconds,
+		2,
+		"0"
+	)}`;
 }

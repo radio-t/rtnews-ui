@@ -7,6 +7,7 @@ import {
 	padStart,
 	toServerTime,
 	fromServerTime,
+	intervalToString,
 } from "./utils";
 
 describe("first", () => {
@@ -90,5 +91,14 @@ describe("fromServerTime", () => {
 		expect(date.getFullYear()).toBe(2018);
 		expect(date.getUTCDate()).toBe(16);
 		expect(date.getUTCHours()).toBe(1);
+	});
+});
+
+describe("intervalToString", () => {
+	test("ok", async () => {
+		expect(intervalToString(1000)).toBe("00:00:01");
+		expect(intervalToString((2 * 60 + 35) * 1000)).toBe("00:02:35");
+		expect(intervalToString(3 * 60 * 1000)).toBe("00:03:00");
+		expect(intervalToString((72 * 60 + 25) * 1000)).toBe("01:12:25");
 	});
 });
