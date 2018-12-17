@@ -7,7 +7,7 @@ import {
 	PostLevel,
 	Sorting,
 } from "./settings";
-import { first, retry, sleep, toServerTime, fromServerTime } from "./utils";
+import { first, retry, sleep, fromServerTime, padStart } from "./utils";
 import { ArticleInit, Article } from "./articleInterface";
 import { Feed } from "./feedInterface";
 import { ThemeType } from "./themeInterface";
@@ -374,8 +374,29 @@ export function removeFeed(id: string): Promise<null> {
 	return request("/feeds/" + id, { method: "DELETE" }) as Promise<null>;
 }
 
-export function startShow(): Promise<null> {
-	return request("/show/start", { method: "PUT" }) as Promise<null>;
+/**
+ * Converts date to yyyymmdd-hhmmss which server requires
+ *
+ * @param date
+ */
+function toShowStartTimeURLParameter(date: Date): string {
+	const d = new Date(date);
+	d.setUTCHours(d.getUTCHours() - 6);
+	const pad = (i: string | number) => padStart(i, 2, "0");
+	return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(
+		d.getUTCDate()
+	)}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}`;
+}
+
+/**
+ *
+ * @param date show start datetime, current time if null
+ */
+export function startShow(date?: Date): Promise<null> {
+	const appendix = date
+		? `/${encodeURIComponent(toShowStartTimeURLParameter(date))}`
+		: "";
+	return request("/show/start" + appendix, { method: "PUT" }) as Promise<null>;
 }
 
 export function getShowStartTime(): Promise<Date | null> {
@@ -387,12 +408,6 @@ export function getShowStartTime(): Promise<Date | null> {
 			console.error(e);
 			return null;
 		});
-}
-
-export function setShowStartTime(date: Date): Promise<void> {
-	return request(`/show/start/${encodeURIComponent(toServerTime(date))}`, {
-		method: "PUT",
-	}) as Promise<void>;
 }
 
 export function getRecentness(): PostRecentness {

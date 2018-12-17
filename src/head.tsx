@@ -5,7 +5,6 @@ import {
 	startShow,
 	setTheme as saveTheme,
 	getShowStartTime,
-	setShowStartTime,
 } from "./api";
 import { setState, setTheme as commitTheme } from "./store";
 import { addNotification, removeNotification } from "./notifications";
@@ -305,8 +304,7 @@ export default class Head extends Component<Props, State> {
 				: async () => {
 						const d = new Date();
 						d.setUTCMinutes(d.getUTCMinutes() - offset);
-						await setShowStartTime(d);
-						return null;
+						return startShow(d);
 				  };
 
 		addNotification({
