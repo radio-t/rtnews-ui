@@ -255,12 +255,13 @@ export default class Head extends Component<Props, State> {
 					while (!this.state.showStartTime) {
 						const startTime = await getShowStartTimeWithMaxDuration();
 						if (startTime) {
-							this.setState({ showStartTime: showStartTime });
+							this.setState({ showStartTime: startTime });
 							break;
 						}
 						if (
 							new Date().getTime() >=
-							showStartTime.getTime() + showStartTimeDeadline
+								showStartTime.getTime() + showStartTimeDeadline &&
+							notification === null
 						) {
 							notification = addNotification(remove => ({
 								data: (
@@ -277,9 +278,8 @@ export default class Head extends Component<Props, State> {
 										</span>
 									</span>
 								),
-								closable: false,
+								time: null,
 							}));
-							break;
 						} else {
 							await sleep(60000);
 						}
@@ -315,7 +315,9 @@ export default class Head extends Component<Props, State> {
 				addNotification({
 					data: <b>Шоу началось</b>,
 				});
-				this.setState({ showStartTime: await getShowStartTime() });
+				this.setState({
+					showStartTime: await getShowStartTimeWithMaxDuration(),
+				});
 			})
 			.catch((e: any) => {
 				console.error(e);
