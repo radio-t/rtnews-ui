@@ -390,8 +390,8 @@ export function getShowStartTime(): Promise<Date | null> {
 }
 
 export function setShowStartTime(date: Date): Promise<void> {
-	return request(`/show/start/${toServerTime(date)}`, {
-		method: "POST",
+	return request(`/show/start/${encodeURIComponent(toServerTime(date))}`, {
+		method: "PUT",
 	}) as Promise<void>;
 }
 

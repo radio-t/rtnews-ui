@@ -5,6 +5,7 @@ import {
 	startShow,
 	setTheme as saveTheme,
 	getShowStartTime,
+	setShowStartTime,
 } from "./api";
 import { setState, setTheme as commitTheme } from "./store";
 import { addNotification, removeNotification } from "./notifications";
@@ -287,19 +288,31 @@ export default class Head extends Component<Props, State> {
 		setState({ isAdmin: false });
 	}
 	poehali() {
-		if (!confirm("Таки поехали?")) return;
+		let promptResult = prompt("Таки поехали?\n\nСколько минут назад?", "0");
+		if (promptResult === null) return;
+		let offset = parseInt(promptResult, 10);
+
+		const starter =
+			offset === 0
+				? startShow
+				: async () => {
+						const d = new Date();
+						d.setUTCMinutes(d.getUTCMinutes() - offset);
+						await setShowStartTime(d);
+						return null;
+				  };
 
 		addNotification({
 			data: "Стартую",
 		});
-		startShow()
+		starter()
 			.then(async () => {
 				addNotification({
 					data: <b>Шоу началось</b>,
 				});
 				this.setState({ showStartTime: await getShowStartTime() });
 			})
-			.catch(e => {
+			.catch((e: any) => {
 				console.error(e);
 				addNotification({
 					data: <b>Ошибка при старте шоу</b>,
