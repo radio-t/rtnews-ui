@@ -1,5 +1,5 @@
 .PHONY: build
-build:
+build: test
 	./node_modules/.bin/webpack --mode production
 
 .PHONY: buildDev
