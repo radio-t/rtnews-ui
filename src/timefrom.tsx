@@ -23,12 +23,13 @@ export default class TimeFrom extends PureComponent<Props> {
 		this.start();
 	}
 	private start() {
-		const ts = (this.props.from || new Date()).getTime();
 		const start = new Date().getTime() - performance.now();
+		const ts = (this.props.from || new Date()).getTime();
+		const offset = start - ts;
 		const looper = () => {
 			const time = this.props.withSeconds
-				? intervalToString(start + performance.now() - ts)
-				: intervalToString(start + performance.now() - ts).slice(0, -3);
+				? intervalToString(offset + performance.now())
+				: intervalToString(offset + performance.now()).slice(0, -3);
 			if (time !== this.root!.textContent) this.root!.textContent = time;
 		};
 		looper();
