@@ -2,16 +2,13 @@ import { PureComponent, FormEvent } from "react";
 
 import { getFeeds, addFeed, removeFeed } from "./api";
 import { formatDate, sleep, waitFor } from "./utils";
-import { Redirect } from "react-router-dom";
 
 import { Feed } from "./feedInterface";
 
 import Loading from "./loading";
 import ErrorComponent from "./error";
 
-type Props = {
-	isAdmin: boolean;
-};
+type Props = {};
 
 type State = {
 	feeds: Feed[];
@@ -53,7 +50,6 @@ export default class FeedsForm extends PureComponent<Props, State> {
 		});
 	}
 	render() {
-		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
 				<ErrorComponent

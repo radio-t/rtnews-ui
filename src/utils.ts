@@ -6,7 +6,7 @@ export function first<T>(arr: T[], fn: (item: T) => boolean): T | null {
 }
 
 export function firstIndex<T>(
-	arr: [T],
+	arr: T[],
 	fn: (item: T) => boolean
 ): number | null {
 	for (let i = 0; i < arr.length; i++) {
@@ -25,36 +25,43 @@ export function formatDate(date: Date): string {
 	return day + "." + month + "." + year + " в&nbsp;" + hours + ":" + mins;
 }
 
-export function oneOf<T>(subject: T, ...objects: [T]): boolean {
+export function oneOf<T>(subject: T, ...objects: T[]): boolean {
 	for (let obj of objects) {
 		if (subject === obj) return true;
 	}
 	return false;
 }
 
+/**
+ *
+ * @param n sleep duration in ms
+ */
 export function sleep(n: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, n));
+	return new Promise(resolve => window.setTimeout(resolve, n));
 }
 
-export async function animate(
-	fn: Function,
+export function animate(
+	fn: (stop: () => void, timestamp: number) => void,
 	interval: number = 1000,
 	immediate: boolean = true
 ): Promise<void> {
-	let stopped = false;
-	const stop = () => {
-		stopped = true;
-	};
-	if (immediate) fn(stop);
-	let t = 0;
-	let runner = async (timestamp = 0) => {
-		if (timestamp - interval > t) {
-			await fn(stop);
-			t = timestamp;
-		}
-		if (!stopped) requestAnimationFrame(runner);
-	};
-	requestAnimationFrame(runner);
+	return new Promise(resolve => {
+		let stopped = false;
+		const stop = () => {
+			stopped = true;
+		};
+		let t = performance.now();
+		if (immediate) fn(stop, t);
+		let runner = async (timestamp = t) => {
+			if (timestamp - interval > t) {
+				await fn(stop, timestamp);
+				t = timestamp;
+			}
+			if (!stopped) requestAnimationFrame(runner);
+			else resolve();
+		};
+		requestAnimationFrame(runner);
+	});
 }
 
 /**
@@ -170,7 +177,7 @@ export function debounce(
 		};
 		const callNow = immediate && !timeout;
 		if (timeout) clearTimeout(timeout);
-		timeout = (setTimeout(later, wait) as unknown) as number;
+		timeout = window.setTimeout(later, wait);
 		if (callNow) fn.apply(this, args);
 	};
 }
@@ -186,3 +193,54 @@ export const requestIdleCallback: (
 		return 0;
 	};
 })();
+
+export function padStart(
+	input: string | number,
+	length: number,
+	filler: string = " "
+): string {
+	const strInput = input.toString();
+	if (strInput.length >= length) return strInput;
+	const appendix = new Array(length - strInput.length).fill(filler).join("");
+	return appendix + strInput;
+}
+
+/**
+ * Converts date to string interopable with server "2018-12-31T12:50:34.000000000+01:00"
+ *
+ * @param date
+ * @param offset offset in minutes
+ */
+export function toServerTime(date: Date, offset: number = 6 * 60): string {
+	const iso = new Date(date.getTime() - offset * 60000)
+		.toISOString()
+		.slice(0, -1);
+	const hourOffset = Math.floor(offset / 60);
+	const minutesOffset = offset - hourOffset * 60;
+	const formatDate = `${iso}000000${hourOffset < 0 ? "+" : "-"}${padStart(
+		Math.abs(hourOffset),
+		2,
+		"0"
+	)}:${padStart(minutesOffset, 2, "0")}`;
+	return formatDate;
+}
+
+/**
+ *
+ * @param time string in interop format "2018-12-31T12:50:34.000000000+01:00"
+ */
+export function fromServerTime(time: string): Date {
+	return new Date(time);
+}
+
+export function intervalToString(interval: number): string {
+	const secinterval = interval / 1000;
+	const hours = Math.floor(secinterval / 3600);
+	const minutes = Math.floor((secinterval % 3600) / 60);
+	const seconds = Math.floor(secinterval % 60);
+	return `${padStart(hours, 2, "0")}:${padStart(minutes, 2, "0")}:${padStart(
+		seconds,
+		2,
+		"0"
+	)}`;
+}

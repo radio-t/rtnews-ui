@@ -37,7 +37,6 @@ import { setState } from "./store";
 import { addNotification, removeNotification } from "./notifications";
 import articleCache from "./articleCache";
 import ErrorComponent from "./error";
-import { Notification } from "./notificationInterface";
 import { Article } from "./articleInterface";
 import { ControlID, ChangeID } from "./articleControls";
 
@@ -47,7 +46,6 @@ import {
 	ArticleSort,
 } from "./articleViews";
 import ListingActions from "./listingActions";
-import { Redirect } from "react-router-dom";
 import AddArticle from "./add";
 import Loading from "./loading";
 
@@ -69,7 +67,7 @@ type RequestError = {
  * and upon completition removes notification
  */
 async function en<T>(
-	message: string | Partial<Notification>,
+	message: string | JSX.Element,
 	fn: () => Promise<T>,
 	context: any | null = null
 ): Promise<T> {
@@ -77,12 +75,12 @@ async function en<T>(
 		data: message,
 		time: 30000,
 		context,
-	} as Partial<Notification>);
+	});
 	try {
 		const o = await fn();
 		return o;
 	} finally {
-		setTimeout(() => {
+		window.setTimeout(() => {
 			removeNotification(notification);
 		}, 500);
 	}
@@ -115,15 +113,16 @@ function withAutoUpdate<P extends object, S extends object>(
 			super.componentDidMount && super.componentDidMount();
 
 			this.updateTimestamp = new Date().getTime();
+			const updateIntevalInMS = updateInterval * 60000;
+			const mininterval = Math.min(30000, updateIntevalInMS);
 
-			this.updateInterval = (setInterval(async () => {
+			this.updateInterval = window.setInterval(async () => {
 				let stamp = new Date().getTime();
-				if (stamp - this.updateTimestamp > updateInterval * 60000) {
+				if (stamp - this.updateTimestamp > updateIntevalInMS) {
 					await new Promise(resolve => {
 						requestIdleCallback(
 							() => {
-								super
-									.update()
+								this.update()
 									.then(() => resolve())
 									.catch(e => {
 										console.error(e);
@@ -131,12 +130,12 @@ function withAutoUpdate<P extends object, S extends object>(
 									});
 							},
 							{
-								timeout: 30000,
+								timeout: mininterval,
 							}
 						);
 					});
 				}
-			}, 30000) as unknown) as number;
+			}, mininterval);
 		}
 
 		componentWillUnmount() {
@@ -144,16 +143,15 @@ function withAutoUpdate<P extends object, S extends object>(
 			this.updateInterval && clearInterval(this.updateInterval);
 		}
 
-		async update(force: boolean) {
-			const o = super.update(force);
+		async update(force: boolean = false) {
+			await super.update(force);
 			this.updateTimestamp = new Date().getTime();
-			return o;
 		}
 	};
 }
 
 type BaseListingProps = {
-	activeId: string | null;
+	activeId?: string | null;
 	isAdmin?: boolean;
 };
 
@@ -446,11 +444,10 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 			this.state.sort === sortings[0];
 
 		return (
-			<>
+			<div>
 				<ListingActions
 					includeFilters={true}
 					className={this.props.isAdmin ? "listing-actions-all" : ""}
-					//
 					postRecentness={this.state.postRecentness}
 					onRecentnessChange={(postRecentness: PostRecentness) => {
 						this.setState({ postRecentness });
@@ -484,7 +481,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 								className="pseudo add-form-overlay__control"
 								onClick={() => {
 									this.setState({ addFormExpanded: true });
-									setTimeout(() => {
+									window.setTimeout(() => {
 										const el: HTMLInputElement | null =
 											document.querySelector(".add-form__article-url") ||
 											document.querySelector(".add-form__article-manual-link");
@@ -554,19 +551,26 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 									key={x.id}
 									article={x}
 									archive={false}
-									controls={this.props.isAdmin ? getControls() : null}
+									controls={getControls()}
 									active={isCurrent}
 									draggable={sortIsDefault}
 									onChange={(change: ChangeID, data: any) =>
 										this.onArticleChange(x, change, data)
 									}
+									onMove={(id, from, to) => {
+										this.onArticleChange(x, "move", {
+											id,
+											from,
+											to,
+										});
+									}}
 								/>
 							) : (
 								<ArticleBrief
 									key={x.id}
 									article={x}
 									archive={false}
-									controls={this.props.isAdmin ? getControls() : null}
+									controls={null}
 									active={isCurrent}
 									onChange={(change: ChangeID, data: any) =>
 										this.onArticleChange(x, change, data)
@@ -575,7 +579,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 							);
 						})}
 				</div>
-			</>
+			</div>
 		);
 	}
 }
@@ -583,7 +587,6 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 export const ListingWithAutoUpdate = withAutoUpdate(Listing);
 
 type ArchiveListingProps = {
-	activeId: string | null;
 	isAdmin?: boolean;
 };
 
@@ -650,10 +653,7 @@ export class ArchiveListing extends BaseListing<
 
 export const ArchiveListingWithAutoUpdate = withAutoUpdate(ArchiveListing);
 
-type DeletedListingProps = {
-	activeId: string | null;
-	isAdmin?: boolean;
-};
+type DeletedListingProps = {};
 
 type DeletedListingState = {
 	news: Article[];
@@ -690,7 +690,6 @@ export class DeletedListing extends BaseListing<
 		this.update();
 	}
 	render() {
-		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
 				<ErrorComponent
@@ -709,7 +708,7 @@ export class DeletedListing extends BaseListing<
 					<ArticleBrief
 						key={x.id}
 						article={x}
-						controls={this.props.isAdmin ? ["restore"] : []}
+						controls={["restore"]}
 						onChange={(id: ChangeID, data: any) =>
 							this.onArticleChange(x, id, data)
 						}
@@ -724,7 +723,6 @@ export const DeletedListingWithAutoUpdate = withAutoUpdate(DeletedListing);
 
 type SorterProps = {
 	activeId: string | null;
-	isAdmin?: boolean;
 };
 
 type SorterState = {
@@ -755,7 +753,6 @@ export class Sorter extends BaseListing<SorterProps, SorterState> {
 		this.update();
 	}
 	render() {
-		if (!this.props.isAdmin) return <Redirect to="/login/" />;
 		if (this.state.error)
 			return (
 				<ErrorComponent
@@ -784,6 +781,13 @@ export class Sorter extends BaseListing<SorterProps, SorterState> {
 							onChange={(id: ChangeID, data: any) =>
 								this.onArticleChange(article, id, data)
 							}
+							onMove={(id, from, to) => {
+								this.onArticleChange(article, "move", {
+									id,
+									from,
+									to,
+								});
+							}}
 							draggable={true}
 						/>
 					))}

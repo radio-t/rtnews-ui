@@ -21,7 +21,7 @@ import GearIcon from "./static/svg/gear.svg";
 
 function ArticleHeader({ article }: { article: ArticleType }) {
 	return (
-		<>
+		<div>
 			<h3 className="title article__title">
 				{article.geek && (
 					<SVGInline
@@ -50,7 +50,7 @@ function ArticleHeader({ article }: { article: ArticleType }) {
 					}}
 				/>
 			</div>
-		</>
+		</div>
 	);
 }
 
@@ -94,20 +94,18 @@ function ArticleFactory(editable: boolean = false) {
 					if (article === null) {
 						throw new Error("Unknown article");
 					}
-					document.title = article.title + "| Новости Радио-Т";
+					document.title = article.title + " | Новости Радио-Т";
 					this.setState({ article });
 				})
 				.catch(error => {
 					this.setState({ error });
 				});
 
-			setTimeout(() => {
+			window.setTimeout(() => {
 				const hash = window.location.hash;
 				if (hash === "") return;
 				const el = document.getElementById(hash.substr(1));
-				if (el) {
-					scrollIntoView(el);
-				}
+				if (el) scrollIntoView(el);
 			}, 200);
 		}
 		protected async edit() {

@@ -7,7 +7,7 @@ import {
 	PostLevel,
 	Sorting,
 } from "./settings";
-import { first, retry, sleep } from "./utils";
+import { first, retry, sleep, fromServerTime, padStart } from "./utils";
 import { ArticleInit, Article } from "./articleInterface";
 import { Feed } from "./feedInterface";
 import { ThemeType } from "./themeInterface";
@@ -58,7 +58,12 @@ function processArticles(articles: ArticleInit[]): Article[] {
  */
 export function getPrepTopicsURL(): Promise<string | null> {
 	return fetch("https://radio-t.com/site-api/last/1?categories=prep")
-		.then(resp => resp.json())
+		.then(resp => {
+			if (resp.status >= 400) {
+				return new Error(resp.statusText);
+			}
+			return resp.json();
+		})
 		.then(data => {
 			if (data.length < 1) return null;
 			return data[0].url || null;
@@ -100,7 +105,10 @@ export function getIssueNumber(): Promise<{
 		.catch(() => null);
 }
 
-function request(endpoint: string, options: RequestInit = {}): Promise<any> {
+function request(
+	endpoint: string,
+	options: RequestInit = {}
+): Promise<unknown> {
 	if (!options.hasOwnProperty("headers")) {
 		options.headers = new Headers();
 	}
@@ -129,28 +137,30 @@ function request(endpoint: string, options: RequestInit = {}): Promise<any> {
  * Updates articles on the server
  */
 export function update(): Promise<null> {
-	return request("/news/reload", { method: "PUT" });
+	return request("/news/reload", { method: "PUT" }) as Promise<null>;
 }
 
 /**
  * Gets articles from the server
  */
 export function getNews(): Promise<Article[]> {
-	return request("/news").then(processArticles);
+	return (request("/news") as Promise<ArticleInit[]>).then(processArticles);
 }
 
 /**
  * Gets archive articles from the server
  */
 export function getArchiveNews(): Promise<Article[]> {
-	return request("/news/archive").then(processArticles);
+	return (request("/news/archive") as Promise<ArticleInit[]>).then(
+		processArticles
+	);
 }
 
 /**
  * Gets deleted articles from the server
  */
 export function getDeletedNews(): Promise<Article[]> {
-	return request("/news/del").then(processArticles);
+	return (request("/news/del") as Promise<ArticleInit[]>).then(processArticles);
 }
 
 /**
@@ -171,9 +181,9 @@ export async function getArticle(id: string): Promise<Article | null> {
 		return Promise.resolve(articlesCache.get(articlesIdSlugMap.get(
 			id
 		) as string) as Article);
-	const articleInit: object = await request(
+	const articleInit: object = (await request(
 		"/news/id/" + encodeURIComponent(id)
-	).then(processArticle);
+	)) as Promise<object>;
 	if (!articleInit.hasOwnProperty("id")) {
 		return null;
 	}
@@ -189,9 +199,9 @@ export async function getArticle(id: string): Promise<Article | null> {
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
 	if (articlesCache.has(slug))
 		return Promise.resolve(articlesCache.get(slug) as Article);
-	const articleInit: object = await request(
+	const articleInit: object = (await request(
 		"/news/slug/" + encodeURIComponent(slug)
-	);
+	)) as Promise<object>;
 	if (!articleInit.hasOwnProperty("id")) return null;
 	const article = processArticle(articleInit as ArticleInit);
 	articlesCache.set(slug, article);
@@ -202,8 +212,8 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 /**
  * @return active article id
  */
-export function getActiveArticle(): Promise<string> {
-	return request(`/news/active/id`)
+export function getActiveArticle(): Promise<string | null> {
+	return (request(`/news/active/id`) as Promise<{ id?: string }>)
 		.then(x => x.id || null)
 		.catch(() => null);
 }
@@ -216,8 +226,10 @@ export function getActiveArticle(): Promise<string> {
 export async function pollActiveArticle(ms: number = 295): Promise<string> {
 	while (true) {
 		try {
-			const req = await request(`/news/active/wait/${ms}`);
-			if (req != null && req.hasOwnProperty("id")) return req.id;
+			const req = (await request(`/news/active/wait/${ms}`)) as {
+				id?: string;
+			} | null;
+			if (req != null && req.hasOwnProperty("id")) return req.id!;
 		} catch (e) {
 			console.error("Error while polling for active article");
 			await sleep(3000);
@@ -266,7 +278,7 @@ export function addArticle(
 		method: "POST",
 		body: JSON.stringify(body),
 		headers,
-	});
+	}) as Promise<null>;
 }
 
 export function updateArticle(updated: Partial<Article>): Promise<null> {
@@ -284,30 +296,32 @@ export function updateArticle(updated: Partial<Article>): Promise<null> {
 		method: "POST",
 		body: JSON.stringify(updated),
 		headers,
-	});
+	}) as Promise<null>;
 }
 
 export function archiveArticle(id: string): Promise<null> {
-	return request(`/news/archive/${id}`, { method: "PUT" });
+	return request(`/news/archive/${id}`, { method: "PUT" }) as Promise<null>;
 }
 
 export function activateArticle(id: string): Promise<null> {
-	return request(`/news/active/${id}`, { method: "PUT" });
+	return request(`/news/active/${id}`, { method: "PUT" }) as Promise<null>;
 }
 
 export function removeArticle(id: string): Promise<null> {
-	return request(`/news/${id}`, { method: "DELETE" });
+	return request(`/news/${id}`, { method: "DELETE" }) as Promise<null>;
 }
 
 export function restoreArticle(id: string): Promise<null> {
-	return request(`/news/undelete/${id}`, { method: "PUT" });
+	return request(`/news/undelete/${id}`, { method: "PUT" }) as Promise<null>;
 }
 
 export function moveArticle(
 	id: string,
 	offset: number
 ): Promise<{ [id: string]: number }> {
-	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
+	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" }) as Promise<{
+		[id: string]: number;
+	}>;
 }
 
 /**
@@ -316,31 +330,35 @@ export function moveArticle(
 export async function makeArticleFirst(
 	id: string
 ): Promise<{ [id: string]: number }> {
-	const positions: { [id: string]: number } = await request("/news/positions");
+	const positions = (await request("/news/positions")) as {
+		[id: string]: number;
+	};
 	if (!positions.hasOwnProperty(id))
 		throw new Error("Can't find id's position");
 	const pos = positions[id];
-	const maxPos = Math.max(...Object.values(positions));
+	const maxPos = Object.values(positions).reduce((c, x) => Math.max(c, x), 0);
 	const offset = maxPos - pos;
-	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" });
+	return request(`/news/moveid/${id}/${offset}`, { method: "PUT" }) as Promise<{
+		[id: string]: number;
+	}>;
 }
 
 /**
  * Makes article Geek
  */
 export function makeArticleGeek(id: string): Promise<null> {
-	return request(`/news/geek/${id}`, { method: "PUT" });
+	return request(`/news/geek/${id}`, { method: "PUT" }) as Promise<null>;
 }
 
 /**
  * Removes geek indicator from article
  */
 export function makeArticleNotGeek(id: string): Promise<null> {
-	return request(`/news/nogeek/${id}`, { method: "PUT" });
+	return request(`/news/nogeek/${id}`, { method: "PUT" }) as Promise<null>;
 }
 
 export function getFeeds(): Promise<Feed[]> {
-	return request("/feeds");
+	return request("/feeds") as Promise<Feed[]>;
 }
 
 export function addFeed(url: string): Promise<null> {
@@ -349,15 +367,47 @@ export function addFeed(url: string): Promise<null> {
 	const body = JSON.stringify({
 		feedlink: url,
 	});
-	return request("/feeds", { method: "POST", headers, body });
+	return request("/feeds", { method: "POST", headers, body }) as Promise<null>;
 }
 
 export function removeFeed(id: string): Promise<null> {
-	return request("/feeds/" + id, { method: "DELETE" });
+	return request("/feeds/" + id, { method: "DELETE" }) as Promise<null>;
 }
 
-export function startShow(): Promise<null> {
-	return request("/show/start", { method: "PUT" });
+/**
+ * Converts date to yyyymmdd-hhmmss which server requires
+ *
+ * @param date
+ */
+function toShowStartTimeURLParameter(date: Date): string {
+	const d = new Date(date);
+	d.setUTCHours(d.getUTCHours() - 6);
+	const pad = (i: string | number) => padStart(i, 2, "0");
+	return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(
+		d.getUTCDate()
+	)}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}`;
+}
+
+/**
+ *
+ * @param date show start datetime, current time if null
+ */
+export function startShow(date?: Date): Promise<null> {
+	const appendix = date
+		? `/${encodeURIComponent(toShowStartTimeURLParameter(date))}`
+		: "";
+	return request("/show/start" + appendix, { method: "PUT" }) as Promise<null>;
+}
+
+export function getShowStartTime(): Promise<Date | null> {
+	return (request("/show/start") as Promise<{ started?: string }>)
+		.then(obj => {
+			return obj.started ? fromServerTime(obj.started) : null;
+		})
+		.catch(e => {
+			console.error(e);
+			return null;
+		});
 }
 
 export function getRecentness(): PostRecentness {

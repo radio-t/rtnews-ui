@@ -112,13 +112,6 @@ module.exports = (a, args) => {
 											},
 										},
 									],
-									[
-										"@babel/preset-react",
-										{
-											pragma: "createElement",
-											pragmaFrag: '"div"',
-										},
-									],
 								],
 							},
 						},

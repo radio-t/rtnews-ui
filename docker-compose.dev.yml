@@ -20,7 +20,9 @@ services:
             - ./@types:/app/@types:ro
             - ./makefile:/app/makefile:ro
             - ./tsconfig.json:/app/tsconfig.json:ro
+            - ./testSetup:/app/testSetup:ro
             - ./webpack.config.js:/app/webpack.config.js:ro
+            - ./jest.config.js:/app/jest.config.js:ro
             - ./sync-packages.sh:/app/sync-packages.sh:ro
             - ./package.json:/app/package.json.host
             - ./package-lock.json:/app/package-lock.json.host

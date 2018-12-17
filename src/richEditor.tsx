@@ -102,7 +102,7 @@ export default class RichEditor extends PureComponent<Props, State> {
 		return this.quill!.root.innerHTML;
 	}
 	focus(): void {
-		setTimeout(() => {
+		window.setTimeout(() => {
 			this.quill!.root.focus();
 		}, 100);
 	}

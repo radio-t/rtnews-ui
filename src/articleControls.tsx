@@ -53,7 +53,7 @@ type Props = {
 
 export default function ArticleControls(props: Props) {
 	return (
-		<div className={"post-controls " + props.className ? props.className : ""}>
+		<div className={"post-controls " + (props.className || "")}>
 			{props.controls.map(c => (
 				<span
 					role="button"

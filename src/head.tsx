@@ -1,14 +1,30 @@
 import { Component, MouseEvent } from "react";
 
-import { logout, startShow, setTheme as saveTheme } from "./api";
+import {
+	logout,
+	startShow,
+	setTheme as saveTheme,
+	getShowStartTime,
+} from "./api";
 import { setState, setTheme as commitTheme } from "./store";
-import { addNotification } from "./notifications";
-import { postsPrefix } from "./settings";
+import {
+	addNotification,
+	removeNotification,
+	removeNotificationsWithContext,
+} from "./notifications";
+import { Notification } from "./notificationInterface";
+import {
+	postsPrefix,
+	maxShowDuration,
+	showStartTime,
+	showStartTimeDeadline,
+} from "./settings";
 
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
-import { sleep, scrollIntoView, waitFor } from "./utils";
-import { listingRef } from "./symbols";
+import TimeFrom from "./timefrom";
+import { sleep, scrollIntoView, waitFor, formatDate } from "./utils";
+import { getListingInstance } from "./references";
 
 // @ts-ignore
 import SVGInline from "react-svg-inline";
@@ -55,9 +71,26 @@ type Props = {
 	history: History;
 };
 
-type State = {};
+type State = {
+	showStartTime?: Date | null;
+};
+
+// Returns null if show duration over max duration
+async function getShowStartTimeWithMaxDuration(): Promise<Date | null> {
+	const showServerStartTime = await getShowStartTime();
+	if (!showServerStartTime) return null;
+	const durationIsLegit: boolean = Boolean(
+		new Date().getTime() - showServerStartTime.getTime() < maxShowDuration
+	);
+	return durationIsLegit ? showServerStartTime : null;
+}
+
+const ShowStartNotificationcontext = Symbol();
 
 export default class Head extends Component<Props, State> {
+	async componentDidMount() {
+		if (this.props.isAdmin) this.pollForShowStartTime();
+	}
 	render() {
 		return (
 			<div className="header wrapper page__header">
@@ -73,6 +106,16 @@ export default class Head extends Component<Props, State> {
 								this.props.issueNumber.number
 							)}
 						</span>
+					)}
+					{this.props.isAdmin && this.state.showStartTime && (
+						<TimeFrom
+							className="header__show-start-counter"
+							from={this.state.showStartTime}
+							title={formatDate(this.state.showStartTime).replace(
+								"&nbsp;",
+								" "
+							)}
+						/>
 					)}
 				</h1>
 				<ul
@@ -205,26 +248,92 @@ export default class Head extends Component<Props, State> {
 			</div>
 		);
 	}
+	protected async pollForShowStartTime() {
+		this.setState({
+			showStartTime: await getShowStartTimeWithMaxDuration(),
+		});
+
+		// start show start time polling
+		if (new Date().getUTCDay() === showStartTime.getUTCDay()) {
+			Promise.resolve()
+				.then(async () => {
+					let notification: Notification | null = null;
+					while (!this.state.showStartTime) {
+						const startTime = await getShowStartTimeWithMaxDuration();
+						if (startTime) {
+							this.setState({ showStartTime: startTime });
+							break;
+						}
+						if (
+							new Date().getTime() >=
+								showStartTime.getTime() + showStartTimeDeadline &&
+							notification === null
+						) {
+							notification = addNotification(remove => ({
+								data: (
+									<span>
+										Может{" "}
+										<span
+											className="pseudo"
+											onClick={async () => {
+												await this.poehali();
+												remove();
+											}}
+										>
+											поехали?
+										</span>
+									</span>
+								),
+								time: null,
+							}));
+						} else {
+							await sleep(60000);
+						}
+					}
+					if (notification) removeNotification(notification);
+				})
+				.catch(e => console.error(e));
+		}
+	}
 	protected logout() {
 		logout();
 		setState({ isAdmin: false });
 	}
 	poehali() {
-		if (!confirm("Таки поехали?")) return;
+		let promptResult = prompt("Таки поехали?\n\nСколько минут назад?", "0");
+		if (promptResult === null) return;
+		let offset = parseInt(promptResult, 10);
+
+		const starter =
+			offset === 0
+				? startShow
+				: async () => {
+						const d = new Date();
+						d.setUTCMinutes(d.getUTCMinutes() - offset);
+						return startShow(d);
+				  };
 
 		addNotification({
 			data: "Стартую",
+			context: ShowStartNotificationcontext,
 		});
-		startShow()
-			.then(() => {
+		starter()
+			.then(async () => {
+				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
 					data: <b>Шоу началось</b>,
+					context: ShowStartNotificationcontext,
+				});
+				this.setState({
+					showStartTime: await getShowStartTimeWithMaxDuration(),
 				});
 			})
-			.catch(e => {
+			.catch((e: any) => {
 				console.error(e);
+				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
 					data: <b>Ошибка при старте шоу</b>,
+					context: ShowStartNotificationcontext,
 					level: "error",
 				});
 			});
@@ -233,13 +342,13 @@ export default class Head extends Component<Props, State> {
 		if (!confirm("Таки темы слушателей?")) return;
 
 		try {
-			if (!(window as any)[listingRef]) this.props.history.push("/");
+			if (!getListingInstance()) this.props.history.push("/");
 			await waitFor(
-				() => (window as any)[listingRef],
+				() => !!getListingInstance(),
 				15000,
 				new Error(`Can't navigate to "/"`)
 			);
-			(window as any)[listingRef].startPrepTopics();
+			getListingInstance()!.startPrepTopics();
 		} catch (e) {
 			console.error(e);
 			addNotification({

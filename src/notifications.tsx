@@ -1,118 +1,148 @@
-import { setState, store } from "./store";
-import { Notification } from "./notificationInterface";
+import { Component } from "react";
+
+import { Notification, NotificationInit } from "./notificationInterface";
 
 type Props = {
-	notifications: Notification[];
 	className?: string;
 };
 
-export function Notifications(props: Props) {
-	return (
-		<div className="notifications">
-			{props.notifications &&
-				props.notifications
-					.slice(0)
-					.reverse()
-					.map(n => (
-						<div
-							className={
-								"notifications__item " +
-								(n.level ? `notifications__item-level-${n.level}` : "")
-							}
-							key={n.id}
-						>
-							{n.data}
-							{n.closable && (
-								<div
-									role="button"
-									className="notifications__close-item"
-									onClick={() => removeNotification(n)}
-								>
-									×︎
-								</div>
-							)}
-						</div>
-					))}
-		</div>
-	);
+type State = {
+	notifications: Notification[];
+};
+
+const InstanceRef = Symbol();
+
+function getInstance(): Notifications {
+	return (window as any)[InstanceRef];
+}
+
+export class Notifications extends Component<Props, State> {
+	constructor(props: Props) {
+		super(props);
+		this.state = {
+			notifications: [],
+		};
+	}
+	componentDidMount() {
+		(window as any)[InstanceRef] = this;
+	}
+	add(notification: Notification): void {
+		this.setState({
+			notifications: [...this.state.notifications, notification],
+		});
+	}
+	remove(notification: Notification): void {
+		this.setState({
+			notifications: this.state.notifications.filter(n => n !== notification),
+		});
+	}
+	removeWithContext(context: any): void {
+		this.setState({
+			notifications: this.state.notifications.filter(
+				n => n.context !== context
+			),
+		});
+	}
+	render() {
+		return (
+			<div className="notifications">
+				{this.state.notifications &&
+					this.state.notifications
+						.slice(0)
+						.reverse()
+						.map(n => (
+							<div
+								className={
+									"notifications__item " +
+									(n.level ? `notifications__item-level-${n.level}` : "")
+								}
+								key={n.id}
+							>
+								{n.data}
+								{n.closable && (
+									<div
+										role="button"
+										className="notifications__close-item"
+										onClick={() => removeNotification(n)}
+									>
+										×︎
+									</div>
+								)}
+							</div>
+						))}
+			</div>
+		);
+	}
 }
 
 let notificationId: number = 0;
 
-type DeferredNotification = (remove: () => void) => Partial<Notification>;
+type DeferredNotification = (remove: () => void) => NotificationInit;
 
 function createNotification(
-	notification: string | Partial<Notification>
+	notification: string | NotificationInit
 ): Notification {
+	let result: Notification;
 	if (typeof notification === "string") {
-		notification = {
+		result = {
 			data: <span dangerouslySetInnerHTML={{ __html: notification }} />,
 			time: 3000,
 			level: "default",
-		};
+		} as Notification;
 	} else if (typeof notification.data === "string") {
-		notification.data = (
-			<span dangerouslySetInnerHTML={{ __html: notification.data }} />
-		);
+		result = {
+			...notification,
+			data: <span dangerouslySetInnerHTML={{ __html: notification.data }} />,
+		} as Notification;
+	} else {
+		result = { ...notification } as Notification;
 	}
-	notification.id = notificationId++;
-	notification = Object.assign(
-		{
-			context: null,
-			level: "default",
-			time: 3000,
-			closable: true,
-		},
-		notification
+	result.id = notificationId++;
+	Object.assign(
+		result,
+		Object.assign(
+			{
+				context: null,
+				level: "default",
+				time: 3000,
+				closable: true,
+			},
+			result
+		)
 	);
 	//inject key into react component to avoid misrendering
-	(notification.data as JSX.Element).key = notification.id || null;
-	return notification as Notification;
+	(result.data as any).key = result.id;
+	return result;
 }
 
 export function addNotification(
-	notification: DeferredNotification | string | Partial<Notification>
+	notification: DeferredNotification | string | NotificationInit
 ): Notification {
+	let result: Notification;
 	if (typeof notification === "function") {
 		// fuckery with indirection
-		const n = {};
+		const n = {} as Notification;
 		const remover = () => {
-			store.dispatch({
-				type: "removeNotification",
-				notification: n,
-			});
+			getInstance().remove(n);
 		};
 		Object.assign(n, createNotification(notification(remover)));
-		notification = n;
+		result = n;
 	} else {
-		notification = createNotification(notification);
+		result = createNotification(notification);
 	}
-	store.dispatch({
-		type: "addNotification",
-		notification,
-	});
-	if (notification.time !== null) {
-		setTimeout(() => {
-			store.dispatch({
-				type: "removeNotification",
-				notification: notification as Partial<Notification>,
-			});
-		}, notification.time);
+	getInstance().add(result);
+	if (result.time) {
+		window.setTimeout(() => {
+			getInstance().remove(result);
+		}, result.time);
 	}
-	return notification as Notification;
+	return result;
 }
 
 export function removeNotification(notification: Notification): void {
-	store.dispatch({
-		type: "removeNotification",
-		notification,
-	});
+	getInstance().remove(notification);
 }
 
 export function removeNotificationsWithContext(context: any): void {
-	setState({
-		notifications: store
-			.getState()
-			.notifications.filter((n: Notification) => n.context !== context),
-	});
+	getInstance().removeWithContext(context);
 }

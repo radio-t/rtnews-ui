@@ -1,5 +1,5 @@
 .PHONY: build
-build:
+build: test
 	./node_modules/.bin/webpack --mode production
 
 .PHONY: buildDev
@@ -25,6 +25,9 @@ devServer:
 devServerWithRemote:
 	./node_modules/.bin/webpack-dev-server --mode development --remote
 
+.PHONY: test
+test:
+	./node_modules/.bin/jest --verbose
 
 #docker
 
@@ -56,3 +59,7 @@ dockerDevServer:
 .PHONY: dockerDevServerWithRemote
 dockerDevServerWithRemote:
 	docker-compose -f docker-compose.dev.yml run --rm -p "0.0.0.0:9000:9000" builder -c "make devServerWithRemote"
+
+.PHONY: dockerTest
+dockerTest:
+	docker-compose -f docker-compose.dev.yml run --rm builder -c "make test"
