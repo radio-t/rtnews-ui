@@ -43,7 +43,7 @@ export const maxShowDuration = 1000 * 60 * 60 * 6;
  * Definas start date of next show
  */
 export const showStartTime: Date = (() => {
-	const d = new Date("2018-12-16");
+	const d = new Date();
 	const dow = d.getUTCDay();
 	switch (dow) {
 		case 0:
