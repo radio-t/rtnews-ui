@@ -83,7 +83,7 @@ npm install && ./node_modules/.bin/webpack --mode "development"
 * miscs
  * `GET /api/v1/news/rss/:count` - get rss feed with last (by time) :count
  * `PUT /api/v1/news/reload` - force reprocessing of all RSS feeds
- * `PUT /api/v1/show/start` - save start time (used by markdown request)
+ * `PUT /api/v1/show/start[/:datetime]` - save start time (used by markdown request). `datetime`: show start forced datetime in `YYYYMMDD-HHMMSS` format
  * `GET /api/v1/show/start` - return saved start time
 
 ## _article (news) records_
