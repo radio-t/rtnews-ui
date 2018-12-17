@@ -7,7 +7,11 @@ import {
 	getShowStartTime,
 } from "./api";
 import { setState, setTheme as commitTheme } from "./store";
-import { addNotification, removeNotification } from "./notifications";
+import {
+	addNotification,
+	removeNotification,
+	removeNotificationsWithContext,
+} from "./notifications";
 import { Notification } from "./notificationInterface";
 import {
 	postsPrefix,
@@ -80,6 +84,8 @@ async function getShowStartTimeWithMaxDuration(): Promise<Date | null> {
 	);
 	return durationIsLegit ? showServerStartTime : null;
 }
+
+const ShowStartNotificationcontext = Symbol();
 
 export default class Head extends Component<Props, State> {
 	async componentDidMount() {
@@ -309,11 +315,14 @@ export default class Head extends Component<Props, State> {
 
 		addNotification({
 			data: "Стартую",
+			context: ShowStartNotificationcontext,
 		});
 		starter()
 			.then(async () => {
+				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
 					data: <b>Шоу началось</b>,
+					context: ShowStartNotificationcontext,
 				});
 				this.setState({
 					showStartTime: await getShowStartTimeWithMaxDuration(),
@@ -321,8 +330,10 @@ export default class Head extends Component<Props, State> {
 			})
 			.catch((e: any) => {
 				console.error(e);
+				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
 					data: <b>Ошибка при старте шоу</b>,
+					context: ShowStartNotificationcontext,
 					level: "error",
 				});
 			});
