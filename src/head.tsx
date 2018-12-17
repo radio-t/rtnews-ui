@@ -20,7 +20,7 @@ import {
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
 import TimeFrom from "./timefrom";
-import { sleep, scrollIntoView, waitFor } from "./utils";
+import { sleep, scrollIntoView, waitFor, formatDate } from "./utils";
 import { getListingInstance } from "./references";
 
 // @ts-ignore
@@ -84,51 +84,7 @@ async function getShowStartTimeWithMaxDuration(): Promise<Date | null> {
 
 export default class Head extends Component<Props, State> {
 	async componentDidMount() {
-		this.setState({
-			showStartTime: await getShowStartTimeWithMaxDuration(),
-		});
-
-		// start show start time polling
-		if (new Date().getUTCDay() === showStartTime.getUTCDay()) {
-			Promise.resolve()
-				.then(async () => {
-					let notification: Notification | null = null;
-					while (!this.state.showStartTime) {
-						const startTime = await getShowStartTimeWithMaxDuration();
-						if (startTime) {
-							this.setState({ showStartTime: showStartTime });
-							break;
-						}
-						if (
-							new Date().getTime() >=
-							showStartTime.getTime() + showStartTimeDeadline
-						) {
-							notification = addNotification(remove => ({
-								data: (
-									<span>
-										Может{" "}
-										<span
-											className="pseudo"
-											onClick={async () => {
-												await this.poehali();
-												remove();
-											}}
-										>
-											поехали?
-										</span>
-									</span>
-								),
-								closable: false,
-							}));
-							break;
-						} else {
-							await sleep(60000);
-						}
-					}
-					if (notification) removeNotification(notification);
-				})
-				.catch(e => console.error(e));
-		}
+		if (this.props.isAdmin) this.pollForShowStartTime();
 	}
 	render() {
 		return (
@@ -150,6 +106,10 @@ export default class Head extends Component<Props, State> {
 						<TimeFrom
 							className="header__show-start-counter"
 							from={this.state.showStartTime}
+							title={formatDate(this.state.showStartTime).replace(
+								"&nbsp;",
+								" "
+							)}
 						/>
 					)}
 				</h1>
@@ -282,6 +242,53 @@ export default class Head extends Component<Props, State> {
 				<hr />
 			</div>
 		);
+	}
+	protected async pollForShowStartTime() {
+		this.setState({
+			showStartTime: await getShowStartTimeWithMaxDuration(),
+		});
+
+		// start show start time polling
+		if (new Date().getUTCDay() === showStartTime.getUTCDay()) {
+			Promise.resolve()
+				.then(async () => {
+					let notification: Notification | null = null;
+					while (!this.state.showStartTime) {
+						const startTime = await getShowStartTimeWithMaxDuration();
+						if (startTime) {
+							this.setState({ showStartTime: showStartTime });
+							break;
+						}
+						if (
+							new Date().getTime() >=
+							showStartTime.getTime() + showStartTimeDeadline
+						) {
+							notification = addNotification(remove => ({
+								data: (
+									<span>
+										Может{" "}
+										<span
+											className="pseudo"
+											onClick={async () => {
+												await this.poehali();
+												remove();
+											}}
+										>
+											поехали?
+										</span>
+									</span>
+								),
+								closable: false,
+							}));
+							break;
+						} else {
+							await sleep(60000);
+						}
+					}
+					if (notification) removeNotification(notification);
+				})
+				.catch(e => console.error(e));
+		}
 	}
 	protected logout() {
 		logout();

@@ -6,6 +6,7 @@ type Props = {
 	withSeconds?: boolean;
 	className?: string;
 	id?: string;
+	title?: string;
 };
 
 export default class TimeFrom extends PureComponent<Props> {
@@ -44,6 +45,7 @@ export default class TimeFrom extends PureComponent<Props> {
 			<div
 				id={this.props.id || ""}
 				ref={ref => (this.root = ref!)}
+				title={this.props.title || undefined}
 				className={`counter ${this.props.className || ""}`}
 			/>
 		);
