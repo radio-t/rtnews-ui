@@ -557,6 +557,13 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 									onChange={(change: ChangeID, data: any) =>
 										this.onArticleChange(x, change, data)
 									}
+									onMove={(id, from, to) => {
+										this.onArticleChange(x, "move", {
+											id,
+											from,
+											to,
+										});
+									}}
 								/>
 							) : (
 								<ArticleBrief
@@ -774,6 +781,13 @@ export class Sorter extends BaseListing<SorterProps, SorterState> {
 							onChange={(id: ChangeID, data: any) =>
 								this.onArticleChange(article, id, data)
 							}
+							onMove={(id, from, to) => {
+								this.onArticleChange(article, "move", {
+									id,
+									from,
+									to,
+								});
+							}}
 							draggable={true}
 						/>
 					))}
