@@ -22,7 +22,7 @@ import CommentsIcon from "./static/svg/i-comment.svg";
 import GearIcon from "./static/svg/gear.svg";
 import { Article } from "./articleInterface";
 import Remark from "./remark";
-import UpdateIfVisible from "./visivilityDependant";
+import UpdateIfVisible from "./visibilityDependant";
 import Draggable from "./draggable";
 
 type ArticleBriefBasicProps = {
