@@ -5,6 +5,8 @@ import { getArticleBySlug, updateArticle } from "./api";
 import articleCache from "./articleCache";
 import { remark, prepTopicsReg } from "./settings";
 import { Article as ArticleType } from "./articleInterface";
+import { connect } from "react-redux";
+import { State as StoreState } from "./store";
 
 import Remark from "./remark";
 import Loading from "./loading";
@@ -18,6 +20,14 @@ import { Notification } from "./notificationInterface";
 import SVGInline from "react-svg-inline";
 // @ts-ignore
 import GearIcon from "./static/svg/gear.svg";
+
+const RemarkWithTheme = connect(
+	(state: StoreState): { theme: "light" | "dark" } => {
+		return {
+			theme: state.theme === "day" ? "light" : "dark",
+		};
+	}
+)(Remark);
 
 function ArticleHeader({ article }: { article: ArticleType }) {
 	return (
@@ -209,7 +219,7 @@ function ArticleFactory(editable: boolean = false) {
 				return (
 					<article className="article">
 						<ArticleHeader article={this.state.article} />
-						<Remark
+						<RemarkWithTheme
 							baseurl={remark.baseurl}
 							site_id="radiot"
 							id="to-comments"
@@ -337,7 +347,7 @@ function ArticleFactory(editable: boolean = false) {
 						/>,
 					]}
 					<hr className="article__break" />
-					<Remark
+					<RemarkWithTheme
 						className="article__comments"
 						id="to-comments"
 						baseurl={remark.baseurl}

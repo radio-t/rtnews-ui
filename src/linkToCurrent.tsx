@@ -50,7 +50,7 @@ const onMissingArticle = async () => {
 type Props = {
 	onClick?: (event: Event) => void;
 	title: string;
-	className: string;
+	className?: string;
 };
 
 export default function LinkToCurrent(props: Props) {

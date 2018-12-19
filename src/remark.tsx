@@ -1,11 +1,14 @@
 import { Component } from "react";
 
+type RemarkTheme = "light" | "dark";
+
 type Props = {
 	baseurl?: string;
 	site_id: string;
 	url?: string;
 	id?: string;
 	className?: string;
+	theme?: RemarkTheme;
 };
 
 export default class Remark extends Component<Props> {
@@ -21,11 +24,22 @@ export default class Remark extends Component<Props> {
 		}
 	) => void;
 	protected postClickOutsideToIframe?: (event: MouseEvent) => void;
+	protected changeTheme?: (theme: RemarkTheme) => void;
 	constructor(props: Props) {
 		super(props);
 	}
 	render() {
-		return <div ref={ref => (this.ref = ref!)} id="remark42" {...this.props} />;
+		return (
+			<div
+				className={`remark42 ${this.props.className || ""}`}
+				id={this.props.id}
+				ref={ref => (this.ref = ref!)}
+			/>
+		);
+	}
+	shouldComponentUpdate(nextProps: Props) {
+		if (nextProps.theme !== this.props.theme) return true;
+		return false;
 	}
 	componentDidMount() {
 		const COMMENT_NODE_CLASSNAME_PREFIX = "remark42__comment-";
@@ -34,9 +48,11 @@ export default class Remark extends Component<Props> {
 			baseurl: string;
 			site_id: string;
 			url?: string;
+			theme: RemarkTheme;
 		} = {
 			baseurl: this.props.baseurl || "https://remark42.radio-t.com",
 			site_id: this.props.site_id,
+			theme: this.props.theme || "light",
 		};
 
 		if (!remark_config.site_id) {
@@ -122,6 +138,11 @@ export default class Remark extends Component<Props> {
 			}
 		};
 
+		this.changeTheme = function(theme) {
+			iframe.contentWindow &&
+				iframe.contentWindow.postMessage(JSON.stringify({ theme }), "*");
+		};
+
 		window.addEventListener("message", this.receiveMessages);
 		window.addEventListener("hashchange", this.postHashToIframe);
 		document.addEventListener("click", this.postClickOutsideToIframe);
@@ -164,6 +185,7 @@ export default class Remark extends Component<Props> {
             transition: transform 0.4s ease-out;
             max-width: 100%;
             transform: translate(400px, 0);
+						z-index: 4;
           }
           #${remarkRootId}-node[data-animation] {
             transform: translate(0, 0);
@@ -177,6 +199,7 @@ export default class Remark extends Component<Props> {
             background: rgba(0,0,0,0.7);
             opacity: 0;
             transition: opacity 0.4s ease-out;
+						z-index: 3;
           }
           #${remarkRootId}-back[data-animation] {
             opacity: 1;
@@ -194,6 +217,7 @@ export default class Remark extends Component<Props> {
             padding: 0;
             margin-right: 4px;
             background-color: transparent;
+						z-index: 4;
           }
           @media all and (max-width: 430px) {
             #${remarkRootId}-close {
@@ -236,7 +260,8 @@ export default class Remark extends Component<Props> {
         title="Remark42"
         verticalscrolling="no"
         horizontalscrolling="no"
-      />`;
+					/>
+				`;
 				this.iframe = this.node.querySelector("iframe");
 				this.node.appendChild(this.closeEl);
 				document.body.appendChild(this.style);
@@ -305,5 +330,10 @@ export default class Remark extends Component<Props> {
 		window.removeEventListener("message", this.receiveMessages!);
 		window.removeEventListener("hashchange", this.postHashToIframe!);
 		document.removeEventListener("click", this.postClickOutsideToIframe!);
+	}
+	componentDidUpdate(prevProps: Props) {
+		if (prevProps.theme !== this.props.theme) {
+			this.changeTheme && this.changeTheme(this.props.theme || "light");
+		}
 	}
 }

@@ -4,7 +4,7 @@ import "whatwg-fetch";
 import "./ganalitics";
 
 import { render } from "react-dom";
-import { store, setState, setTheme } from "./store";
+import { State as StoreState, store, setState, setTheme } from "./store";
 import {
 	addNotification,
 	removeNotificationsWithContext,
@@ -82,9 +82,7 @@ async function main() {
 		console.error(e);
 	}
 
-	const CApp = connect(state => {
-		return state;
-	})(App);
+	const CApp = connect((state: StoreState) => state)(App);
 
 	await loginViaStorage().then(isAdmin => {
 		setState({ isAdmin });
