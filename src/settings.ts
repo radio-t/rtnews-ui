@@ -1,5 +1,6 @@
 import { NOW, DAY, MONTH, MINUTE } from "./constants";
 import { Article } from "./articleInterface";
+import { getNextShowDate } from "./utils";
 
 // via webpack define plugin
 declare var APIROOT: string;
@@ -35,33 +36,14 @@ export const newsCacheValidInterval: number | null = 5;
 export const activeArticleID = "active-article";
 
 /**
- * defines max show duration in ms, six hours
+ * Defines max show duration in ms, six hours
  */
 export const maxShowDuration = 1000 * 60 * 60 * 6;
 
 /**
- * Definas start date of next show
+ * Defines start date of the next show
  */
-export const showStartTime: Date = (() => {
-	const d = new Date();
-	const dow = d.getUTCDay();
-	switch (dow) {
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-			d.setUTCDate(d.getUTCDate() + (5 - dow));
-			break;
-		case 5:
-			break;
-		case 6:
-			d.setUTCDate(d.getUTCDate() + 6);
-			break;
-	}
-	d.setUTCHours(20, 0, 0, 0);
-	return d;
-})();
+export const showStartTime = getNextShowDate();
 
 /**
  * Defines interval from showStartTime when
