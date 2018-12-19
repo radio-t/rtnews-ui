@@ -12,7 +12,7 @@ module.exports = (a, args) => {
 			: "https://news.radio-t.com/api/v1");
 
 	return {
-		entry: "./main.jsx",
+		entry: "./main.tsx",
 		context: path.resolve(__dirname, "src"),
 		output: {
 			path: path.resolve(__dirname, "public"),

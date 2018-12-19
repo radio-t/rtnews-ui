@@ -62,8 +62,8 @@ interface History {
 
 type Props = {
 	issueNumber: {
-		link?: string;
 		number: number;
+		link: string | null;
 	} | null;
 	isAdmin: boolean;
 	activeId: string | null;

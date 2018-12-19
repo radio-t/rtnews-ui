@@ -8,6 +8,8 @@ import {
 	remark,
 } from "./settings";
 import { getArticleBySlug } from "./api";
+import { connect } from "react-redux";
+import { State as StoreState } from "./store";
 
 import ArticleControls, { ControlID, ChangeID } from "./articleControls";
 import { Link } from "react-router-dom";
@@ -24,6 +26,14 @@ import { Article } from "./articleInterface";
 import Remark from "./remark";
 import UpdateIfVisible from "./visibilityDependant";
 import Draggable from "./draggable";
+
+const RemarkWithTheme = connect(
+	(state: StoreState): { theme: "light" | "dark" } => {
+		return {
+			theme: state.theme === "day" ? "light" : "dark",
+		};
+	}
+)(Remark);
 
 type ArticleBriefBasicProps = {
 	article: Article;
@@ -190,7 +200,7 @@ class ArticleBriefBasic extends Component<
 							<div className="post__full-content" key="fulltext">
 								{prepTopicsReg.test(this.props.article.origlink) ? (
 									<div className="article-content post__full-content-content post__remark-comments">
-										<Remark
+										<RemarkWithTheme
 											baseurl={remark.baseurl}
 											site_id="radiot"
 											id="to-comments"

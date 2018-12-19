@@ -25,20 +25,18 @@ import Feeds from "./feeds";
 import LoginForm from "./login";
 import NotFound from "./notFound";
 import { Notifications } from "./notifications";
-import { Notification } from "./notificationInterface";
 
 import { listingRef } from "./references";
 import { ThemeType } from "./themeInterface";
 
 type AppProps = {
 	issueNumber: {
-		link?: string;
 		number: number;
+		link: string | null;
 	} | null;
 	isAdmin: boolean;
 	activeId: null | string;
 	theme: ThemeType;
-	notifications: Notification[];
 };
 
 export default class App extends Component<AppProps> {
