@@ -244,3 +244,24 @@ export function intervalToString(interval: number): string {
 		"0"
 	)}`;
 }
+
+export function getNextShowDate(from: Date = new Date()): Date {
+	const d = new Date(from);
+	d.setUTCHours(20, 0, 0, 0);
+	const dow = d.getUTCDay();
+	switch (dow) {
+		case 0:
+			d.setUTCDate(d.getUTCDate() + 6);
+			break;
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			d.setUTCDate(d.getUTCDate() + (6 - dow));
+			break;
+		case 6:
+			break;
+	}
+	return d;
+}

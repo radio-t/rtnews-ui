@@ -8,6 +8,7 @@ import {
 	toServerTime,
 	fromServerTime,
 	intervalToString,
+	getNextShowDate,
 } from "./utils";
 
 describe("first", () => {
@@ -101,4 +102,34 @@ describe("intervalToString", () => {
 		expect(intervalToString(3 * 60 * 1000)).toBe("00:03:00");
 		expect(intervalToString((72 * 60 + 25) * 1000)).toBe("01:12:25");
 	});
+});
+
+describe("getNextShowDate", () => {
+	const cases: [string, string][] = [
+		["2018-04-10", "2018-04-14"],
+		["2018-09-06", "2018-09-08"],
+		["2018-12-07", "2018-12-08"],
+		["2018-12-08", "2018-12-08"],
+		["2018-12-16", "2018-12-22"],
+		["2018-12-17", "2018-12-22"],
+		["2018-12-18", "2018-12-22"],
+		["2018-12-19", "2018-12-22"],
+		["2018-12-20", "2018-12-22"],
+		["2018-12-21", "2018-12-22"],
+		["2018-12-22", "2018-12-22"],
+		["2019-01-02", "2019-01-05"],
+		["2019-02-13", "2019-02-16"],
+	];
+	for (const [date, result] of cases) {
+		test(date, async () => {
+			const d = getNextShowDate(new Date(date + " 10:10:10+000"));
+			expect(d.toISOString().substr(0, 19)).toBe(result + "T20:00:00");
+
+			const nt = getNextShowDate(new Date(date + " 22:10:10+000"));
+			expect(nt.toISOString().substr(0, 19)).toBe(result + "T20:00:00");
+
+			const lt = getNextShowDate(new Date(date + " 03:10:10+180"));
+			expect(lt.toISOString().substr(0, 19)).toBe(result + "T20:00:00");
+		});
+	}
 });
