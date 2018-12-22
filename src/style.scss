@@ -1045,10 +1045,14 @@ p {
 		position: relative;
 		z-index: 2;
 		margin-top: 0.6rem;
-		background: rgba(0, 0, 0, 0.03);
+		background-color: rgba(0, 0, 0, 0.03);
 
 		display: flex;
 		flex-direction: row;
+
+		.post-active & {
+			background: transparentize($color: #fff, $amount: 0.34);
+		}
 	}
 
 	&__full-content .loading {
@@ -1240,7 +1244,9 @@ p {
 /* NIGHT THEME */
 
 html[data-theme="night"] {
-	background: hsl(40, 10%, 12%);
+	$backgoundColor: hsl(40, 10%, 12%);
+	$activeBackgroundColor: hsla(40, 90%, 90%, 0.2);
+	background-color: $backgoundColor;
 	color: #ddd;
 
 	a,
@@ -1278,7 +1284,7 @@ html[data-theme="night"] {
 	}
 
 	.sorter__item-current {
-		background: hsla(40, 90%, 90%, 0.2);
+		background-color: $activeBackgroundColor;
 	}
 
 	/* add-form-overlay */
@@ -1339,12 +1345,12 @@ html[data-theme="night"] {
 	@media (hover: hover) {
 		.listing-actions__news-recent-button:hover,
 		.listing-actions__news-recent-button:focus {
-			background: hsla(200, 60%, 60%, 0.2);
+			background-color: hsla(200, 60%, 60%, 0.2);
 		}
 
 		.listing-actions__news-recent-button-active:hover,
 		.listing-actions__news-recent-button-active:focus {
-			background: hsla(200, 60%, 60%, 0.7);
+			background-color: hsla(200, 60%, 60%, 0.7);
 		}
 	}
 
@@ -1361,7 +1367,7 @@ html[data-theme="night"] {
 	/* post */
 
 	.post-active {
-		background: hsla(40, 90%, 90%, 0.2);
+		background-color: hsla(40, 90%, 90%, 0.2);
 	}
 
 	.post__title-link {
@@ -1375,22 +1381,28 @@ html[data-theme="night"] {
 	}
 
 	.post__full-content {
-		background: rgba(255, 255, 255, 0.23);
+		background-color: rgba(255, 255, 255, 0.15);
+		box-shadow: 0px 0px 2px #000;
 	}
 
 	.post__full-content-hide {
 		color: rgba(255, 255, 255, 0.2);
-		background: rgba(255, 255, 255, 0.13);
+		background-color: rgba(255, 255, 255, 0.13);
 	}
 
 	.post__full-content-hide:hover {
-		background: rgba(255, 255, 255, 0.26);
+		background-color: rgba(255, 255, 255, 0.26);
+	}
+
+	.post-active .post__full-content {
+		background-color: transparentize($color: $backgoundColor, $amount: 0.2);
+		box-shadow: none;
 	}
 
 	/* article */
 
 	.article__snippet {
-		background: hsla(40, 60%, 90%, 0.2);
+		background-color: hsla(40, 60%, 90%, 0.2);
 	}
 
 	/* drop */
@@ -1403,12 +1415,12 @@ html[data-theme="night"] {
 
 	/* touch-drag */
 	.touch-drag-item__start {
-		background: rgba(0, 0, 0, 0);
+		background-color: rgba(0, 0, 0, 0);
 	}
 
 	.touch-drag-item {
 		box-shadow: none;
-		background: hsla(200, 70%, 80%, 0.5);
+		background-color: hsla(200, 70%, 80%, 0.5);
 	}
 
 	.touch-drag-target-top {
