@@ -90,7 +90,9 @@ export default class App extends Component<AppProps> {
 								exact={true}
 								render={() => (
 									<ScrollContext>
-										<ArchiveListingWithAutoUpdate />
+										<ArchiveListingWithAutoUpdate
+											isAdmin={this.props.isAdmin}
+										/>
 									</ScrollContext>
 								)}
 							/>
