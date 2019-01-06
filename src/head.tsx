@@ -23,7 +23,13 @@ import {
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
 import TimeFrom from "./timefrom";
-import { sleep, scrollIntoView, waitFor, formatDate } from "./utils";
+import {
+	sleep,
+	scrollIntoView,
+	waitFor,
+	formatDate,
+	getRussianMonth,
+} from "./utils";
 import { getListingInstance } from "./references";
 
 // @ts-ignore
@@ -314,6 +320,13 @@ export default class Head extends Component<Props, State> {
 		if (promptResult === null) return;
 		let offset = parseInt(promptResult, 10);
 
+		const getTodayDate = (): string => {
+			const now = new Date();
+			return `${now.getUTCDate()} ${getRussianMonth(
+				now.getUTCMonth()
+			).toLocaleLowerCase()} ${now.getUTCFullYear()} года`;
+		};
+
 		const starter =
 			offset === 0
 				? startShow
@@ -331,8 +344,15 @@ export default class Head extends Component<Props, State> {
 			.then(async () => {
 				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
-					data: <b>Шоу началось</b>,
+					data: (
+						<div>
+							<b>Шоу началось</b>
+							<br />
+							<span>{getTodayDate()}</span>
+						</div>
+					),
 					context: ShowStartNotificationcontext,
+					time: 20000,
 				});
 				this.setState({
 					showStartTime: await getShowStartTimeWithMaxDuration(),
@@ -342,9 +362,16 @@ export default class Head extends Component<Props, State> {
 				console.error(e);
 				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
-					data: <b>Ошибка при старте шоу</b>,
+					data: (
+						<div>
+							<b>Ошибка при старте шоу</b>
+							<br />
+							<span>{getTodayDate()}</span>
+						</div>
+					),
 					context: ShowStartNotificationcontext,
 					level: "error",
+					time: 20000,
 				});
 			});
 	}
