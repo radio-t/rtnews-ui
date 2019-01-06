@@ -32,6 +32,8 @@ import SVGInline from "react-svg-inline";
 import MoonIcon from "./static/svg/moon.svg";
 // @ts-ignore
 import SunIcon from "./static/svg/sun.svg";
+// @ts-ignore
+import RSSIcon from "./static/svg/rss.svg";
 import { ThemeType } from "./themeInterface";
 
 const setTheme = (v: ThemeType) => {
@@ -162,6 +164,14 @@ export default class Head extends Component<Props, State> {
 							Архив
 						</NavLink>
 					</li>
+					{!this.props.isAdmin && (
+						<li className="navigation__item navigation__rss">
+							<a href="/rss">
+								РСС
+								<SVGInline svg={RSSIcon} className="navigation__rss-icon" />
+							</a>
+						</li>
+					)}
 					{this.props.isAdmin && [
 						<li className="navigation__item navigation__item_admin">
 							<NavLink

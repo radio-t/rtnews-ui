@@ -465,6 +465,22 @@ p {
 		float: right;
 	}
 
+	&__rss {
+		letter-spacing: 0.1em;
+
+		&-icon-svg {
+			height: 0.8em;
+			width: 0.8em;
+			vertical-align: -0.04em;
+			margin-left: 0.15em;
+		}
+
+		@media screen and (min-width: 30rem) {
+			float: right;
+			margin-right: 0 !important;
+		}
+	}
+
 	&__scroll-toggle {
 		vertical-align: -0.02em;
 		color: hsla(200, 0%, 40%, 0.5);
