@@ -43,7 +43,7 @@ export default class TimeFrom extends PureComponent<Props> {
 	}
 	render() {
 		return (
-			<div
+			<span
 				id={this.props.id || ""}
 				ref={ref => (this.root = ref!)}
 				title={this.props.title || undefined}
