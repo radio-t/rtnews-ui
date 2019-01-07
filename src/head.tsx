@@ -23,7 +23,13 @@ import {
 import { Link, NavLink, Route } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
 import TimeFrom from "./timefrom";
-import { sleep, scrollIntoView, waitFor, formatDate } from "./utils";
+import {
+	sleep,
+	scrollIntoView,
+	waitFor,
+	formatDate,
+	getRussianMonth,
+} from "./utils";
 import { getListingInstance } from "./references";
 
 // @ts-ignore
@@ -32,6 +38,8 @@ import SVGInline from "react-svg-inline";
 import MoonIcon from "./static/svg/moon.svg";
 // @ts-ignore
 import SunIcon from "./static/svg/sun.svg";
+// @ts-ignore
+import RSSIcon from "./static/svg/rss.svg";
 import { ThemeType } from "./themeInterface";
 
 const setTheme = (v: ThemeType) => {
@@ -241,6 +249,17 @@ export default class Head extends Component<Props, State> {
 						)}
 					/>
 					{!this.props.isAdmin && (
+						<li className="navigation__item navigation__rss">
+							<a
+								href="/rss"
+								className="navigation__rss-link"
+								title="Фид новостей"
+							>
+								<SVGInline svg={RSSIcon} className="navigation__rss-icon" />
+							</a>
+						</li>
+					)}
+					{!this.props.isAdmin && (
 						<ThemeSwitchButton theme={this.props.theme} />
 					)}
 				</ul>
@@ -304,6 +323,13 @@ export default class Head extends Component<Props, State> {
 		if (promptResult === null) return;
 		let offset = parseInt(promptResult, 10);
 
+		const getTodayDate = (): string => {
+			const now = new Date();
+			return `${now.getUTCDate()} ${getRussianMonth(
+				now.getUTCMonth()
+			).toLocaleLowerCase()} ${now.getUTCFullYear()} года`;
+		};
+
 		const starter =
 			offset === 0
 				? startShow
@@ -321,8 +347,15 @@ export default class Head extends Component<Props, State> {
 			.then(async () => {
 				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
-					data: <b>Шоу началось</b>,
+					data: (
+						<div>
+							<b>Шоу началось</b>
+							<br />
+							<span>{getTodayDate()}</span>
+						</div>
+					),
 					context: ShowStartNotificationcontext,
+					time: 20000,
 				});
 				this.setState({
 					showStartTime: await getShowStartTimeWithMaxDuration(),
@@ -332,9 +365,16 @@ export default class Head extends Component<Props, State> {
 				console.error(e);
 				removeNotificationsWithContext(ShowStartNotificationcontext);
 				addNotification({
-					data: <b>Ошибка при старте шоу</b>,
+					data: (
+						<div>
+							<b>Ошибка при старте шоу</b>
+							<br />
+							<span>{getTodayDate()}</span>
+						</div>
+					),
 					context: ShowStartNotificationcontext,
 					level: "error",
+					time: 20000,
 				});
 			});
 	}
