@@ -172,8 +172,8 @@ export default class Head extends Component<Props, State> {
 					</li>
 					{!this.props.isAdmin && (
 						<li className="navigation__item navigation__rss">
-							<a href="/rss">
-								РСС
+							<a href="/rss" title="Подписаться на фид новостей">
+								RSS
 								<SVGInline svg={RSSIcon} className="navigation__rss-icon" />
 							</a>
 						</li>
