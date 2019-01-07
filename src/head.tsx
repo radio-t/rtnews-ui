@@ -170,14 +170,6 @@ export default class Head extends Component<Props, State> {
 							Архив
 						</NavLink>
 					</li>
-					{!this.props.isAdmin && (
-						<li className="navigation__item navigation__rss">
-							<a href="/rss" title="Подписаться на фид новостей">
-								RSS
-								<SVGInline svg={RSSIcon} className="navigation__rss-icon" />
-							</a>
-						</li>
-					)}
 					{this.props.isAdmin && [
 						<li className="navigation__item navigation__item_admin">
 							<NavLink
@@ -256,6 +248,17 @@ export default class Head extends Component<Props, State> {
 							</li>
 						)}
 					/>
+					{!this.props.isAdmin && (
+						<li className="navigation__item navigation__rss">
+							<a
+								href="/rss"
+								className="navigation__rss-link"
+								title="Фид новостей"
+							>
+								<SVGInline svg={RSSIcon} className="navigation__rss-icon" />
+							</a>
+						</li>
+					)}
 					{!this.props.isAdmin && (
 						<ThemeSwitchButton theme={this.props.theme} />
 					)}

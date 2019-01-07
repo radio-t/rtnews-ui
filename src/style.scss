@@ -27,6 +27,7 @@ a,
 .pseudo {
 	color: hsla(200, 90%, 30%, 1);
 	fill: hsla(200, 90%, 30%, 1);
+	stroke: hsla(200, 90%, 30%, 1);
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
 	border-bottom-color: hsla(200, 50%, 30%, 0.3);
@@ -44,6 +45,7 @@ a:hover,
 .pseudo:hover {
 	color: #e05020;
 	fill: #e05020;
+	stroke: #e05020;
 	border-bottom-color: rgba(224, 80, 32, 0.9);
 	transition: color 0s, border-bottom-color 0s;
 }
@@ -466,13 +468,14 @@ p {
 	}
 
 	&__rss {
-		letter-spacing: 0.04em;
-
 		&-icon-svg {
-			height: 0.8em;
-			width: 0.8em;
-			vertical-align: -0.04em;
-			margin-left: 0.15em;
+			height: 1em;
+			width: 1em;
+			vertical-align: middle;
+		}
+
+		&-link {
+			border: none;
 		}
 
 		@media screen and (min-width: 30rem) {
@@ -1269,6 +1272,7 @@ html[data-theme="night"] {
 	.pseudo {
 		color: hsla(200, 60%, 60%, 1);
 		fill: hsla(200, 60%, 60%, 1);
+		stroke: hsla(200, 60%, 60%, 1);
 		border-bottom-color: hsla(200, 60%, 60%, 0.6);
 	}
 
@@ -1276,6 +1280,7 @@ html[data-theme="night"] {
 	.pseudo:hover {
 		color: rgba(224, 80, 72, 1);
 		fill: rgba(224, 80, 72, 1);
+		stroke: rgba(224, 80, 72, 1);
 		border-bottom-color: rgba(224, 80, 72, 0.4);
 	}
 
