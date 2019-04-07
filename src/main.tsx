@@ -2,6 +2,7 @@ import "./style.scss";
 import "intersection-observer";
 import "whatwg-fetch";
 import "./ganalitics";
+import "./patchPreactContext";
 
 import { render } from "react-dom";
 import { State as StoreState, store, setState, setTheme } from "./store";
