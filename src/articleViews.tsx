@@ -146,6 +146,7 @@ class ArticleBriefBasic extends Component<
 						className="post__original-link"
 						href={this.props.article.origlink}
 						title={this.props.article.origlink}
+						target="_blank"
 					>
 						{this.props.article.domain}
 					</a>
