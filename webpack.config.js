@@ -4,6 +4,33 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
+const babelLoader = {
+	loader: "babel-loader",
+	options: {
+		plugins: ["@babel/plugin-syntax-dynamic-import"],
+		presets: [
+			[
+				"@babel/preset-env",
+				{
+					useBuiltIns: "usage",
+					modules: false,
+					targets: {
+						ie: "11",
+					},
+					corejs: 3,
+				},
+			],
+			[
+				"@babel/preset-react",
+				{
+					pragma: "createElement",
+					pragmaFrag: '"div"',
+				},
+			],
+		],
+	},
+};
+
 module.exports = (a, args) => {
 	const APIROOT =
 		process.env.RTHOST ||
@@ -24,99 +51,14 @@ module.exports = (a, args) => {
 		module: {
 			rules: [
 				{
-					test: /\.js$/,
+					test: /\.jsx?$/,
 					exclude: /node_modules/,
-					use: {
-						loader: "babel-loader",
-						options: {
-							plugins: ["@babel/plugin-syntax-dynamic-import"],
-							presets: [
-								[
-									"@babel/preset-env",
-									{
-										useBuiltIns: "usage",
-										modules: false,
-									},
-								],
-							],
-						},
-					},
+					use: babelLoader,
 				},
 				{
-					test: /\.ts$/,
+					test: /\.tsx?$/,
 					exclude: /node_modules/,
-					use: [
-						{
-							loader: "babel-loader",
-							options: {
-								plugins: ["@babel/plugin-syntax-dynamic-import"],
-								presets: [
-									[
-										"@babel/preset-env",
-										{
-											useBuiltIns: "usage",
-											modules: false,
-										},
-									],
-								],
-							},
-						},
-						"ts-loader",
-					],
-				},
-				{
-					test: /\.jsx$/,
-					exclude: /node_modules/,
-					use: {
-						loader: "babel-loader",
-						options: {
-							plugins: ["@babel/plugin-syntax-dynamic-import"],
-							presets: [
-								[
-									"@babel/preset-env",
-									{
-										useBuiltIns: "usage",
-										modules: false,
-										targets: {
-											ie: "11",
-										},
-									},
-								],
-								[
-									"@babel/preset-react",
-									{
-										pragma: "createElement",
-										pragmaFrag: '"div"',
-									},
-								],
-							],
-						},
-					},
-				},
-				{
-					test: /\.tsx$/,
-					exclude: /node_modules/,
-					use: [
-						{
-							loader: "babel-loader",
-							options: {
-								plugins: ["@babel/plugin-syntax-dynamic-import"],
-								presets: [
-									[
-										"@babel/preset-env",
-										{
-											useBuiltIns: "usage",
-											modules: false,
-											targets: {
-												ie: "11",
-											},
-										},
-									],
-								],
-							},
-						},
-						"ts-loader",
-					],
+					use: [babelLoader, "ts-loader"],
 				},
 				{
 					test: /\.css$/,
@@ -205,6 +147,6 @@ module.exports = (a, args) => {
 				},
 			},
 		},
-		devtool: false,
+		devtool: "source-map",
 	};
 };
