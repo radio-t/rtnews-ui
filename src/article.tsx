@@ -49,6 +49,7 @@ function ArticleHeader({ article }: { article: ArticleType }) {
 					className="post__original-link"
 					href={article.origlink}
 					title={article.origlink}
+					target="_blank"
 				>
 					{article.domain}
 				</a>
