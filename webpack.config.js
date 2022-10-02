@@ -32,11 +32,7 @@ const babelLoader = {
 };
 
 module.exports = (a, args) => {
-	const APIROOT =
-		process.env.RTHOST ||
-		(args.mode === "development"
-			? "http://jess.umputun.com:8780/api/v1"
-			: "https://news.radio-t.com/api/v1");
+	const APIROOT = process.env.RTHOST || "https://news.radio-t.com/api/v1";
 
 	return {
 		entry: "./main.tsx",

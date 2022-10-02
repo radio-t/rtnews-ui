@@ -8,11 +8,6 @@ export const apiRoot = APIROOT;
 
 export const postsPrefix = "/post";
 
-export const remark = {
-	baseurl: "https://remark42.radio-t.com",
-	site_id: "rtnews",
-};
-
 /**
  * now in ms
  */
@@ -54,7 +49,8 @@ export const showStartTimeDeadline = MINUTE * 15;
 /**
  * Matches if article origlink matches to listeners proposed topics url
  */
-export const prepTopicsReg = /^https?:\/\/radio-t.com\/p\/\d{4}\/\d{2}\/\d{2}\/prep-\d+\/?$/i;
+export const prepTopicsReg =
+	/^https?:\/\/radio-t.com\/p\/\d{4}\/\d{2}\/\d{2}\/prep-\d+\/?$/i;
 
 /**
  * needs for situation when dragging something
