@@ -3,12 +3,9 @@ import { PureComponent } from "react";
 import { formatDate, scrollIntoView, waitFor } from "./utils";
 import { getArticleBySlug, updateArticle } from "./api";
 import articleCache from "./articleCache";
-import { remark, prepTopicsReg } from "./settings";
+import { prepTopicsReg } from "./settings";
 import { Article as ArticleType } from "./articleInterface";
-import { connect } from "react-redux";
-import { State as StoreState } from "./store";
 
-import Remark from "./remark";
 import Loading from "./loading";
 import NotFound from "./notFound";
 import ErrorComponent from "./error";
@@ -20,14 +17,6 @@ import { Notification } from "./notificationInterface";
 import SVGInline from "react-svg-inline";
 // @ts-ignore
 import GearIcon from "./static/svg/gear.svg";
-
-const RemarkWithTheme = connect(
-	(state: StoreState): { theme: "light" | "dark" } => {
-		return {
-			theme: state.theme === "day" ? "light" : "dark",
-		};
-	}
-)(Remark);
 
 function ArticleHeader({ article }: { article: ArticleType }) {
 	return (
@@ -101,14 +90,14 @@ function ArticleFactory(editable: boolean = false) {
 		}
 		componentDidMount() {
 			getArticleBySlug(this.props.slug)
-				.then(article => {
+				.then((article) => {
 					if (article === null) {
 						throw new Error("Unknown article");
 					}
 					document.title = article.title + " | Новости Радио-Т";
 					this.setState({ article });
 				})
-				.catch(error => {
+				.catch((error) => {
 					this.setState({ error });
 				});
 
@@ -220,13 +209,6 @@ function ArticleFactory(editable: boolean = false) {
 				return (
 					<article className="article">
 						<ArticleHeader article={this.state.article} />
-						<RemarkWithTheme
-							baseurl={remark.baseurl}
-							site_id="radiot"
-							id="to-comments"
-							className="article__remark-comments"
-							url={this.state.article.origlink}
-						/>
 					</article>
 				);
 			}
@@ -332,7 +314,7 @@ function ArticleFactory(editable: boolean = false) {
 						<RichEditor
 							className="article__editor"
 							content={this.state.previewSnippet || ""}
-							ref={ref => (this.snippeteditor = ref)}
+							ref={(ref) => (this.snippeteditor = ref)}
 							placeholder="сниппет"
 							rich={false}
 						/>,
@@ -342,19 +324,11 @@ function ArticleFactory(editable: boolean = false) {
 						<RichEditor
 							className="article__editor"
 							content={this.state.previewContent || ""}
-							ref={ref => (this.editor = ref)}
+							ref={(ref) => (this.editor = ref)}
 							placeholder="контент"
 							rich={true}
 						/>,
 					]}
-					<hr className="article__break" />
-					<RemarkWithTheme
-						className="article__comments"
-						id="to-comments"
-						baseurl={remark.baseurl}
-						site_id={remark.site_id}
-						url={`https://news.radio-t.com/post/${this.state.article.slug}`}
-					/>
 				</article>
 			);
 		}

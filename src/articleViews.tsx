@@ -1,15 +1,8 @@
 import { Component } from "react";
 
 import { formatDate, scrollIntoView } from "./utils";
-import {
-	postsPrefix,
-	activeArticleID,
-	prepTopicsReg,
-	remark,
-} from "./settings";
+import { postsPrefix, activeArticleID } from "./settings";
 import { getArticleBySlug } from "./api";
-import { connect } from "react-redux";
-import { State as StoreState } from "./store";
 
 import ArticleControls, { ControlID, ChangeID } from "./articleControls";
 import { Link } from "react-router-dom";
@@ -23,17 +16,8 @@ import CommentsIcon from "./static/svg/i-comment.svg";
 // @ts-ignore
 import GearIcon from "./static/svg/gear.svg";
 import { Article } from "./articleInterface";
-import Remark from "./remark";
 import UpdateIfVisible from "./visibilityDependant";
 import Draggable from "./draggable";
-
-const RemarkWithTheme = connect(
-	(state: StoreState): { theme: "light" | "dark" } => {
-		return {
-			theme: state.theme === "day" ? "light" : "dark",
-		};
-	}
-)(Remark);
 
 type ArticleBriefBasicProps = {
 	article: Article;
@@ -79,10 +63,10 @@ class ArticleBriefBasic extends Component<
 		if (this.state.articleText !== null) return;
 		this.fetchLock = true;
 		getArticleBySlug(this.props.article.slug)
-			.then(article => {
+			.then((article) => {
 				this.setState({ articleText: article!.content! });
 			})
-			.catch(e => {
+			.catch((e) => {
 				this.setState({
 					articleText: "Не смог загрузить новость",
 				});
@@ -94,7 +78,7 @@ class ArticleBriefBasic extends Component<
 		return (
 			<article
 				key={this.props.article.id}
-				ref={ref => (this.mainElement = ref!)}
+				ref={(ref) => (this.mainElement = ref!)}
 				id={this.props.active ? activeArticleID : undefined}
 				className={
 					"post " +
@@ -103,14 +87,14 @@ class ArticleBriefBasic extends Component<
 			>
 				<div
 					className="post__drag-handle"
-					ref={ref => (this.dragHandle = ref!)}
+					ref={(ref) => (this.dragHandle = ref!)}
 					style={{ display: this.props.draggable ? "" : "none" }}
 				/>
 				{this.props.controls && (
 					<ArticleControls
 						className="post__controls"
 						controls={this.props.controls}
-						onChange={change =>
+						onChange={(change) =>
 							this.props.onChange && this.props.onChange(change)
 						}
 					/>
@@ -184,7 +168,7 @@ class ArticleBriefBasic extends Component<
 					<span
 						key="detailed"
 						className="pseudo post__detailed-link"
-						ref={ref => (this.detailedRef = ref)}
+						ref={(ref) => (this.detailedRef = ref)}
 						onClick={() => {
 							this.setState({ detailedExpanded: !this.state.detailedExpanded });
 							this.fetchArticle();
@@ -199,21 +183,10 @@ class ArticleBriefBasic extends Component<
 							</div>
 						) : (
 							<div className="post__full-content" key="fulltext">
-								{prepTopicsReg.test(this.props.article.origlink) ? (
-									<div className="article-content post__full-content-content post__remark-comments">
-										<RemarkWithTheme
-											baseurl={remark.baseurl}
-											site_id="radiot"
-											id="to-comments"
-											url={this.props.article.origlink}
-										/>
-									</div>
-								) : (
-									<div
-										className="article-content post__full-content-content"
-										dangerouslySetInnerHTML={{ __html: this.state.articleText }}
-									/>
-								)}
+								<div
+									className="article-content post__full-content-content"
+									dangerouslySetInnerHTML={{ __html: this.state.articleText }}
+								/>
 								<div
 									className="post__full-content-hide"
 									onClick={() => {
@@ -239,7 +212,7 @@ class ArticleBriefBasic extends Component<
 export const ArticleBrief = UpdateIfVisible(ArticleBriefBasic, ["active"]);
 
 export const DraggableArticleBrief = Draggable(
-	(ArticleBrief as unknown) as new (
+	ArticleBrief as unknown as new (
 		props: ArticleBriefBasicProps
 	) => ArticleBriefBasic,
 	"rtnews/article"
@@ -278,7 +251,7 @@ export class ArticleSortBasic extends Component<
 				this.props.article.geek ? "make-ungeek" : "make-geek",
 				"archive",
 				"remove",
-			].filter(x => x !== null) as ControlID[];
+			].filter((x) => x !== null) as ControlID[];
 		this.getPosition = () => this.props.article.position;
 		this.getData = () => this.props.article.id;
 	}
@@ -288,13 +261,13 @@ export class ArticleSortBasic extends Component<
 				className={
 					"sorter__item " + (this.props.active ? "sorter__item-current" : "")
 				}
-				ref={ref => (this.mainElement = ref!)}
+				ref={(ref) => (this.mainElement = ref!)}
 			>
 				<div className="sorter__item-content">
 					<ArticleControls
 						className="sorter__item-controls"
 						controls={this.controls()}
-						onChange={change =>
+						onChange={(change) =>
 							this.props.onChange && this.props.onChange(change)
 						}
 					/>
@@ -345,7 +318,7 @@ export class ArticleSortBasic extends Component<
 				</div>
 				<div
 					className="sorter__item-handle"
-					ref={ref => (this.dragHandle = ref!)}
+					ref={(ref) => (this.dragHandle = ref!)}
 				>
 					☰
 				</div>
@@ -355,7 +328,7 @@ export class ArticleSortBasic extends Component<
 }
 
 export const ArticleSort = Draggable(
-	(UpdateIfVisible(ArticleSortBasic, ["active"]) as unknown) as new (
+	UpdateIfVisible(ArticleSortBasic, ["active"]) as unknown as new (
 		props: ArticleSortBasicProps
 	) => ArticleSortBasic,
 	"rtnews/article"

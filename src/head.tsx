@@ -1,4 +1,4 @@
-import { Component, MouseEvent } from "react";
+import { Component } from "react";
 
 import {
 	logout,
@@ -14,22 +14,15 @@ import {
 } from "./notifications";
 import { Notification } from "./notificationInterface";
 import {
-	postsPrefix,
 	maxShowDuration,
 	showStartTime,
 	showStartTimeDeadline,
 } from "./settings";
 
-import { Link, NavLink, Route } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import LinkToCurrent from "./linkToCurrent";
 import TimeFrom from "./timefrom";
-import {
-	sleep,
-	scrollIntoView,
-	waitFor,
-	formatDate,
-	getRussianMonth,
-} from "./utils";
+import { sleep, waitFor, formatDate, getRussianMonth } from "./utils";
 import { getListingInstance } from "./references";
 
 // @ts-ignore
@@ -223,31 +216,6 @@ export default class Head extends Component<Props, State> {
 							</span>
 						</li>
 					)}
-					<Route
-						path={`${postsPrefix}/:slug`}
-						render={() => (
-							<li className="navigation__item navigation__item_to-comments">
-								<Link
-									to="#to-comments"
-									onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-										event.preventDefault();
-										const el = document.getElementById("to-comments");
-										if (!el) {
-											console.error("Comments node not found");
-											return;
-										}
-										scrollIntoView(el);
-										sleep(500).then(() => {
-											window.location.hash = "to-comments";
-										});
-									}}
-									className="pseudo navigation__item-link"
-								>
-									К комментариям
-								</Link>
-							</li>
-						)}
-					/>
 					{!this.props.isAdmin && (
 						<li className="navigation__item navigation__rss">
 							<a
@@ -288,7 +256,7 @@ export default class Head extends Component<Props, State> {
 								showStartTime.getTime() + showStartTimeDeadline &&
 							notification === null
 						) {
-							notification = addNotification(remove => ({
+							notification = addNotification((remove) => ({
 								data: (
 									<span>
 										Может{" "}
@@ -311,7 +279,7 @@ export default class Head extends Component<Props, State> {
 					}
 					if (notification) removeNotification(notification);
 				})
-				.catch(e => console.error(e));
+				.catch((e) => console.error(e));
 		}
 	}
 	protected logout() {
