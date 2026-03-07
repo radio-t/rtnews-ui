@@ -375,7 +375,7 @@ export class Listing extends BaseListing<ListingProps, ListingState> {
 				});
 				return;
 			}
-			const number = url.substr(url.length - 4, 3);
+			const number = url.substr(url.length - 5, 4);
 
 			const maxPosition = this.state.news.reduce(
 				(n, a) => Math.max(n, a.position),
