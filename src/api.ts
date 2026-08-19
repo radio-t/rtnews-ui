@@ -1,3 +1,5 @@
+import * as DOMPurify from "dompurify";
+
 import {
 	apiRoot,
 	sortings,
@@ -14,6 +16,69 @@ import { ThemeType } from "./themeInterface";
 
 const whitespaceRegex = /(\t|\s)+/g;
 const longWordRegex = /([^\s\\]{16})/gm;
+const softHyphen = "\u00AD";
+
+/**
+ * Feeds are third party content, so their html is sanitized before it
+ * reaches dangerouslySetInnerHTML. Css goes, both as an element and as
+ * an attribute, because either one can cover the page with content the
+ * feed controls. Target is kept because feeds use it for outgoing links
+ * and the hook below makes such links safe to open.
+ */
+const sanitizerConfig = {
+	ADD_ATTR: ["target"],
+	FORBID_ATTR: ["style"],
+	FORBID_TAGS: ["style"],
+};
+
+DOMPurify.addHook("afterSanitizeAttributes", node => {
+	if (!node.hasAttribute("target")) return;
+	// tagName is uppercase for html elements and lowercase for svg ones
+	if (node.tagName === "A") node.setAttribute("rel", "noopener noreferrer");
+	else node.removeAttribute("target");
+});
+
+/**
+ * Strips scripts, event handlers and unsafe urls from feed provided html
+ */
+export function sanitizeHTML(html: string): string {
+	return DOMPurify.sanitize(html, sanitizerConfig);
+}
+
+/**
+ * Empties everything a feed could put in href to run a script,
+ * leaving http and https links as they are
+ */
+export function safeLink(link: string): string {
+	try {
+		const protocol = new URL(link).protocol;
+		return protocol === "http:" || protocol === "https:" ? link : "";
+	} catch (e) {
+		return "";
+	}
+}
+
+/**
+ * Collapses whitespace and breaks up long words, leaving markup alone
+ */
+function hyphenateText(html: string): string {
+	const container = document.createElement("div");
+	container.innerHTML = html;
+	const walker = document.createTreeWalker(
+		container,
+		NodeFilter.SHOW_TEXT,
+		null,
+		false
+	);
+	let node = walker.nextNode();
+	while (node !== null) {
+		node.nodeValue = (node.nodeValue || "")
+			.replace(whitespaceRegex, " ")
+			.replace(longWordRegex, "$1" + softHyphen);
+		node = walker.nextNode();
+	}
+	return container.innerHTML;
+}
 
 export class ArticleParseError extends TypeError {}
 
@@ -22,9 +87,10 @@ function processArticle(article: ArticleInit): Article {
 		throw new ArticleParseError("Article type is wrong");
 	const output = { ...article } as Article;
 	if (output.hasOwnProperty("snippet")) {
-		output.snippet = output.snippet
-			.replace(whitespaceRegex, " ")
-			.replace(longWordRegex, "$1&shy;");
+		output.snippet = hyphenateText(sanitizeHTML(output.snippet));
+	}
+	if (typeof output.content === "string") {
+		output.content = sanitizeHTML(output.content);
 	}
 	if (output.hasOwnProperty("ts")) {
 		output.parsedts = Date.parse(output.ts);
@@ -34,6 +100,9 @@ function processArticle(article: ArticleInit): Article {
 	}
 	if (output.hasOwnProperty("activets")) {
 		output.parsedactivets = Date.parse(output.activets);
+	}
+	if (output.hasOwnProperty("origlink")) {
+		output.origlink = safeLink(output.origlink);
 	}
 	if (output.domain === "") {
 		try {

@@ -131,6 +131,7 @@ class ArticleBriefBasic extends Component<
 						href={this.props.article.origlink}
 						title={this.props.article.origlink}
 						target="_blank"
+						rel="noopener noreferrer"
 					>
 						{this.props.article.domain}
 					</a>

@@ -39,6 +39,7 @@ function ArticleHeader({ article }: { article: ArticleType }) {
 					href={article.origlink}
 					title={article.origlink}
 					target="_blank"
+					rel="noopener noreferrer"
 				>
 					{article.domain}
 				</a>
