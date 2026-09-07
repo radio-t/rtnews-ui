@@ -1,4 +1,4 @@
-FROM node:11-alpine AS build
+FROM node:24-alpine AS build
 COPY ./package.json ./package-lock.json ./webpack.config.js ./tsconfig.json ./jest.config.js /app/
 COPY ./@types /app/@types
 COPY ./testSetup /app/testSetup
