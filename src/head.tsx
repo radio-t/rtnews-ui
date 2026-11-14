@@ -47,11 +47,12 @@ function ThemeSwitchButton({ theme }: { theme: ThemeType }) {
 			title={
 				theme === "day" ? "Поставить ночную тему" : "Поставить дневную тему"
 			}
-			className="inline-button navigation__item navigation__theme-switcher"
+			type="button"
+			className="header__icon-button"
 		>
 			<SVGInline
 				svg={theme === "day" ? MoonIcon : SunIcon}
-				className="icon navigation__theme-switcher-icon"
+				className="header__theme-icon"
 			/>
 		</button>
 	);
@@ -93,146 +94,127 @@ export default class Head extends Component<Props, State> {
 		if (this.props.isAdmin) this.pollForShowStartTime();
 	}
 	render() {
+		const isAdmin = this.props.isAdmin;
+		const isLive = isAdmin && !!this.state.showStartTime;
 		return (
-			<div className="header wrapper page__header">
-				<h1 className="title header__title">
-					Новости для <span className="no-break">Радио-Т</span>
-					{this.props.issueNumber && (
-						<span className="header__issue-number">
-							{this.props.issueNumber.link ? (
-								<a href={this.props.issueNumber.link} title="Темы слушателей">
-									{this.props.issueNumber.number}
-								</a>
-							) : (
-								this.props.issueNumber.number
-							)}
-						</span>
-					)}
-					{this.props.isAdmin && this.state.showStartTime && (
-						<TimeFrom
-							className="header__show-start-counter"
-							from={this.state.showStartTime}
-							title={formatDate(this.state.showStartTime).replace(
-								"&nbsp;",
-								" "
-							)}
-						/>
-					)}
-				</h1>
-				<ul
-					className="navigation header__navigation"
-					role="navigation"
-					aria-label="Main navigation"
-				>
-					{this.props.isAdmin && (
-						<li className="navigation__item navigation__item_admin navigation__item_right navigation__item_logout">
-							<span
-								role="button"
-								className="pseudo navigation__item-link"
+			<header className="header page__header">
+				<div className="header__top">
+					<h1 className="title header__title">
+						Новости для <span className="no-break">Радио-Т</span>
+						{this.props.issueNumber && (
+							<span className="header__issue-number">
+								{this.props.issueNumber.link ? (
+									<a href={this.props.issueNumber.link} title="Темы слушателей">
+										{this.props.issueNumber.number}
+									</a>
+								) : (
+									this.props.issueNumber.number
+								)}
+							</span>
+						)}
+					</h1>
+					<div className="header__tools">
+						{isLive && (
+							<span className="header__live">
+								<TimeFrom
+									className="header__show-start-counter"
+									from={this.state.showStartTime!}
+									title={formatDate(this.state.showStartTime!).replace(
+										"&nbsp;",
+										" "
+									)}
+								/>
+							</span>
+						)}
+						{!isAdmin && (
+							<a
+								href="/rss"
+								className="header__icon-button header__rss"
+								title="Фид новостей"
+							>
+								<SVGInline svg={RSSIcon} className="header__rss-icon" />
+							</a>
+						)}
+						<ThemeSwitchButton theme={this.props.theme} />
+						{isAdmin && (
+							<button
+								type="button"
+								className="text-button header__logout"
 								onClick={() => this.logout()}
 							>
 								Выйти
-							</span>
-						</li>
-					)}
-					<li className="navigation__item navigation__item_user">
-						<NavLink to="/" exact={true} className="link navigation__item-link">
+							</button>
+						)}
+					</div>
+				</div>
+				<div className="header__bar">
+					<nav className="header__tabs" aria-label="Main navigation">
+						<NavLink to="/" exact={true} className="header__tab">
 							Все темы
 						</NavLink>
-					</li>
-					{this.props.isAdmin && (
-						<li
-							className="navigation__item navigation__item_admin"
-							id="dels-wrap"
-						>
-							<NavLink
-								to="/deleted/"
-								exact={true}
-								className="link navigation__item-link"
-							>
+						{isAdmin && (
+							<NavLink to="/deleted/" exact={true} className="header__tab">
 								Удалённые
 							</NavLink>
-						</li>
-					)}
-					<li className="navigation__item">
-						<NavLink
-							to="/archive/"
-							exact={true}
-							className="link navigation__item-link"
-						>
+						)}
+						<NavLink to="/archive/" exact={true} className="header__tab">
 							Архив
 						</NavLink>
-					</li>
-					{this.props.isAdmin && [
-						<li className="navigation__item navigation__item_admin">
+						{isAdmin && [
 							<NavLink
+								key="sort"
 								to="/sort/"
 								exact={true}
-								className="link navigation__item-link"
+								className="header__tab"
 								title="Сортировать Темы"
 							>
 								Сортировать
-							</NavLink>
-						</li>,
-						<li className="navigation__item navigation__item_admin">
+							</NavLink>,
 							<NavLink
+								key="feeds"
 								to="/feeds/"
 								exact={true}
-								className="link navigation__item-link"
+								className="header__tab"
 								title="Управление фидами"
 							>
 								Фиды
-							</NavLink>
-						</li>,
-						<li className="navigation__item navigation__item_admin">
-							<span
-								role="button"
-								className="pseudo navigation__item-link"
-								onClick={() => this.poehali()}
-							>
-								Поехали!
-							</span>
-						</li>,
-						<li className="navigation__item navigation__item_admin">
-							<span
-								role="button"
-								className="pseudo navigation__item-link"
-								onClick={() => this.startPrepTopics()}
-								title="Начать темы слушателей"
-							>
-								Темы слушателей
-							</span>
-						</li>,
-						<ThemeSwitchButton theme={this.props.theme} />,
-						<div className="navigation__separator" />,
-					]}
-					{this.props.activeId !== null && (
-						<li className="navigation__item navigation__item_to-current">
-							<span>
+							</NavLink>,
+						]}
+					</nav>
+					{(isAdmin || this.props.activeId !== null) && (
+						<div className="header__actions">
+							{isAdmin && [
+								<button
+									key="poehali"
+									type="button"
+									className={
+										"header__action " +
+										(isLive ? "" : "header__action-primary")
+									}
+									onClick={() => this.poehali()}
+								>
+									Поехали!
+								</button>,
+								<button
+									key="prep"
+									type="button"
+									className="header__action"
+									onClick={() => this.startPrepTopics()}
+									title="Начать темы слушателей"
+								>
+									Темы слушателей
+								</button>,
+							]}
+							{this.props.activeId !== null && (
 								<LinkToCurrent
 									title="К текущей теме"
-									className="pseudo navigation__item-link"
+									className="header__action"
 								/>
-							</span>
-						</li>
+							)}
+						</div>
 					)}
-					{!this.props.isAdmin && (
-						<li className="navigation__item navigation__rss">
-							<a
-								href="/rss"
-								className="navigation__rss-link"
-								title="Фид новостей"
-							>
-								<SVGInline svg={RSSIcon} className="navigation__rss-icon" />
-							</a>
-						</li>
-					)}
-					{!this.props.isAdmin && (
-						<ThemeSwitchButton theme={this.props.theme} />
-					)}
-				</ul>
-				<hr />
-			</div>
+				</div>
+			</header>
 		);
 	}
 	protected async pollForShowStartTime() {
