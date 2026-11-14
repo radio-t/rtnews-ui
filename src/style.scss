@@ -319,16 +319,6 @@ p {
 		font-size: 0.9em;
 		margin-right: 0.5em;
 	}
-
-	&__comments-link {
-		opacity: 0.4;
-		fill: rgba(0, 0, 0, 0.8);
-		white-space: nowrap;
-	}
-
-	&__comments-icon {
-		margin-right: 0;
-	}
 }
 
 /* loading */
@@ -1040,22 +1030,6 @@ p {
 		opacity: 0.8;
 	}
 
-	&__comments-link {
-		white-space: nowrap;
-	}
-
-	&__comments-link:not(:hover) {
-		border-bottom: none;
-		color: hsl(0, 0%, 50%);
-		fill: hsl(0, 0%, 50%);
-		border-bottom-color: hsla(0, 0%, 50%, 0.6);
-	}
-
-	&__comments-icon {
-		margin-right: 0.2em;
-		vertical-align: -0.15em;
-	}
-
 	&__original-link {
 		margin-right: 0.4em;
 	}
@@ -1129,10 +1103,6 @@ p {
 
 	&__break {
 		opacity: 0.3;
-	}
-
-	&__comments {
-		margin-top: 2rem;
 	}
 
 	&__edit-button-edit {
@@ -1301,11 +1271,6 @@ html[data-theme="night"] {
 
 	.header__show-start-counter {
 		opacity: 0.6;
-	}
-
-	.sorter__comments-link {
-		opacity: 0.7;
-		fill: rgba(255, 255, 255, 0.8);
 	}
 
 	.sorter__item-current {

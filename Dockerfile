@@ -12,7 +12,6 @@ RUN \
 
 
 FROM alpine
-COPY --from=build /app/public /var/www/webapp
-VOLUME ["/var/www/webapp"]
-CMD ["-c", "tail -f /dev/null"]
-ENTRYPOINT ["/bin/sh"]
+COPY --from=build /app/public /srv/webapp
+COPY --chmod=755 ./publish.sh /srv/publish.sh
+CMD ["/srv/publish.sh"]

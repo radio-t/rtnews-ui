@@ -78,13 +78,6 @@ export const sortings: Sorting[] = [
 			return a.parsedats > b.parsedats ? -1 : 1;
 		},
 	},
-	{
-		title: "По комментариям",
-		fn(a, b) {
-			if (a.comments === b.comments) return 0;
-			return a.comments > b.comments ? -1 : 1;
-		},
-	},
 ];
 
 export type PostRecentnessString = "Все" | "Свежие";

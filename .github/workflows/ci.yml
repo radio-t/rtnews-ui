@@ -1,0 +1,30 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v6
+
+      - name: build image, runs tests
+        run: |
+          docker build \
+            --label org.opencontainers.image.source=https://github.com/${{ github.repository }} \
+            -t ghcr.io/radio-t/rtnews-ui:master .
+
+      - name: push master image to ghcr.io
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "${GITHUB_TOKEN}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/radio-t/rtnews-ui:master
