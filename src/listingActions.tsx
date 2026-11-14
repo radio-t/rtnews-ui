@@ -31,13 +31,15 @@ export default class ListingActions extends Component<Props> {
 					<div className="listing-actions__filters">
 						{this.props.postRecentness && (
 							<button
+								type="button"
+								aria-pressed={this.props.postRecentness === postRecentness[1]}
 								className={
 									"listing-actions__news-recent-button " +
 									(this.props.postRecentness === postRecentness[1]
 										? "listing-actions__news-recent-button-active"
 										: "")
 								}
-								onMouseDown={() => {
+								onClick={() => {
 									const val =
 										this.props.postRecentness === postRecentness[0]
 											? postRecentness[1]
@@ -46,7 +48,7 @@ export default class ListingActions extends Component<Props> {
 										this.props.onRecentnessChange(val);
 								}}
 							>
-								<span style={{ borderBottom: "1px dashed" }}>Свежие</span>
+								Свежие
 							</button>
 						)}
 						<Select
@@ -67,58 +69,25 @@ export default class ListingActions extends Component<Props> {
 				)}
 				<div className="listing-actions__sortings">
 					<ul className="sortings-list">
-						{(this.props.sortings || sortings).map(x =>
-							x.title === this.props.sort.title ? (
-								<li
-									role="button"
-									className="sortings-list__item sortings-list__current-item"
-									key={x.title}
-								>
-									<label
-										className="sortings-list__item-content sortings-list__current-item-content"
-										tabIndex={0}
+						{(this.props.sortings || sortings).map(x => {
+							const current = x.title === this.props.sort.title;
+							return (
+								<li className="sortings-list__item" key={x.title}>
+									<button
+										type="button"
+										className="sortings-list__button"
+										aria-pressed={current}
+										onClick={() =>
+											!current &&
+											this.props.onSortingChange &&
+											this.props.onSortingChange(x)
+										}
 									>
-										<input
-											type="radio"
-											className="sortings-list__item-input"
-											checked={true}
-											name="post-sortings"
-											value={x.title}
-										/>
 										{x.title}
-									</label>
+									</button>
 								</li>
-							) : (
-								<li
-									role="button"
-									className="sortings-list__item"
-									onMouseDown={() =>
-										this.props.onSortingChange && this.props.onSortingChange(x)
-									}
-									key={x.title}
-								>
-									<label
-										className="sortings-list__item-content"
-										tabIndex={0}
-										onKeyPress={e => {
-											if (e.keyCode === 13) {
-												e.preventDefault();
-												this.props.onSortingChange &&
-													this.props.onSortingChange(x);
-											}
-										}}
-									>
-										<input
-											type="radio"
-											className="sortings-list__item-input"
-											name="post-sortings"
-											value={x.title}
-										/>
-										{x.title}
-									</label>
-								</li>
-							)
-						)}
+							);
+						})}
 					</ul>
 				</div>
 			</div>

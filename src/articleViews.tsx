@@ -43,7 +43,7 @@ class ArticleBriefBasic extends Component<
 	dragHandle?: HTMLElement;
 	getPosition: () => number;
 	getData: () => string;
-	protected detailedRef: HTMLSpanElement | null;
+	protected detailedRef: HTMLButtonElement | null;
 	constructor(props: any) {
 		super(props);
 		this.state = {
@@ -145,9 +145,11 @@ class ArticleBriefBasic extends Component<
 							dangerouslySetInnerHTML={{ __html: this.props.article.snippet }}
 						/>
 					</div>,
-					<span
+					<button
+						type="button"
 						key="detailed"
-						className="pseudo post__detailed-link"
+						className="text-button post__detailed-link"
+						aria-expanded={!!this.state.detailedExpanded}
 						ref={(ref) => (this.detailedRef = ref)}
 						onClick={() => {
 							this.setState({ detailedExpanded: !this.state.detailedExpanded });
@@ -155,7 +157,7 @@ class ArticleBriefBasic extends Component<
 						}}
 					>
 						{this.state.detailedExpanded ? "Скрыть" : "Подробнее"}
-					</span>,
+					</button>,
 					this.state.detailedExpanded &&
 						(this.state.articleText === null ? (
 							<div className="post__full-content" key="fulltext">

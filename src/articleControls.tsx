@@ -55,14 +55,14 @@ export default function ArticleControls(props: Props) {
 	return (
 		<div className={"post-controls " + (props.className || "")}>
 			{props.controls.map(c => (
-				<span
-					role="button"
+				<button
+					type="button"
 					className={"post-controls__control " + `post-controls__control-${c}`}
 					key={c}
 					onClick={() => props.onChange && props.onChange(c)}
 				>
 					{controls[c].title}
-				</span>
+				</button>
 			))}
 		</div>
 	);
