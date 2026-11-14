@@ -6,13 +6,10 @@ import { getArticleBySlug } from "./api";
 
 import ArticleControls, { ControlID, ChangeID } from "./articleControls";
 import { Link } from "react-router-dom";
-import { HashLink } from "react-router-hash-link";
 import Loading from "./loading";
 
 // @ts-ignore
 import SVGInline from "react-svg-inline";
-// @ts-ignore
-import CommentsIcon from "./static/svg/i-comment.svg";
 // @ts-ignore
 import GearIcon from "./static/svg/gear.svg";
 import { Article } from "./articleInterface";
@@ -141,23 +138,6 @@ class ArticleBriefBasic extends Component<
 							__html: formatDate(new Date(Date.parse(this.props.article.ats))),
 						}}
 					/>
-					{!this.props.archive && (
-						<HashLink
-							className="post__comments-link"
-							to={`${postsPrefix}/${this.props.article.slug}#to-comments`}
-							scroll={(el: HTMLElement) => {
-								window.setTimeout(() => {
-									scrollIntoView(el);
-								}, 500);
-							}}
-						>
-							<SVGInline
-								className="icon post__comments-icon"
-								svg={CommentsIcon}
-							/>
-							{this.props.article.comments}
-						</HashLink>
-					)}
 				</div>
 				{!this.props.archive && [
 					<div key="paragraph" className="post__snippet">
@@ -306,14 +286,6 @@ export class ArticleSortBasic extends Component<
 								),
 							}}
 						/>
-						<span className="sorter__comments-link">
-							<SVGInline
-								className="icon sorter__comments-icon"
-								svg={CommentsIcon}
-							/>
-							&nbsp;
-							{this.props.article.comments}
-						</span>
 					</div>
 				</div>
 				<div

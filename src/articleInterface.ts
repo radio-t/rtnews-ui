@@ -11,10 +11,6 @@ export type ArticleInit = {
 	ats: string;
 	author: string;
 	/**
-	 * number of comments
-	 */
-	comments: number;
-	/**
 	 * full article's content
 	 */
 	content?: string;
